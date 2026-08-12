@@ -795,11 +795,31 @@ select:focus-visible {
   text-transform: uppercase;
 }
 
-.player-stepper strong {
+.player-stepper input {
+  width: 100%;
+  min-height: 3.4rem;
+  border: 0;
+  padding: 0 .35rem;
   color: var(--ivory-50);
+  background: transparent;
   font-family: var(--font-numeric);
   font-size: 1.25rem;
   font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  text-align: center;
+  appearance: textfield;
+}
+
+.player-stepper input::-webkit-inner-spin-button,
+.player-stepper input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.player-stepper input:focus-visible {
+  outline: 2px solid var(--orange-400);
+  outline-offset: -3px;
+  box-shadow: inset 0 0 0 1px rgb(255 249 232 / 24%);
 }
 
 .icon-button {

@@ -109,4 +109,16 @@ describe('TournamentDisplay', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Open Tournament Director' }))
     expect(onOpenDirector).toHaveBeenCalledOnce()
   })
+
+  it('updates player statistics from the editable player count', async () => {
+    const user = userEvent.setup()
+    renderDisplay()
+    const input = screen.getByRole('spinbutton', { name: 'Players remaining' })
+
+    await user.clear(input)
+    await user.type(input, '53{Enter}')
+
+    expect(screen.getByText('53 / 80')).toBeVisible()
+    expect(screen.getByText('302')).toBeVisible()
+  })
 })

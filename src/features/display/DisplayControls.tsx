@@ -2,6 +2,7 @@ import type { Dispatch } from 'react'
 import type { TournamentState } from '../../domain/types'
 import { audioAlerts } from '../../services/audio'
 import type { TournamentAction } from '../../state/reducer'
+import { PlayerCountControl } from './PlayerCountControl'
 
 interface DisplayControlsProps {
   state: TournamentState
@@ -55,22 +56,12 @@ export function DisplayControls({
         </button>
       </div>
 
-      <div className="player-stepper" aria-label="Players remaining controls">
-        <button
-          onClick={() => dispatch({ type: 'ADJUST_PLAYERS', delta: -1 })}
-          disabled={state.runtime.playersRemaining <= 1}
-          aria-label="Eliminate player"
-        >−</button>
-        <div>
-          <span>Players</span>
-          <strong>{state.runtime.playersRemaining}</strong>
-        </div>
-        <button
-          onClick={() => dispatch({ type: 'ADJUST_PLAYERS', delta: 1 })}
-          disabled={state.runtime.playersRemaining >= state.configuration.startingPlayers}
-          aria-label="Restore player"
-        >+</button>
-      </div>
+      <PlayerCountControl
+        playersRemaining={state.runtime.playersRemaining}
+        startingPlayers={state.configuration.startingPlayers}
+        onSetPlayers={(players) => dispatch({ type: 'SET_PLAYERS', players })}
+        onAdjustPlayers={(delta) => dispatch({ type: 'ADJUST_PLAYERS', delta })}
+      />
 
       <div className="control-group control-group--utility">
         {fullscreenError && <span role="status" className="control-status">{fullscreenError}</span>}
