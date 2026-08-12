@@ -30,9 +30,12 @@ export function TournamentDisplay({
       <main className="display-grid">
         <section className="tournament-stage">
           <header className="brand-header">
-            <ClubLogo className="club-logo" size={56} />
+            <div className="club-mark">
+              <ClubLogo className="club-logo" size={64} />
+            </div>
             <div className="brand-copy">
-              <p>{state.configuration.organizationName}</p>
+              <p className="brand-eyebrow">Official Tournament Clock</p>
+              <p className="brand-organization">{state.configuration.organizationName}</p>
               <h1>{state.configuration.tournamentName}</h1>
             </div>
             <div className={running ? 'status-pill status-pill--live' : 'status-pill'}>
