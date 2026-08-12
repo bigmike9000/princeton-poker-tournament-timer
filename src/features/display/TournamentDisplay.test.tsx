@@ -58,10 +58,26 @@ describe('TournamentDisplay', () => {
 
     renderDisplay()
 
-    expect(screen.getAllByText('BREAK').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('BREAK · 10 MIN').length).toBeGreaterThan(0)
     expect(screen.getByRole('region', { name: 'Current break' })).toHaveTextContent('Chip up to 5s')
     expect(screen.getByText(/Next: Level 6/)).toBeVisible()
     expect(screen.getAllByText(/10 \/ 20/).length).toBeGreaterThan(0)
+  })
+
+  it('renders a generic break label once and opts its current schedule row into shortcuts', () => {
+    const state = createInitialState()
+    state.structure[5] = { ...state.structure[5], kind: 'break', durationSeconds: 600, label: 'Break' }
+    state.runtime.currentEntryIndex = 5
+    state.runtime.remainingMs = entryDurationMs(state.structure[5]) ?? 0
+    state.runtime.status = 'paused'
+    saveSnapshot(localStorage, state, Date.now())
+
+    renderDisplay()
+
+    const currentBreak = within(screen.getByRole('region', { name: 'Current break' }))
+    expect(currentBreak.getAllByText('BREAK · 10 MIN')).toHaveLength(1)
+    expect(currentBreak.queryByText('Break', { exact: true })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Break, 10 min' })).toHaveAttribute('data-tournament-shortcuts', 'true')
   })
 
   it('highlights the current structure row and lists completed levels', () => {
@@ -97,7 +113,7 @@ describe('TournamentDisplay', () => {
     expect(screen.queryByText(/Expected finish/)).not.toBeInTheDocument()
     expect(screen.queryByText(/^BB ante begins$/)).not.toBeInTheDocument()
     expect(screen.queryByText(/^Final level$/)).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Break Chip up to 5s, 10 min' })).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Break, 10 min, Chip up to 5s' })).toBeVisible()
     expect(screen.getByRole('button', {
       name: 'Level 13 100 / 200, BIG BLIND ANTE: 200, 15 min',
     })).toBeVisible()

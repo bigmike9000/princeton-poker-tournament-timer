@@ -11,8 +11,14 @@ function isEditableTarget(target: EventTarget | null): boolean {
   return ['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON'].includes(target.tagName)
 }
 
+function isScheduleShortcutTarget(target: EventTarget | null): boolean {
+  return target instanceof HTMLElement && target.closest('[data-tournament-shortcuts="true"]') !== null
+}
+
 export function shortcutForEvent(event: KeyboardEvent): TournamentShortcut | null {
-  if (event.metaKey || event.ctrlKey || event.altKey || isEditableTarget(event.target)) return null
+  if (event.metaKey || event.ctrlKey || event.altKey) return null
+  const scheduleKey = event.key === ' ' || event.key === 'ArrowRight' || event.key === 'ArrowLeft'
+  if (isEditableTarget(event.target) && !(scheduleKey && isScheduleShortcutTarget(event.target))) return null
 
   switch (event.key) {
     case ' ':

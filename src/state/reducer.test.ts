@@ -33,6 +33,49 @@ describe('tournamentReducer', () => {
     expect(state.runtime.status).toBe('running')
   })
 
+  it('does not reload the current break when that schedule entry is selected again', () => {
+    const state = createInitialState()
+    state.runtime.currentEntryIndex = 5
+    state.runtime.status = 'running'
+    state.runtime.remainingMs = 524_000
+    state.runtime.baselineAt = 10_000
+
+    const result = tournamentReducer(state, { type: 'GO_TO_ENTRY', index: 5, now: 20_000 })
+
+    expect(result).toBe(state)
+    expect(result.runtime.remainingMs).toBe(524_000)
+    expect(result.runtime.baselineAt).toBe(10_000)
+  })
+
+  it('pauses and resumes a running break at the exact resolved remainder', () => {
+    let state = createInitialState()
+    state = tournamentReducer(state, { type: 'GO_TO_ENTRY', index: 5, now: 1_000 })
+    state = tournamentReducer(state, { type: 'START', now: 1_000 })
+    state = tournamentReducer(state, { type: 'PAUSE', now: 16_250 })
+    expect(state.runtime).toMatchObject({ status: 'paused', remainingMs: 584_750, baselineAt: null })
+
+    state = tournamentReducer(state, { type: 'START', now: 40_000 })
+    expect(state.runtime).toMatchObject({ status: 'running', remainingMs: 584_750, baselineAt: 40_000 })
+  })
+
+  it('pauses an automatically entered break without reloading its duration', () => {
+    const state = createInitialState()
+    state.runtime.currentEntryIndex = 4
+    state.runtime.status = 'running'
+    state.runtime.remainingMs = 1_000
+    state.runtime.baselineAt = 20_000
+
+    const result = tournamentReducer(state, { type: 'PAUSE', now: 22_500 })
+
+    expect(result.runtime).toMatchObject({
+      currentEntryIndex: 5,
+      status: 'paused',
+      remainingMs: 598_500,
+      baselineAt: null,
+      transitionCause: null,
+    })
+  })
+
   it('resets the current entry to its configured duration', () => {
     const state = createInitialState()
     state.runtime.status = 'running'

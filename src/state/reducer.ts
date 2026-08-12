@@ -113,6 +113,7 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
     }
     case 'GO_TO_ENTRY': {
       const index = clamp(Math.round(action.index), 0, state.structure.length - 1)
+      if (index === state.runtime.currentEntryIndex) return state
       const running = state.runtime.status === 'running'
       const duration = entryDurationMs(state.structure[index])
       return {

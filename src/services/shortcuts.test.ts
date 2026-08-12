@@ -21,4 +21,14 @@ describe('shortcutForEvent', () => {
     expect(shortcutForEvent(keyEvent('ArrowRight', document.createElement('select')))).toBeNull()
     expect(shortcutForEvent(keyEvent('f', document.body, { metaKey: true }))).toBeNull()
   })
+
+  it('allows schedule navigation keys only on opted-in schedule buttons', () => {
+    const scheduleButton = document.createElement('button')
+    scheduleButton.dataset.tournamentShortcuts = 'true'
+
+    expect(shortcutForEvent(keyEvent(' ', scheduleButton))).toBe('toggle-running')
+    expect(shortcutForEvent(keyEvent('ArrowRight', scheduleButton))).toBe('next')
+    expect(shortcutForEvent(keyEvent('ArrowLeft', scheduleButton))).toBe('previous')
+    expect(shortcutForEvent(keyEvent('Enter', scheduleButton))).toBeNull()
+  })
 })

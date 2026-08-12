@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { formatChips } from '../../domain/calculations'
+import { breakPresentation } from '../../domain/breakPresentation'
 import { durationLabel } from '../../domain/structure'
 import type { TournamentState } from '../../domain/types'
 import { selectPokerLevelNumber } from '../../state/selectors'
@@ -34,9 +35,7 @@ export function BlindStructure({ state, onSelectEntry }: BlindStructureProps) {
             : current ? 'current' : 'upcoming'
 
           if (entry.kind === 'break') {
-            const duration = durationLabel(entry)
-            const rowLabel = `BREAK — ${duration.toUpperCase()}`
-            const buttonLabel = `Break ${entry.label}, ${duration}`
+            const presentation = breakPresentation(entry)
             return (
               <li
                 key={entry.id}
@@ -44,18 +43,19 @@ export function BlindStructure({ state, onSelectEntry }: BlindStructureProps) {
                 className={`structure-row structure-row--break structure-row--${rowState}`}
                 data-state={rowState}
                 aria-current={current ? 'step' : undefined}
-                aria-label={rowLabel}
+                aria-label={presentation.heading}
               >
                 <button
                   type="button"
                   className="structure-row-button"
-                  aria-label={buttonLabel}
+                  data-tournament-shortcuts="true"
+                  aria-label={presentation.accessibleLabel}
                   onClick={() => onSelectEntry(index)}
                 >
                   <span className="break-rule" aria-hidden="true" />
                   <span className="structure-break-copy">
-                    <strong>BREAK — {duration}</strong>
-                    <small>{entry.label}</small>
+                    <strong>{presentation.heading}</strong>
+                    {presentation.subtitle && <small>{presentation.subtitle}</small>}
                   </span>
                   <span className="break-rule" aria-hidden="true" />
                 </button>
@@ -82,6 +82,7 @@ export function BlindStructure({ state, onSelectEntry }: BlindStructureProps) {
               <button
                 type="button"
                 className="structure-row-button"
+                data-tournament-shortcuts="true"
                 aria-label={label}
                 onClick={() => onSelectEntry(index)}
               >
