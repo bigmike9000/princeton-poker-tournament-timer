@@ -32,86 +32,96 @@ export function StructureRow({
   }
 
   return (
-    <fieldset className={entry.kind === 'break' ? 'structure-editor-row structure-editor-row--break' : 'structure-editor-row'} aria-label={label}>
-      <legend>
+    <fieldset className={`structure-editor-row structure-editor-row--${entry.kind}`} aria-label={label}>
+      <legend className="structure-row-legend">
         <span className="entry-kind">{entry.kind === 'break' ? 'Break' : 'Poker level'}</span>
         <strong>{label}</strong>
       </legend>
-      <div className="row-order-actions">
-        <button type="button" aria-label="Move up" disabled={index === 0} onClick={() => onMove(-1)}>↑</button>
-        <button type="button" aria-label="Move down" disabled={index === total - 1} onClick={() => onMove(1)}>↓</button>
-        <button type="button" aria-label="Delete" className="delete-entry" onClick={onDelete}>×</button>
-      </div>
+      <div className="structure-row-grid">
+        <div className="structure-row-identity" aria-hidden="true">
+          <span className="entry-kind">{entry.kind === 'break' ? 'Break' : 'Poker level'}</span>
+          <strong>{label}</strong>
+        </div>
 
-      {entry.kind === 'level' ? (
-        <div className="structure-fields structure-fields--level">
-          <div className="structure-duration-field">
-            {entry.durationSeconds !== null && (
-              <label>
-                <span>Duration minutes</span>
-                <input aria-label="Duration minutes" type="number" min="1" step="1" value={entry.durationSeconds / 60} onChange={(event) => updateNumber('durationSeconds', String(Number(event.target.value) * 60))} />
-              </label>
-            )}
-            <label className="structure-until-end">
-              <input
-                type="checkbox"
-                checked={entry.durationSeconds === null}
-                onChange={(event) => onChange({ ...entry, durationSeconds: event.target.checked ? null : 900 })}
-              />
-              <span>Until end</span>
+        {entry.kind === 'level' ? (
+          <>
+            <div className="structure-cell structure-duration-field">
+              <span className="structure-cell-label">Duration minutes</span>
+              <div className="structure-duration-controls">
+                {entry.durationSeconds !== null && (
+                  <input aria-label="Duration minutes" type="number" min="1" step="1" value={entry.durationSeconds / 60} onChange={(event) => updateNumber('durationSeconds', String(Number(event.target.value) * 60))} />
+                )}
+                <label className="structure-until-end">
+                  <input
+                    type="checkbox"
+                    checked={entry.durationSeconds === null}
+                    onChange={(event) => onChange({ ...entry, durationSeconds: event.target.checked ? null : 900 })}
+                  />
+                  <span>Until end</span>
+                </label>
+              </div>
+              <FieldIssue field="durationSeconds" issues={issues} />
+            </div>
+            <label className="structure-cell structure-small-blind">
+              <span className="structure-cell-label">Small blind</span>
+              <input aria-label="Small blind" type="number" min="0" step="1" value={entry.smallBlind} onChange={(event) => updateNumber('smallBlind', event.target.value)} />
+              <FieldIssue field="smallBlind" issues={issues} />
             </label>
-            <FieldIssue field="durationSeconds" issues={issues} />
+            <label className="structure-cell structure-big-blind">
+              <span className="structure-cell-label">Big blind</span>
+              <input aria-label="Big blind" type="number" min="1" step="1" value={entry.bigBlind} onChange={(event) => updateNumber('bigBlind', event.target.value)} />
+              <FieldIssue field="bigBlind" issues={issues} />
+            </label>
+            <label className="structure-cell structure-ante">
+              <span className="structure-cell-label">Ante</span>
+              <input aria-label="Ante" type="number" min="0" step="1" value={entry.ante} onChange={(event) => updateNumber('ante', event.target.value)} />
+              <FieldIssue field="ante" issues={issues} />
+            </label>
+            <label className="structure-cell structure-ante-type">
+              <span className="structure-cell-label">Ante type</span>
+              <select
+                aria-label="Ante type"
+                value={entry.anteType}
+                onChange={(event) => {
+                  const anteType = event.target.value as typeof entry.anteType
+                  onChange({ ...entry, anteType, ante: anteType === 'none' ? 0 : Math.max(entry.ante, entry.bigBlind) })
+                }}
+              >
+                <option value="none">None</option>
+                <option value="traditional">Traditional ante</option>
+                <option value="big-blind">Big Blind Ante</option>
+              </select>
+            </label>
+            <label className="structure-cell structure-level-note">
+              <span className="structure-cell-label">Level note</span>
+              <input aria-label="Level note" value={entry.note ?? ''} maxLength={80} onChange={(event) => onChange({ ...entry, note: event.target.value })} />
+              <FieldIssue field="note" issues={issues} />
+            </label>
+          </>
+        ) : (
+          <>
+            <div className="structure-cell structure-duration-field">
+              <span className="structure-cell-label">Duration minutes</span>
+              <input aria-label="Duration minutes" type="number" min="1" step="1" value={entry.durationSeconds / 60} onChange={(event) => updateNumber('durationSeconds', String(Number(event.target.value) * 60))} />
+              <FieldIssue field="durationSeconds" issues={issues} />
+            </div>
+            <label className="structure-cell structure-break-label">
+              <span className="structure-cell-label">Break label</span>
+              <input aria-label="Break label" value={entry.label} maxLength={30} onChange={(event) => onChange({ ...entry, label: event.target.value })} />
+              <FieldIssue field="label" issues={issues} />
+            </label>
+          </>
+        )}
+
+        <div className="structure-cell structure-actions-cell">
+          <span className="structure-cell-label" aria-hidden="true">Actions</span>
+          <div className="row-order-actions">
+            <button type="button" aria-label="Move up" disabled={index === 0} onClick={() => onMove(-1)}>↑</button>
+            <button type="button" aria-label="Move down" disabled={index === total - 1} onClick={() => onMove(1)}>↓</button>
+            <button type="button" aria-label="Delete" className="delete-entry" onClick={onDelete}>×</button>
           </div>
-          <label>
-            <span>Small blind</span>
-            <input aria-label="Small blind" type="number" min="0" step="1" value={entry.smallBlind} onChange={(event) => updateNumber('smallBlind', event.target.value)} />
-            <FieldIssue field="smallBlind" issues={issues} />
-          </label>
-          <label>
-            <span>Big blind</span>
-            <input aria-label="Big blind" type="number" min="1" step="1" value={entry.bigBlind} onChange={(event) => updateNumber('bigBlind', event.target.value)} />
-            <FieldIssue field="bigBlind" issues={issues} />
-          </label>
-          <label>
-            <span>Ante</span>
-            <input aria-label="Ante" type="number" min="0" step="1" value={entry.ante} onChange={(event) => updateNumber('ante', event.target.value)} />
-            <FieldIssue field="ante" issues={issues} />
-          </label>
-          <label>
-            <span>Ante type</span>
-            <select
-              aria-label="Ante type"
-              value={entry.anteType}
-              onChange={(event) => {
-                const anteType = event.target.value as typeof entry.anteType
-                onChange({ ...entry, anteType, ante: anteType === 'none' ? 0 : Math.max(entry.ante, entry.bigBlind) })
-              }}
-            >
-              <option value="none">None</option>
-              <option value="traditional">Traditional ante</option>
-              <option value="big-blind">Big Blind Ante</option>
-            </select>
-          </label>
-          <label className="structure-level-note">
-            <span>Level note</span>
-            <input aria-label="Level note" value={entry.note ?? ''} maxLength={80} onChange={(event) => onChange({ ...entry, note: event.target.value })} />
-            <FieldIssue field="note" issues={issues} />
-          </label>
         </div>
-      ) : (
-        <div className="structure-fields structure-fields--break">
-          <label>
-            <span>Break label</span>
-            <input aria-label="Break label" value={entry.label} maxLength={30} onChange={(event) => onChange({ ...entry, label: event.target.value })} />
-            <FieldIssue field="label" issues={issues} />
-          </label>
-          <label>
-            <span>Duration minutes</span>
-            <input aria-label="Duration minutes" type="number" min="1" step="1" value={entry.durationSeconds / 60} onChange={(event) => updateNumber('durationSeconds', String(Number(event.target.value) * 60))} />
-            <FieldIssue field="durationSeconds" issues={issues} />
-          </label>
-        </div>
-      )}
+      </div>
     </fieldset>
   )
 }

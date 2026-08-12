@@ -103,6 +103,16 @@ export function StructureEditor() {
         <p role="alert" className="validation-banner">Add at least one valid poker level before applying.</p>
       )}
 
+      <div className="structure-editor-columns" aria-hidden="true">
+        <span>Level</span>
+        <span>Duration</span>
+        <span>Small</span>
+        <span>Big</span>
+        <span>Ante</span>
+        <span>Type</span>
+        <span>Note</span>
+        <span>Actions</span>
+      </div>
       <div className="structure-editor-list">
         {draft.map((entry, index) => {
           const entryNumber = draft

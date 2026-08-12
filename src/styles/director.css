@@ -644,15 +644,29 @@
 
 .structure-editor-list {
   display: grid;
-  gap: .7rem;
+  gap: .35rem;
+}
+
+.structure-editor-columns {
+  display: grid;
+  grid-template-columns: 5.25rem 5.75rem 4.75rem 4.75rem 4.75rem 7.5rem minmax(10rem, 1fr) 8.7rem;
+  gap: .4rem;
+  margin-bottom: -.7rem;
+  padding: 0 .55rem;
+  color: var(--slate-500);
+  font-size: .56rem;
+  font-weight: 850;
+  letter-spacing: .11em;
+  text-transform: uppercase;
 }
 
 .structure-editor-row {
-  position: relative;
+  display: grid;
+  min-height: 3.75rem;
   min-width: 0;
   margin: 0;
   border: 1px solid var(--line);
-  padding: 1.1rem 1rem 1rem;
+  padding: .45rem .55rem;
   background: linear-gradient(145deg, rgb(27 25 20 / 88%), rgb(13 13 11 / 88%));
 }
 
@@ -661,29 +675,54 @@
   background: linear-gradient(90deg, rgb(217 121 43 / 8%), rgb(13 13 11 / 88%));
 }
 
-.structure-editor-row legend {
-  display: flex;
-  align-items: center;
-  gap: .65rem;
-  padding: 0 .35rem;
+.structure-row-legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.structure-row-grid {
+  display: grid;
+  grid-template-columns: 5.25rem 5.75rem 4.75rem 4.75rem 4.75rem 7.5rem minmax(10rem, 1fr) 8.7rem;
+  min-width: 0;
+  align-items: start;
+  gap: .4rem;
+}
+
+.structure-row-identity {
+  display: grid;
+  min-width: 0;
+  min-height: 2.75rem;
+  align-content: center;
+  gap: .15rem;
+  padding: 0;
   color: var(--ivory-100);
   font-family: var(--font-heritage);
-  font-size: .92rem;
+  font-size: .84rem;
+  line-height: 1.1;
+}
+
+.structure-row-identity strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .entry-kind {
   color: var(--orange-400);
-  font-size: .55rem;
+  font-size: .5rem;
   font-weight: 850;
-  letter-spacing: .11em;
+  letter-spacing: .08em;
   text-transform: uppercase;
 }
 
 .row-order-actions {
-  position: absolute;
-  top: -.9rem;
-  right: .75rem;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 2.75rem);
   gap: .3rem;
 }
 
@@ -718,73 +757,75 @@
   color: var(--danger-400);
 }
 
-.structure-fields {
-  display: grid;
-  align-items: start;
-  gap: .65rem;
-}
-
-.structure-fields--level {
-  grid-template-columns: .8fr repeat(3, 1fr) 1.35fr;
+.structure-cell {
+  min-width: 0;
 }
 
 .structure-duration-field {
   display: grid;
-  gap: .45rem;
+  gap: .3rem;
 }
 
-.structure-duration-field label > span,
-.structure-level-note > span {
-  display: block;
-  margin-bottom: .28rem;
+.structure-cell-label {
+  display: none;
   color: var(--slate-400);
-  font-size: .56rem;
+  font-size: .53rem;
   font-weight: 820;
   letter-spacing: .1em;
   text-transform: uppercase;
+}
+
+.structure-duration-controls {
+  display: grid;
+  grid-template-columns: minmax(2.65rem, 1fr) 2.5rem;
+  gap: .25rem;
+}
+
+.structure-duration-controls > .structure-until-end:only-child {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
+.director-overlay .structure-editor-row input,
+.director-overlay .structure-editor-row select {
+  min-height: 2.75rem;
+  padding: 0 .45rem;
+  font-size: .74rem;
 }
 
 .structure-until-end {
   display: flex;
   min-height: 2.75rem;
+  min-width: 2.75rem;
+  flex-direction: column;
   align-items: center;
-  gap: .55rem;
+  justify-content: center;
+  gap: .16rem;
   cursor: pointer;
 }
 
 .director-overlay .structure-until-end input {
-  width: 1.15rem;
-  min-height: 1.15rem;
+  width: 1rem;
+  min-height: 1rem;
+  padding: 0;
   margin: 0;
   accent-color: var(--orange-500);
 }
 
-.structure-fields .structure-until-end > span {
-  display: inline;
-  margin: 0;
+.structure-until-end > span {
   color: var(--slate-300);
-  font-size: .72rem;
+  font-size: .48rem;
   font-weight: 750;
-  letter-spacing: normal;
-  text-transform: none;
+  line-height: 1;
+  white-space: nowrap;
 }
 
-.structure-level-note {
-  grid-column: 1 / -1;
+.structure-actions-cell {
+  grid-column: 8;
 }
 
-.structure-fields--break {
-  grid-template-columns: 1fr 1fr;
-}
-
-.structure-fields label > span {
-  display: block;
-  margin-bottom: .28rem;
-  color: var(--slate-400);
-  font-size: .56rem;
-  font-weight: 820;
-  letter-spacing: .1em;
-  text-transform: uppercase;
+.structure-editor-row--break .structure-break-label {
+  grid-column: 3 / 8;
 }
 
 .structure-field-error {
@@ -1118,9 +1159,26 @@
   font-size: .7rem;
 }
 
+@media (max-width: 1180px) {
+  .structure-editor-columns { display: none; }
+  .structure-row-grid {
+    grid-template-columns: 5.25rem 5.75rem repeat(3, minmax(4.75rem, 1fr)) 8.7rem;
+    row-gap: .6rem;
+  }
+  .structure-cell-label { display: block; margin-bottom: .25rem; }
+  .structure-editor-row--level .structure-row-identity { grid-row: 1 / 3; }
+  .structure-editor-row--level .structure-duration-field { grid-column: 2; }
+  .structure-editor-row--level .structure-small-blind { grid-column: 3; }
+  .structure-editor-row--level .structure-big-blind { grid-column: 4; }
+  .structure-editor-row--level .structure-ante { grid-column: 5; }
+  .structure-editor-row--level .structure-ante-type { grid-column: 2 / 4; }
+  .structure-editor-row--level .structure-level-note { grid-column: 4 / 6; }
+  .structure-actions-cell { grid-column: 6; grid-row: 1 / 3; }
+  .structure-editor-row--break .structure-break-label { grid-column: 3 / 6; }
+}
+
 @media (max-width: 1000px) {
   .structure-live-tools { grid-template-columns: 1fr; }
-  .structure-fields--level { grid-template-columns: repeat(3, 1fr); }
   .save-preset-card, .preset-row { grid-template-columns: 1fr; }
   .preset-symbol { display: none; }
   .preset-actions { flex-wrap: wrap; }
@@ -1130,7 +1188,27 @@
 @media (max-width: 620px) {
   .structure-editor-heading { display: block; }
   .structure-add-actions { margin-top: 1rem; }
-  .structure-fields--level, .structure-fields--break { grid-template-columns: 1fr; }
+  .structure-row-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .65rem;
+  }
+  .structure-editor-row { padding: .65rem; }
+  .structure-editor-row--level .structure-row-identity,
+  .structure-editor-row--level .structure-duration-field,
+  .structure-editor-row--level .structure-small-blind,
+  .structure-editor-row--level .structure-big-blind,
+  .structure-editor-row--level .structure-ante,
+  .structure-editor-row--level .structure-ante-type,
+  .structure-editor-row--level .structure-level-note,
+  .structure-editor-row--break .structure-break-label,
+  .structure-actions-cell {
+    grid-column: auto;
+    grid-row: auto;
+  }
+  .structure-row-identity,
+  .structure-editor-row--level .structure-level-note,
+  .structure-actions-cell { grid-column: 1 / -1; }
+  .row-order-actions { justify-content: end; }
   .alert-options, .shortcut-grid { grid-template-columns: 1fr; }
   .row-order-actions button { width: 2.75rem; height: 2.75rem; }
   .preset-actions button { min-height: 2.75rem; }
