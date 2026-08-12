@@ -1,4 +1,4 @@
-import { entryDurationMs } from './structure'
+import { entryDurationMs, isUntimedEntry } from './structure'
 import type { TournamentRuntime, TournamentState } from './types'
 
 function withRuntime(state: TournamentState, runtime: Partial<TournamentRuntime>): TournamentState {
@@ -12,6 +12,11 @@ function withRuntime(state: TournamentState, runtime: Partial<TournamentRuntime>
 }
 
 export function resolveTimer(state: TournamentState, now: number): TournamentState {
+  const currentEntry = state.structure[state.runtime.currentEntryIndex]
+  if (state.runtime.status === 'running' && isUntimedEntry(currentEntry)) {
+    return state
+  }
+
   if (state.runtime.status !== 'running' || state.runtime.baselineAt === null) {
     return state
   }
@@ -32,8 +37,19 @@ export function resolveTimer(state: TournamentState, now: number): TournamentSta
 
   while (remainingMs <= 0 && currentEntryIndex < state.structure.length - 1) {
     currentEntryIndex += 1
-    remainingMs += entryDurationMs(state.structure[currentEntryIndex]) ?? 0
+    const durationMs = entryDurationMs(state.structure[currentEntryIndex])
     changedEntry = true
+    if (durationMs === null) {
+      return withRuntime(state, {
+        currentEntryIndex,
+        remainingMs: 0,
+        baselineAt: null,
+        status: 'running',
+        alertedThresholds: [],
+        transitionCause: 'automatic',
+      })
+    }
+    remainingMs += durationMs
   }
 
   const complete = remainingMs <= 0 && currentEntryIndex === state.structure.length - 1

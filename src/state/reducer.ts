@@ -1,5 +1,5 @@
 import { resolveTimer } from '../domain/timer'
-import { entryDurationMs } from '../domain/structure'
+import { entryDurationMs, isUntimedEntry } from '../domain/structure'
 import type {
   StructureEntry,
   TournamentConfiguration,
@@ -29,6 +29,8 @@ function clamp(value: number, minimum: number, maximum: number): number {
 }
 
 function updateTime(state: TournamentState, remainingMs: number, now: number): TournamentState {
+  if (isUntimedEntry(state.structure[state.runtime.currentEntryIndex])) return state
+
   const wasRunning = state.runtime.status === 'running'
   const resolved = resolveTimer(state, now)
   const nextRemaining = Math.max(0, Math.round(remainingMs))
@@ -51,17 +53,20 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
   switch (action.type) {
     case 'TICK':
       return resolveTimer(state, action.now)
-    case 'START':
+    case 'START': {
       if (state.runtime.status === 'running' || state.runtime.status === 'complete') return state
+      const untimed = isUntimedEntry(state.structure[state.runtime.currentEntryIndex])
       return {
         ...state,
         runtime: {
           ...state.runtime,
           status: 'running',
-          baselineAt: action.now,
+          remainingMs: untimed ? 0 : state.runtime.remainingMs,
+          baselineAt: untimed ? null : action.now,
           transitionCause: null,
         },
       }
+    }
     case 'PAUSE': {
       const resolved = resolveTimer(state, action.now)
       if (resolved.runtime.status !== 'running') return resolved
@@ -71,15 +76,15 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
       }
     }
     case 'RESET_CURRENT': {
-      const duration = entryDurationMs(state.structure[state.runtime.currentEntryIndex]) ?? 0
+      const duration = entryDurationMs(state.structure[state.runtime.currentEntryIndex])
       const running = state.runtime.status === 'running'
       return {
         ...state,
         runtime: {
           ...state.runtime,
           status: running ? 'running' : 'paused',
-          remainingMs: duration,
-          baselineAt: running ? action.now : null,
+          remainingMs: duration ?? 0,
+          baselineAt: running && duration !== null ? action.now : null,
           alertedThresholds: [],
           transitionCause: null,
         },
@@ -107,13 +112,14 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
     case 'GO_TO_ENTRY': {
       const index = clamp(Math.round(action.index), 0, state.structure.length - 1)
       const running = state.runtime.status === 'running'
+      const duration = entryDurationMs(state.structure[index])
       return {
         ...state,
         runtime: {
           ...state.runtime,
           currentEntryIndex: index,
-          remainingMs: entryDurationMs(state.structure[index]) ?? 0,
-          baselineAt: running ? action.now : null,
+          remainingMs: duration ?? 0,
+          baselineAt: running && duration !== null ? action.now : null,
           status: running ? 'running' : state.runtime.status === 'idle' ? 'idle' : 'paused',
           alertedThresholds: [],
           transitionCause: 'manual',
@@ -168,17 +174,17 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
         ? matchingIndex
         : clamp(resolved.runtime.currentEntryIndex, 0, action.structure.length - 1)
       const running = resolved.runtime.status === 'running'
+      const duration = entryDurationMs(action.structure[index])
       return {
         ...resolved,
         structure: structuredClone(action.structure),
         runtime: {
           ...resolved.runtime,
           currentEntryIndex: index,
-          remainingMs: Math.min(
-            resolved.runtime.remainingMs,
-            entryDurationMs(action.structure[index]) ?? 0,
-          ),
-          baselineAt: running ? action.now : null,
+          remainingMs: duration === null
+            ? 0
+            : Math.min(resolved.runtime.remainingMs, duration),
+          baselineAt: running && duration !== null ? action.now : null,
           alertedThresholds: [],
           transitionCause: null,
         },

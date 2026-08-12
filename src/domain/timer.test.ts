@@ -69,8 +69,34 @@ describe('resolveTimer', () => {
     expect(result.runtime.baselineAt).toBeNull()
   })
 
-  it('completes without wrapping after the final entry', () => {
+  it('enters the untimed final level without completing', () => {
     const state = createInitialState()
+    state.runtime.currentEntryIndex = state.structure.length - 2
+    state.runtime.status = 'running'
+    state.runtime.remainingMs = 1_000
+    state.runtime.baselineAt = 10_000
+
+    const result = resolveTimer(state, 12_000)
+
+    expect(result.runtime.currentEntryIndex).toBe(state.structure.length - 1)
+    expect(result.runtime.remainingMs).toBe(0)
+    expect(result.runtime.baselineAt).toBeNull()
+    expect(result.runtime.status).toBe('running')
+    expect(result.runtime.transitionCause).toBe('automatic')
+  })
+
+  it('does not advance or decrement an active untimed level', () => {
+    const state = createInitialState()
+    state.runtime.currentEntryIndex = state.structure.length - 1
+    state.runtime.status = 'running'
+    state.runtime.remainingMs = 0
+    state.runtime.baselineAt = null
+    expect(resolveTimer(state, 999_999)).toEqual(state)
+  })
+
+  it('completes without wrapping after a timed final entry', () => {
+    const state = createInitialState()
+    state.structure = state.structure.slice(0, -1)
     state.runtime.currentEntryIndex = state.structure.length - 1
     state.runtime.status = 'running'
     state.runtime.remainingMs = 1_000

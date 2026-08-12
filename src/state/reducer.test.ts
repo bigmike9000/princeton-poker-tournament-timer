@@ -43,6 +43,68 @@ describe('tournamentReducer', () => {
     expect(result.runtime.transitionCause).toBe('manual')
   })
 
+  it('jumps to an untimed final level without a countdown baseline', () => {
+    const state = createInitialState()
+    state.runtime.status = 'running'
+    const result = tournamentReducer(state, { type: 'GO_TO_ENTRY', index: state.structure.length - 1, now: 5_000 })
+    expect(result.runtime).toMatchObject({ remainingMs: 0, baselineAt: null, status: 'running', transitionCause: 'manual' })
+  })
+
+  it('resets an untimed current level without completing', () => {
+    const state = createInitialState()
+    state.runtime.currentEntryIndex = state.structure.length - 1
+    state.runtime.status = 'paused'
+    const result = tournamentReducer(state, { type: 'RESET_CURRENT', now: 5_000 })
+    expect(result.runtime).toMatchObject({ remainingMs: 0, baselineAt: null, status: 'paused' })
+  })
+
+  it('starts and pauses an untimed level without creating a countdown baseline', () => {
+    const paused = createInitialState()
+    paused.runtime.currentEntryIndex = paused.structure.length - 1
+    paused.runtime.status = 'paused'
+    paused.runtime.remainingMs = 0
+    paused.runtime.baselineAt = null
+
+    const running = tournamentReducer(paused, { type: 'START', now: 5_000 })
+    expect(running.runtime).toMatchObject({ remainingMs: 0, baselineAt: null, status: 'running' })
+
+    const result = tournamentReducer(running, { type: 'PAUSE', now: 8_000 })
+    expect(result.runtime).toMatchObject({ remainingMs: 0, baselineAt: null, status: 'paused' })
+  })
+
+  it('applies a replacement structure while preserving an active untimed level', () => {
+    const state = createInitialState()
+    state.runtime.currentEntryIndex = state.structure.length - 1
+    state.runtime.status = 'running'
+    state.runtime.remainingMs = 0
+    state.runtime.baselineAt = null
+    const structure = structuredClone(state.structure)
+    const final = structure.at(-1)!
+    if (final.kind !== 'level') throw new Error('Expected a poker level.')
+    final.note = 'Replacement final level'
+
+    const result = tournamentReducer(state, { type: 'SET_STRUCTURE', structure, now: 5_000 })
+
+    expect(result.structure.at(-1)).toMatchObject({ note: 'Replacement final level' })
+    expect(result.runtime).toMatchObject({
+      currentEntryIndex: structure.length - 1,
+      remainingMs: 0,
+      baselineAt: null,
+      status: 'running',
+    })
+  })
+
+  it('ignores direct time edits while the current level is untimed', () => {
+    const state = createInitialState()
+    state.runtime.currentEntryIndex = state.structure.length - 1
+    state.runtime.status = 'running'
+    state.runtime.remainingMs = 0
+    state.runtime.baselineAt = null
+
+    expect(tournamentReducer(state, { type: 'SET_TIME', remainingMs: 60_000, now: 5_000 })).toBe(state)
+    expect(tournamentReducer(state, { type: 'ADJUST_TIME', deltaMs: 60_000, now: 5_000 })).toBe(state)
+  })
+
   it('clamps navigation at the first and last entries', () => {
     const first = createInitialState()
     const beforeFirst = tournamentReducer(first, { type: 'GO_TO_ENTRY', index: -1, now: 0 })
