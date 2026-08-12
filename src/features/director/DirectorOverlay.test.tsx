@@ -34,18 +34,19 @@ describe('DirectorOverlay', () => {
     const user = userEvent.setup()
     render(<App />)
     await openDirector(user)
+    const director = within(screen.getByRole('dialog', { name: 'Tournament Director' }))
 
-    await user.clear(screen.getByLabelText('Minutes remaining'))
-    await user.type(screen.getByLabelText('Minutes remaining'), '12')
-    await user.clear(screen.getByLabelText('Seconds remaining'))
-    await user.type(screen.getByLabelText('Seconds remaining'), '30')
-    await user.click(screen.getByRole('button', { name: 'Apply time' }))
+    await user.clear(director.getByLabelText('Minutes remaining'))
+    await user.type(director.getByLabelText('Minutes remaining'), '12')
+    await user.clear(director.getByLabelText('Seconds remaining'))
+    await user.type(director.getByLabelText('Seconds remaining'), '30')
+    await user.click(director.getByRole('button', { name: 'Apply time' }))
 
     expect(screen.getByRole('timer')).toHaveTextContent('12:30')
 
-    await user.clear(screen.getByLabelText('Players remaining'))
-    await user.type(screen.getByLabelText('Players remaining'), '53')
-    await user.click(screen.getByRole('button', { name: 'Apply player count' }))
+    await user.clear(director.getByLabelText('Players remaining'))
+    await user.type(director.getByLabelText('Players remaining'), '53')
+    await user.click(director.getByRole('button', { name: 'Apply player count' }))
     expect(screen.getAllByText('53 / 80').length).toBeGreaterThan(0)
   })
 
