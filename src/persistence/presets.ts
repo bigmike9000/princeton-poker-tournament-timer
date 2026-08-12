@@ -38,14 +38,18 @@ function makeId(): string {
   return globalThis.crypto?.randomUUID?.() ?? `preset-${Date.now()}-${Math.random().toString(16).slice(2)}`
 }
 
+function isTimestamp(value: unknown): value is string {
+  return typeof value === 'string' && Number.isFinite(Date.parse(value))
+}
+
 function isPreset(value: unknown): value is StructurePreset {
   if (typeof value !== 'object' || value === null) return false
   const preset = value as Partial<StructurePreset>
   const structure = parseStructure(preset.structure)
   return typeof preset.id === 'string' &&
     typeof preset.name === 'string' &&
-    typeof preset.createdAt === 'string' &&
-    typeof preset.updatedAt === 'string' &&
+    isTimestamp(preset.createdAt) &&
+    isTimestamp(preset.updatedAt) &&
     structure !== null &&
     validateStructure(structure).valid
 }
@@ -61,23 +65,24 @@ export function createPresetRepository(
 
   const read = (): StructurePreset[] => {
     const raw = storage.getItem(PRESETS_KEY)
-    const persisted = (() => {
+    const parsed = (() => {
       try {
         const value = raw === null ? [] : JSON.parse(raw) as unknown
         return Array.isArray(value)
-          ? clone(value.filter(isPreset).map((preset) => ({
-              ...preset,
-              structure: removeObsoleteBundledNotes(preset.structure),
-            })))
+          ? clone(value.filter(isPreset))
           : []
       } catch {
         return []
       }
     })()
 
-    const stablePresets = persisted.filter((preset) => isBuiltInPreset(preset))
-    const formerBundledIndex = persisted.findIndex((preset) =>
+    const formerBundledIndex = parsed.findIndex((preset) =>
       preset.name === BUILT_IN_PRESET_NAME && isFormerBundledStructure(preset.structure))
+    const persisted = parsed.map((preset, index) =>
+      index === formerBundledIndex || preset.name === BUILT_IN_PRESET_NAME
+        ? preset
+        : { ...preset, structure: removeObsoleteBundledNotes(preset.structure) })
+    const stablePresets = persisted.filter((preset) => isBuiltInPreset(preset))
     const replacedPresets = stablePresets.concat(formerBundledIndex >= 0 ? [persisted[formerBundledIndex]] : [])
     const createdAt = replacedPresets
       .map((preset) => preset.createdAt)

@@ -142,6 +142,38 @@ describe('preset repository', () => {
     expect(presets.slice(1)).toEqual([custom, customizedStandard])
   })
 
+  it('preserves a standard-named former structure customized only by an obsolete note', () => {
+    const structure = structuredClone(formerBundledStructure)
+    setStructureNote(structure, 'level-6', 'BB ante begins')
+    const custom = persistedPreset({ id: 'custom-legacy-note-v1', structure })
+    localStorage.setItem(PRESETS_KEY, JSON.stringify([custom]))
+
+    const presets = createPresetRepository(localStorage).list()
+
+    expect(presets[0]).toMatchObject({ id: BUILT_IN_PRESET_ID, structure: sampleStructure })
+    expect(presets.slice(1)).toEqual([custom])
+  })
+
+  it.each([
+    ['invalid createdAt', { createdAt: 'not-a-date' }],
+    ['invalid updatedAt', { updatedAt: 'not-a-date' }],
+  ])('filters a stable-ID record with %s instead of propagating it to the canonical preset', (_label, timestamps) => {
+    const invalidStable = persistedPreset({ id: BUILT_IN_PRESET_ID, ...timestamps })
+    const custom = persistedPreset({ id: 'valid-custom-v1', name: 'Turbo', structure: structuredClone(sampleStructure) })
+    localStorage.setItem(PRESETS_KEY, JSON.stringify([invalidStable, custom]))
+
+    const presets = createPresetRepository(localStorage, () => 0).list()
+
+    expect(presets[0]).toMatchObject({
+      id: BUILT_IN_PRESET_ID,
+      name: 'Princeton Poker Club Standard',
+      structure: sampleStructure,
+      createdAt: '1970-01-01T00:00:00.000Z',
+      updatedAt: '1970-01-01T00:00:00.000Z',
+    })
+    expect(presets.slice(1)).toEqual([custom])
+  })
+
   it('self-restores a directly deleted built-in preset without touching custom records', () => {
     const repository = createPresetRepository(localStorage)
     const custom = repository.save('Turbo', createInitialState().structure)
