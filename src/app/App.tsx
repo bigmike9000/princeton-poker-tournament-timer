@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { DirectorOverlay } from '../features/director/DirectorOverlay'
 import { TournamentDisplay } from '../features/display/TournamentDisplay'
+import { InfoOverlay } from '../features/info/InfoOverlay'
 import { audioAlerts } from '../services/audio'
 import { toggleFullscreen } from '../services/fullscreen'
 import { shortcutForEvent } from '../services/shortcuts'
@@ -11,9 +12,11 @@ import { useTournament } from './useTournament'
 
 function AppContent() {
   const [directorOpen, setDirectorOpen] = useState(false)
+  const [infoOpen, setInfoOpen] = useState(false)
   const [fullscreen, setFullscreen] = useState(Boolean(document.fullscreenElement))
   const [fullscreenError, setFullscreenError] = useState<string | null>(null)
   const directorTrigger = useRef<HTMLElement | null>(null)
+  const infoTrigger = useRef<HTMLElement | null>(null)
   const { state, dispatch } = useTournament()
 
   const handleFullscreen = useCallback(async () => {
@@ -59,6 +62,7 @@ function AppContent() {
   }, [dispatch, handleFullscreen, state])
 
   const openDirector = () => {
+    if (infoOpen) return
     directorTrigger.current = document.activeElement instanceof HTMLElement
       ? document.activeElement
       : null
@@ -69,23 +73,47 @@ function AppContent() {
     setDirectorOpen(false)
   }
 
+  const openInfo = () => {
+    if (directorOpen) return
+    infoTrigger.current = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null
+    setInfoOpen(true)
+  }
+
+  const closeInfo = () => {
+    setInfoOpen(false)
+  }
+
   const restoreDirectorFocus = useCallback(() => {
     directorTrigger.current?.focus()
+  }, [])
+
+  const restoreInfoFocus = useCallback(() => {
+    infoTrigger.current?.focus()
   }, [])
 
   return (
     <>
       <TournamentDisplay
         onOpenDirector={openDirector}
+        onOpenInfo={openInfo}
         fullscreen={fullscreen}
         fullscreenError={fullscreenError}
         onToggleFullscreen={handleFullscreen}
       />
-      {directorOpen && (
+      {directorOpen && !infoOpen && (
         <DirectorOverlay
           open
           onClose={closeDirector}
           onAfterClose={restoreDirectorFocus}
+        />
+      )}
+      {infoOpen && !directorOpen && (
+        <InfoOverlay
+          open
+          onClose={closeInfo}
+          onAfterClose={restoreInfoFocus}
         />
       )}
       <PwaUpdatePrompt />

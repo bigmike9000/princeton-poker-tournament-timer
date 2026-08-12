@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { TournamentProvider } from '../../app/TournamentProvider'
@@ -7,11 +7,12 @@ import { entryDurationMs } from '../../domain/structure'
 import { saveSnapshot } from '../../persistence/snapshot'
 import { TournamentDisplay } from './TournamentDisplay'
 
-function renderDisplay(onOpenDirector = vi.fn()) {
+function renderDisplay(onOpenDirector = vi.fn(), onOpenInfo = vi.fn()) {
   return render(
     <TournamentProvider>
       <TournamentDisplay
         onOpenDirector={onOpenDirector}
+        onOpenInfo={onOpenInfo}
         fullscreen={false}
         fullscreenError={null}
         onToggleFullscreen={vi.fn().mockResolvedValue(undefined)}
@@ -115,6 +116,18 @@ describe('TournamentDisplay', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Open Tournament Director' }))
     expect(onOpenDirector).toHaveBeenCalledOnce()
+  })
+
+  it('opens public tournament information immediately before fullscreen', () => {
+    const onOpenInfo = vi.fn()
+    renderDisplay(vi.fn(), onOpenInfo)
+    const controls = within(screen.getByRole('navigation', { name: 'Tournament controls' }))
+    const info = controls.getByRole('button', { name: 'Open tournament information' })
+    const fullscreen = controls.getByRole('button', { name: 'Enter fullscreen' })
+
+    expect(info.compareDocumentPosition(fullscreen) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    fireEvent.click(info)
+    expect(onOpenInfo).toHaveBeenCalledOnce()
   })
 
   it('updates player statistics from the editable player count', async () => {

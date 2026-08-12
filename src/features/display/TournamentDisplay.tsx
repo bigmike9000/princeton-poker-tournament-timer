@@ -11,6 +11,7 @@ import { SponsorStrip } from './SponsorStrip'
 
 export interface TournamentDisplayProps {
   onOpenDirector: () => void
+  onOpenInfo: () => void
   fullscreen: boolean
   fullscreenError: string | null
   onToggleFullscreen: () => Promise<void>
@@ -18,6 +19,7 @@ export interface TournamentDisplayProps {
 
 export function TournamentDisplay({
   onOpenDirector,
+  onOpenInfo,
   fullscreen,
   fullscreenError,
   onToggleFullscreen,
@@ -64,6 +66,7 @@ export function TournamentDisplay({
         state={state}
         dispatch={dispatch}
         onOpenDirector={onOpenDirector}
+        onOpenInfo={onOpenInfo}
         fullscreen={fullscreen}
         fullscreenError={fullscreenError}
         onToggleFullscreen={onToggleFullscreen}

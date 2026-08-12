@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from './App'
 
@@ -27,5 +27,26 @@ describe('representative tournament flow', () => {
     expect(screen.getByRole('timer')).toHaveTextContent('11:55')
     expect(screen.getByText('79 / 80')).toBeVisible()
     expect(screen.getByRole('button', { name: 'Start tournament' })).toHaveTextContent('Resume')
+  })
+
+  it('keeps the same running level while Info is open and only elapsed time changes', () => {
+    render(<App />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next level' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Start tournament' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Open tournament information' }))
+    const structure = screen.getByRole('list', { name: 'Tournament blind structure' })
+    expect(within(structure).getAllByRole('listitem')[1]).toHaveAttribute('aria-current', 'step')
+
+    act(() => vi.advanceTimersByTime(3_000))
+
+    expect(screen.getByRole('timer')).toHaveTextContent('11:57')
+    expect(screen.getByRole('button', { name: 'Pause tournament' })).toBeVisible()
+    expect(within(structure).getAllByRole('listitem')[1]).toHaveAttribute('aria-current', 'step')
+    fireEvent.click(screen.getByRole('button', { name: 'Close tournament information' }))
+
+    expect(screen.getByRole('timer')).toHaveTextContent('11:57')
+    expect(screen.getByRole('button', { name: 'Pause tournament' })).toBeVisible()
+    expect(screen.getByRole('region', { name: 'Current poker level' })).toHaveTextContent('LEVEL 2')
   })
 })

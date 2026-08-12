@@ -8,6 +8,7 @@ interface DisplayControlsProps {
   state: TournamentState
   dispatch: Dispatch<TournamentAction>
   onOpenDirector: () => void
+  onOpenInfo: () => void
   fullscreen: boolean
   fullscreenError: string | null
   onToggleFullscreen: () => Promise<void>
@@ -17,6 +18,7 @@ export function DisplayControls({
   state,
   dispatch,
   onOpenDirector,
+  onOpenInfo,
   fullscreen,
   fullscreenError,
   onToggleFullscreen,
@@ -65,6 +67,11 @@ export function DisplayControls({
 
       <div className="control-group control-group--utility">
         {fullscreenError && <span role="status" className="control-status">{fullscreenError}</span>}
+        <button
+          className="icon-button info-button"
+          aria-label="Open tournament information"
+          onClick={onOpenInfo}
+        >Info</button>
         <button
           className="icon-button"
           aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}

@@ -25,6 +25,7 @@ const formerBundledStructure: StructureEntry[] = [
 function formerDefaultState(): TournamentState {
   const state = createInitialState()
   delete state.information
+  state.configuration.sponsorLabels = ['SPONSOR', 'SPONSOR']
   state.configuration.startingStack = 30_000
   state.structure = structuredClone(formerBundledStructure)
   state.runtime.remainingMs = 1_200_000
