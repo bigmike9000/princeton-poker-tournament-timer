@@ -1,0 +1,52 @@
+import { formatChips } from '../../domain/calculations'
+import type { TournamentState } from '../../domain/types'
+import { selectCurrentEntry, selectNextPokerLevel, selectPokerLevelNumber } from '../../state/selectors'
+
+function anteLabel(anteType: 'none' | 'traditional' | 'big-blind', ante: number): string {
+  if (anteType === 'none') return 'NO ANTE'
+  if (anteType === 'traditional') return `ANTE: ${formatChips(ante)}`
+  return `BIG BLIND ANTE: ${formatChips(ante)}`
+}
+
+export function CurrentLevel({ state }: { state: TournamentState }) {
+  const entry = selectCurrentEntry(state)
+
+  if (entry.kind === 'break') {
+    const nextLevel = selectNextPokerLevel(state)
+    const nextIndex = nextLevel
+      ? state.structure.findIndex((candidate) => candidate.id === nextLevel.id)
+      : -1
+    const nextNumber = nextIndex >= 0 ? selectPokerLevelNumber(state, nextIndex) : null
+
+    return (
+      <section className="current-level current-level--break" aria-label="Current break">
+        <p className="eyebrow eyebrow--accent">Tournament break</p>
+        <h2 className="level-heading">BREAK</h2>
+        {nextLevel && nextNumber !== null ? (
+          <div className="next-level-card">
+            <span>Next: Level {nextNumber}</span>
+            <strong>{formatChips(nextLevel.smallBlind)} / {formatChips(nextLevel.bigBlind)}</strong>
+            <small>{anteLabel(nextLevel.anteType, nextLevel.ante)}</small>
+          </div>
+        ) : (
+          <p className="next-level-card">Final break</p>
+        )}
+      </section>
+    )
+  }
+
+  const levelNumber = selectPokerLevelNumber(state, state.runtime.currentEntryIndex)
+
+  return (
+    <section className="current-level" aria-label="Current poker level">
+      <p className="eyebrow">Current level</p>
+      <h2 className="level-heading">LEVEL {levelNumber}</h2>
+      <div className="blind-display">
+        <strong>{formatChips(entry.smallBlind)} / {formatChips(entry.bigBlind)}</strong>
+        <span>{anteLabel(entry.anteType, entry.ante)}</span>
+      </div>
+    </section>
+  )
+}
+
+export { anteLabel }

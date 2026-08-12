@@ -1,0 +1,20 @@
+:root {
+  --ink-950: #050b10;
+  --ink-900: #071018;
+  --ink-850: #0b1721;
+  --ink-800: #10202b;
+  --ink-700: #1b303d;
+  --ivory-50: #fffaf0;
+  --ivory-100: #f5f0e6;
+  --slate-300: #b8c4cc;
+  --slate-400: #99a8b5;
+  --slate-500: #6f8290;
+  --orange-400: #ff9a50;
+  --orange-500: #f58025;
+  --orange-600: #d96612;
+  --green-400: #66d19e;
+  --danger-400: #ff7a72;
+  --line: rgb(183 207 222 / 15%);
+  --surface: rgb(13 28 39 / 82%);
+  --shadow: 0 28px 80px rgb(0 0 0 / 34%);
+}

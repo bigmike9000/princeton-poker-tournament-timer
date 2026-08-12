@@ -1,15 +1,22 @@
-import { createInitialState } from '../domain/sampleStructure'
+import { useState } from 'react'
+import { TournamentDisplay } from '../features/display/TournamentDisplay'
 import { TournamentProvider } from './TournamentProvider'
 
-export function App() {
-  const state = createInitialState()
+function AppContent() {
+  const [directorOpen, setDirectorOpen] = useState(false)
 
   return (
-    <TournamentProvider>
-      <main>
-        <p>{state.configuration.organizationName}</p>
-        <h1>{state.configuration.tournamentName}</h1>
-      </main>
-    </TournamentProvider>
+    <>
+      <TournamentDisplay onOpenDirector={() => setDirectorOpen(true)} />
+      {directorOpen && (
+        <button className="temporary-director-close" onClick={() => setDirectorOpen(false)}>
+          Close Tournament Director
+        </button>
+      )}
+    </>
   )
+}
+
+export function App() {
+  return <TournamentProvider><AppContent /></TournamentProvider>
 }
