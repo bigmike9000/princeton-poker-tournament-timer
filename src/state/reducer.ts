@@ -3,6 +3,7 @@ import { entryDurationMs, isUntimedEntry } from '../domain/structure'
 import type {
   StructureEntry,
   TournamentConfiguration,
+  TournamentInformation,
   TournamentSettings,
   TournamentState,
 } from '../domain/types'
@@ -19,6 +20,7 @@ export type TournamentAction =
   | { type: 'ADJUST_PLAYERS'; delta: number }
   | { type: 'SET_PLAYERS'; players: number }
   | { type: 'SET_CONFIGURATION'; configuration: TournamentConfiguration }
+  | { type: 'SET_INFORMATION'; information: TournamentInformation }
   | { type: 'SET_STRUCTURE'; structure: StructureEntry[]; now: number }
   | { type: 'SET_SETTINGS'; settings: TournamentSettings }
   | { type: 'RESTORE'; state: TournamentState }
@@ -165,6 +167,8 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
           : entry),
       }
     }
+    case 'SET_INFORMATION':
+      return { ...state, information: structuredClone(action.information) }
     case 'SET_STRUCTURE': {
       if (action.structure.length === 0) return state
       const resolved = resolveTimer(state, action.now)

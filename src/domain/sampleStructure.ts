@@ -1,5 +1,6 @@
 import type { StructureEntry, TournamentState } from './types'
 import { entryDurationMs } from './structure'
+import { DEFAULT_TOURNAMENT_INFORMATION } from './tournamentInformation'
 
 export const DEFAULT_STACK_ALLOCATION_LABEL = '10 × 1 · 8 × 5 · 6 × 25 = 200'
 
@@ -60,6 +61,11 @@ export function createInitialState(): TournamentState {
       alertLevelComplete: true,
       alertBreakBeginning: true,
       alertBreakEnding: true,
+    },
+    information: {
+      chipLines: [...DEFAULT_TOURNAMENT_INFORMATION.chipLines],
+      prizeLines: [...DEFAULT_TOURNAMENT_INFORMATION.prizeLines],
+      houseNotes: [...DEFAULT_TOURNAMENT_INFORMATION.houseNotes],
     },
   }
 }

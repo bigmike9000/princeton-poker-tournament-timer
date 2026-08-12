@@ -1,9 +1,56 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createInitialState } from '../domain/sampleStructure'
+import {
+  DEFAULT_TOURNAMENT_INFORMATION,
+  selectTournamentInformation,
+} from '../domain/tournamentInformation'
 import { loadSnapshot, saveSnapshot, SNAPSHOT_KEY } from './snapshot'
+
+function saveRawSnapshot(storage: Storage, state: unknown): void {
+  storage.setItem(SNAPSHOT_KEY, JSON.stringify({ version: 1, savedAt: 1_000, state }))
+}
 
 describe('snapshot persistence', () => {
   beforeEach(() => localStorage.clear())
+
+  it('loads an older valid snapshot without information', () => {
+    const state = createInitialState()
+    delete state.information
+    saveRawSnapshot(localStorage, state)
+
+    const result = loadSnapshot(localStorage, 1_000)
+
+    expect(result.recovered).toBe(false)
+    expect(result.state).not.toHaveProperty('information')
+    expect(selectTournamentInformation(result.state)).toEqual(DEFAULT_TOURNAMENT_INFORMATION)
+  })
+
+  it('round-trips configured tournament information', () => {
+    const state = createInitialState()
+    state.information = { chipLines: ['A'], prizeLines: ['B'], houseNotes: ['C'] }
+
+    saveSnapshot(localStorage, state, 1_000)
+
+    expect(loadSnapshot(localStorage, 1_000).state.information).toEqual(state.information)
+  })
+
+  it.each([
+    { chipLines: [7], prizeLines: ['B'], houseNotes: ['C'] },
+    { chipLines: ['A'], prizeLines: 'B', houseNotes: ['C'] },
+    { chipLines: ['x'.repeat(161)], prizeLines: ['B'], houseNotes: ['C'] },
+    { chipLines: ['A'], prizeLines: ['B'], houseNotes: ['C'], extra: [] },
+    { chipLines: [''], prizeLines: ['B'], houseNotes: ['C'] },
+    { chipLines: Array.from({ length: 25 }, () => 'A'), prizeLines: ['B'], houseNotes: ['C'] },
+  ])('recovers safely from malformed information %#', (information) => {
+    const state = createInitialState()
+    const rawState = { ...state, information }
+    saveRawSnapshot(localStorage, rawState)
+
+    const result = loadSnapshot(localStorage, 1_000)
+
+    expect(result.recovered).toBe(true)
+    expect(result.state.runtime.currentEntryIndex).toBe(0)
+  })
 
   it('restores a running clock paused under the safe close policy', () => {
     const state = createInitialState()

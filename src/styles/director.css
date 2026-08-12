@@ -309,7 +309,8 @@
 }
 
 .director-overlay input,
-.director-overlay select {
+.director-overlay select,
+.director-overlay textarea {
   width: 100%;
   min-height: 3rem;
   border: 1px solid var(--line);
@@ -323,8 +324,16 @@
   font-variant-numeric: tabular-nums;
 }
 
+.director-overlay textarea {
+  min-height: 8rem;
+  padding: .75rem .8rem;
+  resize: vertical;
+  line-height: 1.5;
+}
+
 .director-overlay input:hover:not(:disabled),
-.director-overlay select:hover:not(:disabled) {
+.director-overlay select:hover:not(:disabled),
+.director-overlay textarea:hover:not(:disabled) {
   border-color: rgb(184 154 97 / 48%);
 }
 
@@ -334,7 +343,8 @@
 
 .director-overlay button:disabled,
 .director-overlay input:disabled,
-.director-overlay select:disabled {
+.director-overlay select:disabled,
+.director-overlay textarea:disabled {
   opacity: .35;
   cursor: not-allowed;
 }
@@ -420,8 +430,39 @@
   max-width: 58rem;
 }
 
+.tournament-configuration-form {
+  display: grid;
+  gap: 1rem;
+}
+
 .settings-form .section-intro {
   display: block;
+}
+
+.tournament-information-editor .director-card-heading {
+  margin-bottom: .35rem;
+}
+
+.information-editor-copy,
+.information-editor-actions p {
+  margin: 0;
+  color: var(--slate-400);
+  font-size: .72rem;
+  line-height: 1.5;
+}
+
+.information-fields {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.15rem;
+}
+
+.information-editor-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 .form-grid {

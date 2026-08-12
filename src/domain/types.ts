@@ -40,6 +40,12 @@ export interface TournamentConfiguration {
   sponsorLabels: string[]
 }
 
+export interface TournamentInformation {
+  chipLines: string[]
+  prizeLines: string[]
+  houseNotes: string[]
+}
+
 export interface TournamentRuntime {
   currentEntryIndex: number
   status: TimerStatus
@@ -62,4 +68,5 @@ export interface TournamentState {
   runtime: TournamentRuntime
   chipLedger: ChipContribution[]
   settings: TournamentSettings
+  information?: TournamentInformation
 }

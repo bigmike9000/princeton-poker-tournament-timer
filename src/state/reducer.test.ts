@@ -4,6 +4,22 @@ import { tournamentReducer } from './reducer'
 import { selectCurrentEntry, selectEntryLabel, selectNextPokerLevel, selectRemainingMs } from './selectors'
 
 describe('tournamentReducer', () => {
+  it('updates tournament information atomically', () => {
+    const state = createInitialState()
+    const information = {
+      chipLines: ['1, 5, and 25-value chips'],
+      prizeLines: ['1st — Trophy'],
+      houseNotes: ['No late registration.'],
+    }
+
+    const result = tournamentReducer(state, { type: 'SET_INFORMATION', information })
+
+    expect(result.information).toEqual(information)
+    expect(result.information).not.toBe(information)
+    expect(result.structure).toEqual(state.structure)
+    expect(result.runtime).toEqual(state.runtime)
+  })
+
   it('starts, pauses, and resumes without losing exact time', () => {
     let state = createInitialState()
     state = tournamentReducer(state, { type: 'START', now: 1_000 })

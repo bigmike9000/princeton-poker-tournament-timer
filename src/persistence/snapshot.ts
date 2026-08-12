@@ -29,6 +29,24 @@ function isFiniteNonnegative(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value) && value >= 0
 }
 
+function isInformationLines(value: unknown): value is string[] {
+  return Array.isArray(value) &&
+    value.length <= 24 &&
+    value.every((line) => typeof line === 'string' && line.length > 0 && line.length <= 160)
+}
+
+function isTournamentInformation(value: unknown): boolean {
+  if (!isRecord(value)) return false
+  const keys = Object.keys(value).sort()
+  return keys.length === 3 &&
+    keys[0] === 'chipLines' &&
+    keys[1] === 'houseNotes' &&
+    keys[2] === 'prizeLines' &&
+    isInformationLines(value.chipLines) &&
+    isInformationLines(value.prizeLines) &&
+    isInformationLines(value.houseNotes)
+}
+
 function parseSnapshot(value: unknown): Snapshot {
   if (!isRecord(value) || value.version !== SNAPSHOT_VERSION || !isFiniteNonnegative(value.savedAt)) {
     throw new Error('Unsupported saved tournament format.')
@@ -44,6 +62,7 @@ function parseSnapshot(value: unknown): Snapshot {
   const settings = state.settings
   const structure = parseStructure(state.structure)
   const chipLedger = state.chipLedger
+  const information = state.information
 
   if (typeof configuration.organizationName !== 'string' ||
       typeof configuration.tournamentName !== 'string' ||
@@ -79,6 +98,10 @@ function parseSnapshot(value: unknown): Snapshot {
     ['initial', 'reentry', 'addon'].includes(String(entry.kind)) &&
     Number.isInteger(entry.chips) && Number(entry.chips) >= 0)) {
     throw new Error('Saved tournament chip ledger is invalid.')
+  }
+
+  if (information !== undefined && !isTournamentInformation(information)) {
+    throw new Error('Saved tournament information is invalid.')
   }
 
   const booleanSettings = [
