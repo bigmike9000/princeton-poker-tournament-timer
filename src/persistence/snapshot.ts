@@ -2,6 +2,7 @@ import { createInitialState } from '../domain/sampleStructure'
 import { resolveTimer } from '../domain/timer'
 import type { StructureEntry, TournamentState } from '../domain/types'
 import { validateStructure } from '../domain/validation'
+import { isUntouchedFormerDefault } from './legacyDefaults'
 
 export const SNAPSHOT_KEY = 'ppc-tournament:v1'
 const SNAPSHOT_VERSION = 1
@@ -42,7 +43,8 @@ function isStructureEntry(value: unknown): value is StructureEntry {
     ['none', 'traditional', 'big-blind'].includes(String(value.anteType)) &&
     (value.durationSeconds === null ||
       (isFiniteNonnegative(value.durationSeconds) && value.durationSeconds > 0)) &&
-    (value.note === undefined || typeof value.note === 'string')
+    (value.note === undefined ||
+      (typeof value.note === 'string' && value.note.length <= 80))
 }
 
 function parseSnapshot(value: unknown): Snapshot {
@@ -134,6 +136,9 @@ export function loadSnapshot(storage: Storage, now: number): LoadResult {
 
   try {
     const snapshot = parseSnapshot(JSON.parse(raw) as unknown)
+    if (isUntouchedFormerDefault(snapshot.state)) {
+      return { state: createInitialState(), recovered: false }
+    }
     if (snapshot.state.settings.closeBehavior === 'continue') {
       return {
         state: resolveTimer(snapshot.state, now),

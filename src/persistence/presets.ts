@@ -1,6 +1,7 @@
 import { sampleStructure } from '../domain/sampleStructure'
 import type { StructureEntry } from '../domain/types'
 import { validatePresetName, validateStructure } from '../domain/validation'
+import { isFormerBundledStructure } from './legacyDefaults'
 
 export const PRESETS_KEY = 'ppc-presets:v1'
 
@@ -86,6 +87,18 @@ export function createPresetRepository(
       createdAt: timestamp,
       updatedAt: timestamp,
     }])
+  } else {
+    const presets = read()
+    const legacyStandard = presets.findIndex((preset) =>
+      preset.name === 'Princeton Poker Club Standard' &&
+      isFormerBundledStructure(preset.structure))
+    if (legacyStandard >= 0) {
+      presets[legacyStandard] = {
+        ...presets[legacyStandard],
+        structure: clone(sampleStructure),
+      }
+      write(presets)
+    }
   }
 
   return {

@@ -49,6 +49,17 @@ describe('snapshot persistence', () => {
     expect(restored.state.runtime.remainingMs).toBe(718_500)
   })
 
+  it('round-trips a structure with an untimed terminal level', () => {
+    const state = createInitialState()
+
+    saveSnapshot(localStorage, state, 10_000)
+    const restored = loadSnapshot(localStorage, 10_000)
+
+    expect(restored.recovered).toBe(false)
+    expect(restored.state.structure).toEqual(state.structure)
+    expect(restored.state.structure.at(-1)?.durationSeconds).toBeNull()
+  })
+
   it('returns safe defaults and a recovery warning for malformed storage', () => {
     localStorage.setItem(SNAPSHOT_KEY, '{not-json')
 

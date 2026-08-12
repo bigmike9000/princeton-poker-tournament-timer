@@ -6,6 +6,7 @@ import {
   useState,
   type PropsWithChildren,
 } from 'react'
+import { isUntimedEntry } from '../domain/structure'
 import { loadSnapshot, saveSnapshot } from '../persistence/snapshot'
 import { audioAlerts, thresholdsCrossed } from '../services/audio'
 import { tournamentReducer } from '../state/reducer'
@@ -26,7 +27,8 @@ export function TournamentProvider({ children }: PropsWithChildren) {
   }, [state])
 
   useEffect(() => {
-    if (state.runtime.status !== 'running') return
+    const currentEntry = state.structure[state.runtime.currentEntryIndex]
+    if (state.runtime.status !== 'running' || isUntimedEntry(currentEntry)) return
 
     const interval = window.setInterval(() => {
       const tickAt = Date.now()
@@ -35,7 +37,7 @@ export function TournamentProvider({ children }: PropsWithChildren) {
     }, 250)
 
     return () => window.clearInterval(interval)
-  }, [state.runtime.status])
+  }, [state.runtime.currentEntryIndex, state.runtime.status, state.structure])
 
   useEffect(() => {
     const previous = previousAudioStateRef.current

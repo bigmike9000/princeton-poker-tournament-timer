@@ -1,6 +1,33 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { createInitialState } from '../domain/sampleStructure'
-import { createPresetRepository } from './presets'
+import { createInitialState, sampleStructure } from '../domain/sampleStructure'
+import type { StructureEntry } from '../domain/types'
+import { createPresetRepository, PRESETS_KEY, type StructurePreset } from './presets'
+
+const formerBundledStructure: StructureEntry[] = [
+  { id: 'level-1', kind: 'level', durationSeconds: 1_200, smallBlind: 100, bigBlind: 200, ante: 200, anteType: 'big-blind' },
+  { id: 'level-2', kind: 'level', durationSeconds: 1_200, smallBlind: 100, bigBlind: 300, ante: 300, anteType: 'big-blind' },
+  { id: 'level-3', kind: 'level', durationSeconds: 1_200, smallBlind: 200, bigBlind: 400, ante: 400, anteType: 'big-blind' },
+  { id: 'level-4', kind: 'level', durationSeconds: 1_200, smallBlind: 300, bigBlind: 600, ante: 600, anteType: 'big-blind' },
+  { id: 'break-1', kind: 'break', durationSeconds: 900, label: 'Break' },
+  { id: 'level-5', kind: 'level', durationSeconds: 1_200, smallBlind: 400, bigBlind: 800, ante: 800, anteType: 'big-blind' },
+  { id: 'level-6', kind: 'level', durationSeconds: 1_200, smallBlind: 500, bigBlind: 1_000, ante: 1_000, anteType: 'big-blind' },
+  { id: 'level-7', kind: 'level', durationSeconds: 1_200, smallBlind: 600, bigBlind: 1_200, ante: 1_200, anteType: 'big-blind' },
+  { id: 'level-8', kind: 'level', durationSeconds: 1_200, smallBlind: 800, bigBlind: 1_600, ante: 1_600, anteType: 'big-blind' },
+  { id: 'break-2', kind: 'break', durationSeconds: 900, label: 'Break' },
+  { id: 'level-9', kind: 'level', durationSeconds: 1_200, smallBlind: 1_000, bigBlind: 2_000, ante: 2_000, anteType: 'big-blind' },
+  { id: 'level-10', kind: 'level', durationSeconds: 1_200, smallBlind: 1_500, bigBlind: 3_000, ante: 3_000, anteType: 'big-blind' },
+]
+
+function persistedPreset(overrides: Partial<StructurePreset> = {}): StructurePreset {
+  return {
+    id: 'standard-v1',
+    name: 'Princeton Poker Club Standard',
+    structure: structuredClone(formerBundledStructure),
+    createdAt: '2025-01-02T03:04:05.000Z',
+    updatedAt: '2025-06-07T08:09:10.000Z',
+    ...overrides,
+  }
+}
 
 describe('preset repository', () => {
   beforeEach(() => localStorage.clear())
@@ -40,5 +67,27 @@ describe('preset repository', () => {
 
     expect(() => repository.save('turbo', createInitialState().structure)).toThrow(/already exists/i)
     expect(() => repository.save('Bad', [])).toThrow(/valid structure/i)
+  })
+
+  it('upgrades the former bundled standard preset in place', () => {
+    const legacy = persistedPreset()
+    localStorage.setItem(PRESETS_KEY, JSON.stringify([legacy]))
+
+    const [upgraded] = createPresetRepository(localStorage).list()
+
+    expect(upgraded).toEqual({ ...legacy, structure: sampleStructure })
+  })
+
+  it.each([
+    ['a custom preset with the former structure', persistedPreset({ id: 'custom-v1', name: 'Custom' })],
+    ['a standard-named preset with a customized structure', persistedPreset({
+      structure: [{ ...formerBundledStructure[0], durationSeconds: 1_140 }, ...formerBundledStructure.slice(1)],
+    })],
+  ])('does not alter %s', (_label, preset) => {
+    localStorage.setItem(PRESETS_KEY, JSON.stringify([preset]))
+
+    const [restored] = createPresetRepository(localStorage).list()
+
+    expect(restored).toEqual(preset)
   })
 })
