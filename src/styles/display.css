@@ -553,8 +553,8 @@ select:focus-visible {
 
 .structure-blinds small {
   overflow: hidden;
-  color: var(--slate-500);
-  font-size: .59rem;
+  color: var(--slate-400);
+  font-size: .61rem;
   font-weight: 760;
   letter-spacing: .08em;
   text-overflow: ellipsis;
@@ -566,9 +566,9 @@ select:focus-visible {
 }
 
 .level-duration {
-  color: var(--slate-500);
+  color: var(--slate-400);
   font-family: var(--font-numeric);
-  font-size: .69rem;
+  font-size: .7rem;
   font-weight: 700;
   white-space: nowrap;
 }

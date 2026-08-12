@@ -52,3 +52,67 @@ No snapshot tests were added, as directed by the Task 2 brief for this CSS/prese
 ## Concerns
 
 None. Browsers without CSS masking support will simply render less of the decorative watermark/texture treatment; all content, contrast, layout, and behavior remain intact.
+
+## Fix Round 1
+
+### Review finding addressed
+
+The upcoming-row ante and level-duration values were using `--slate-500` at `.59rem` and `.69rem`, respectively. Updated both operational metadata rules to `--slate-400` and restored their prior minimum sizes: `.61rem` for ante text and `.7rem` for level duration. The current-row orange ante override remains unchanged. No unrelated styling was modified.
+
+### Exact command and output
+
+```sh
+git diff --check && npm run lint && npm run build && npm test -- --run src/features/display/TournamentDisplay.test.tsx
+```
+
+```text
+git diff --check produced no output and exited 0.
+
+> princeton-poker-tournament-timer@0.1.0 lint
+> eslint .
+
+> princeton-poker-tournament-timer@0.1.0 build
+> npm run typecheck && vite build
+
+> princeton-poker-tournament-timer@0.1.0 typecheck
+> tsc -b --pretty false
+
+vite v8.2.1 building client environment for production...
+transforming...✓ 51 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/manifest.webmanifest                          0.51 kB
+dist/index.html                                    0.97 kB │ gzip:  0.47 kB
+dist/assets/index-BrL2gnhi.css                    32.07 kB │ gzip:  7.29 kB
+dist/assets/workbox-window.prod.es5-Bd17z0YL.js    5.65 kB │ gzip:  2.20 kB
+dist/assets/index-NwwR7x0B.js                    248.44 kB │ gzip: 74.77 kB
+
+✓ built in 121ms
+
+PWA v1.3.0
+mode      generateSW
+precache  13 entries (551.24 KiB)
+files generated
+  dist/sw.js
+  dist/workbox-2fbc6a65.js
+
+> princeton-poker-tournament-timer@0.1.0 test
+> vitest --run src/features/display/TournamentDisplay.test.tsx
+
+ RUN  v4.1.10 /Users/michaelfang/Documents/ChatGPT/PPC/.worktrees/premium-ppc-design
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Duration  755ms
+```
+
+### Fix self-review
+
+- Confirmed the diff contains only the two requested color/size corrections plus this report entry.
+- Confirmed upcoming operational metadata now uses the higher-contrast `--slate-400` token.
+- Confirmed neither value is smaller than its pre-refresh size.
+- Confirmed current-level state emphasis, content, behavior, and responsive rules are unchanged.
+
+### Fix concerns
+
+None.
