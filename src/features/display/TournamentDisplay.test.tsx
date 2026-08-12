@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { TournamentProvider } from '../../app/TournamentProvider'
 import { createInitialState } from '../../domain/sampleStructure'
@@ -35,7 +36,9 @@ describe('TournamentDisplay', () => {
     expect(screen.getAllByText('NO ANTE').length).toBeGreaterThan(0)
     expect(screen.getByText('80 / 80')).toBeVisible()
     expect(screen.getByText('200')).toBeVisible()
-    expect(screen.getByText('16,000')).toBeVisible()
+    expect(screen.queryByText('Official Tournament Clock')).not.toBeInTheDocument()
+    expect(screen.queryByText('Total chips')).not.toBeInTheDocument()
+    expect(screen.queryByText('16,000')).not.toBeInTheDocument()
   })
 
   it('renders a break and previews the next poker level', () => {
@@ -48,6 +51,7 @@ describe('TournamentDisplay', () => {
     renderDisplay()
 
     expect(screen.getAllByText('BREAK').length).toBeGreaterThan(0)
+    expect(screen.getByRole('region', { name: 'Current break' })).toHaveTextContent('Chip up to 5s')
     expect(screen.getByText(/Next: Level 6/)).toBeVisible()
     expect(screen.getAllByText(/10 \/ 20/).length).toBeGreaterThan(0)
   })
@@ -63,6 +67,33 @@ describe('TournamentDisplay', () => {
 
     expect(screen.getByRole('listitem', { name: /^Level 3 / })).toHaveAttribute('aria-current', 'step')
     expect(screen.getByRole('listitem', { name: /^Level 1 / })).toHaveAttribute('data-state', 'complete')
+  })
+
+  it('jumps to a schedule entry from the main display', async () => {
+    const user = userEvent.setup()
+    renderDisplay()
+
+    await user.click(screen.getByRole('button', { name: /^Level 2 2 \/ 4/ }))
+
+    expect(screen.getByText('LEVEL 2')).toBeVisible()
+    expect(screen.getByRole('timer')).toHaveTextContent('12:00')
+  })
+
+  it('renders schedule notes and the untimed terminal clock', async () => {
+    const user = userEvent.setup()
+    renderDisplay()
+
+    expect(screen.getByText(/Chip up to 5s/)).toBeVisible()
+    expect(screen.getByText(/Final table target/)).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Break Chip up to 5s, 10 min' })).toBeVisible()
+    expect(screen.getByRole('button', {
+      name: 'Level 13 100 / 200, BIG BLIND ANTE: 200, 15 min, Final table target · chip up to 100s and 500s',
+    })).toBeVisible()
+
+    await user.click(screen.getByRole('button', { name: /^Level 17 500 \/ 1,000/ }))
+
+    expect(screen.getByRole('region', { name: 'Current poker level' })).toHaveTextContent('Final level')
+    expect(screen.getByRole('timer')).toHaveTextContent('UNTIL END')
   })
 
   it('runs safe main-display controls and opens the director overlay', () => {

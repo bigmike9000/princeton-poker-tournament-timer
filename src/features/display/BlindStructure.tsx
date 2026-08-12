@@ -5,7 +5,12 @@ import type { TournamentState } from '../../domain/types'
 import { selectPokerLevelNumber } from '../../state/selectors'
 import { anteLabel } from './format'
 
-export function BlindStructure({ state }: { state: TournamentState }) {
+interface BlindStructureProps {
+  state: TournamentState
+  onSelectEntry: (index: number) => void
+}
+
+export function BlindStructure({ state, onSelectEntry }: BlindStructureProps) {
   const currentRef = useRef<HTMLLIElement>(null)
 
   useEffect(() => {
@@ -29,7 +34,9 @@ export function BlindStructure({ state }: { state: TournamentState }) {
             : current ? 'current' : 'upcoming'
 
           if (entry.kind === 'break') {
-            const label = `BREAK — ${durationLabel(entry).toUpperCase()}`
+            const duration = durationLabel(entry)
+            const rowLabel = `BREAK — ${duration.toUpperCase()}`
+            const buttonLabel = `Break ${entry.label}, ${duration}`
             return (
               <li
                 key={entry.id}
@@ -37,17 +44,32 @@ export function BlindStructure({ state }: { state: TournamentState }) {
                 className={`structure-row structure-row--break structure-row--${rowState}`}
                 data-state={rowState}
                 aria-current={current ? 'step' : undefined}
-                aria-label={label}
+                aria-label={rowLabel}
               >
-                <span className="break-rule" aria-hidden="true" />
-                <strong>{label}</strong>
-                <span className="break-rule" aria-hidden="true" />
+                <button
+                  type="button"
+                  className="structure-row-button"
+                  aria-label={buttonLabel}
+                  onClick={() => onSelectEntry(index)}
+                >
+                  <span className="break-rule" aria-hidden="true" />
+                  <span className="structure-break-copy">
+                    <strong>BREAK — {duration}</strong>
+                    <small>{entry.label}</small>
+                  </span>
+                  <span className="break-rule" aria-hidden="true" />
+                </button>
               </li>
             )
           }
 
           const levelNumber = selectPokerLevelNumber(state, index)
-          const label = `Level ${levelNumber} ${formatChips(entry.smallBlind)} / ${formatChips(entry.bigBlind)}`
+          const label = [
+            `Level ${levelNumber} ${formatChips(entry.smallBlind)} / ${formatChips(entry.bigBlind)}`,
+            anteLabel(entry.anteType, entry.ante),
+            durationLabel(entry),
+            entry.note,
+          ].filter(Boolean).join(', ')
           return (
             <li
               key={entry.id}
@@ -57,13 +79,21 @@ export function BlindStructure({ state }: { state: TournamentState }) {
               aria-current={current ? 'step' : undefined}
               aria-label={label}
             >
-              <span className="level-index">{String(levelNumber).padStart(2, '0')}</span>
-              <div className="structure-blinds">
-                <strong>{formatChips(entry.smallBlind)} / {formatChips(entry.bigBlind)}</strong>
-                <small>{anteLabel(entry.anteType, entry.ante)}</small>
-              </div>
-              <span className="level-duration">{durationLabel(entry)}</span>
-              {current && <span className="live-marker">LIVE</span>}
+              <button
+                type="button"
+                className="structure-row-button"
+                aria-label={label}
+                onClick={() => onSelectEntry(index)}
+              >
+                <span className="level-index">{String(levelNumber).padStart(2, '0')}</span>
+                <span className="structure-blinds">
+                  <strong>{formatChips(entry.smallBlind)} / {formatChips(entry.bigBlind)}</strong>
+                  <small>{anteLabel(entry.anteType, entry.ante)}</small>
+                  {entry.note && <small className="structure-note">{entry.note}</small>}
+                </span>
+                <span className="level-duration">{durationLabel(entry)}</span>
+                {current && <span className="live-marker">LIVE</span>}
+              </button>
             </li>
           )
         })}

@@ -1,4 +1,4 @@
-import { averageStack, formatChips, totalChips } from '../../domain/calculations'
+import { averageStack, formatChips } from '../../domain/calculations'
 import type { TournamentState } from '../../domain/types'
 
 export function PlayerStats({ state }: { state: TournamentState }) {
@@ -11,10 +11,6 @@ export function PlayerStats({ state }: { state: TournamentState }) {
       <article className="stat-card">
         <span>Average stack</span>
         <strong>{formatChips(averageStack(state))}</strong>
-      </article>
-      <article className="stat-card">
-        <span>Total chips</span>
-        <strong>{formatChips(totalChips(state))}</strong>
       </article>
     </section>
   )

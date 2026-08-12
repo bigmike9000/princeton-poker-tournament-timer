@@ -1,6 +1,7 @@
 import { useTournament } from '../../app/useTournament'
 import { ClubLogo } from '../../components/ClubLogo'
-import { selectRemainingMs } from '../../state/selectors'
+import { isUntimedEntry } from '../../domain/structure'
+import { selectCurrentEntry, selectRemainingMs } from '../../state/selectors'
 import { BlindStructure } from './BlindStructure'
 import { Clock } from './Clock'
 import { CurrentLevel } from './CurrentLevel'
@@ -22,6 +23,7 @@ export function TournamentDisplay({
 }: TournamentDisplayProps) {
   const { state, now, dispatch, persistenceError } = useTournament()
   const remainingMs = selectRemainingMs(state, now)
+  const currentEntry = selectCurrentEntry(state)
   const running = state.runtime.status === 'running'
 
   return (
@@ -34,7 +36,6 @@ export function TournamentDisplay({
               <ClubLogo className="club-logo" size={64} />
             </div>
             <div className="brand-copy">
-              <p className="brand-eyebrow">Official Tournament Clock</p>
               <p className="brand-organization">{state.configuration.organizationName}</p>
               <h1>{state.configuration.tournamentName}</h1>
             </div>
@@ -46,7 +47,7 @@ export function TournamentDisplay({
 
           <div className="stage-content">
             <CurrentLevel state={state} />
-            <Clock remainingMs={remainingMs} />
+            <Clock remainingMs={remainingMs} untimed={isUntimedEntry(currentEntry)} />
             <PlayerStats state={state} />
           </div>
 
@@ -58,7 +59,10 @@ export function TournamentDisplay({
           </footer>
         </section>
 
-        <BlindStructure state={state} />
+        <BlindStructure
+          state={state}
+          onSelectEntry={(index) => dispatch({ type: 'GO_TO_ENTRY', index, now: Date.now() })}
+        />
       </main>
       <DisplayControls
         state={state}

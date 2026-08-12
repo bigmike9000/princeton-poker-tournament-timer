@@ -17,6 +17,7 @@ export function CurrentLevel({ state }: { state: TournamentState }) {
       <section className="current-level current-level--break" aria-label="Current break">
         <p className="eyebrow eyebrow--accent">Tournament break</p>
         <h2 className="level-heading">BREAK</h2>
+        <p className="current-level-note current-level-note--break">{entry.label}</p>
         {nextLevel && nextNumber !== null ? (
           <div className="next-level-card">
             <span>Next: Level {nextNumber}</span>
@@ -39,6 +40,7 @@ export function CurrentLevel({ state }: { state: TournamentState }) {
       <div className="blind-display">
         <strong>{formatChips(entry.smallBlind)} / {formatChips(entry.bigBlind)}</strong>
         <span>{anteLabel(entry.anteType, entry.ante)}</span>
+        {entry.note && <small className="current-level-note">{entry.note}</small>}
       </div>
     </section>
   )

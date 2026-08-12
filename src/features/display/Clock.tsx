@@ -1,5 +1,6 @@
 interface ClockProps {
   remainingMs: number
+  untimed: boolean
 }
 
 function formatClock(remainingMs: number): string {
@@ -8,12 +9,15 @@ function formatClock(remainingMs: number): string {
   return `${String(minutes).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`
 }
 
-export function Clock({ remainingMs }: ClockProps) {
-  const urgent = remainingMs > 0 && remainingMs <= 60_000
+export function Clock({ remainingMs, untimed }: ClockProps) {
+  const urgent = !untimed && remainingMs > 0 && remainingMs <= 60_000
+  const className = untimed
+    ? 'clock clock--untimed'
+    : urgent ? 'clock clock--urgent' : 'clock'
 
   return (
-    <div role="timer" aria-live="off" className={urgent ? 'clock clock--urgent' : 'clock'}>
-      {formatClock(remainingMs)}
+    <div role="timer" aria-live="off" className={className}>
+      {untimed ? 'UNTIL END' : formatClock(remainingMs)}
     </div>
   )
 }
