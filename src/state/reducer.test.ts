@@ -94,6 +94,79 @@ describe('tournamentReducer', () => {
     })
   })
 
+  it.each([
+    ['running', 5_000],
+    ['paused', null],
+  ] as const)('loads the configured duration when a %s untimed level becomes timed', (status, baselineAt) => {
+    const state = createInitialState()
+    state.runtime.currentEntryIndex = state.structure.length - 1
+    state.runtime.status = status
+    state.runtime.remainingMs = 0
+    state.runtime.baselineAt = null
+    const structure = structuredClone(state.structure)
+    const final = structure.at(-1)!
+    if (final.kind !== 'level') throw new Error('Expected a poker level.')
+    final.durationSeconds = 600
+
+    const result = tournamentReducer(state, { type: 'SET_STRUCTURE', structure, now: 5_000 })
+
+    expect(result.runtime).toMatchObject({
+      currentEntryIndex: structure.length - 1,
+      remainingMs: 600_000,
+      baselineAt,
+      status,
+    })
+  })
+
+  it('keeps a running level active without a baseline when it becomes untimed', () => {
+    const state = createInitialState()
+    state.runtime.currentEntryIndex = state.structure.length - 1
+    state.runtime.status = 'running'
+    state.runtime.remainingMs = 420_000
+    state.runtime.baselineAt = 1_000
+    const current = state.structure.at(-1)!
+    if (current.kind !== 'level') throw new Error('Expected a poker level.')
+    current.durationSeconds = 600
+    const structure = structuredClone(state.structure)
+    const final = structure.at(-1)!
+    if (final.kind !== 'level') throw new Error('Expected a poker level.')
+    final.durationSeconds = null
+
+    const result = tournamentReducer(state, { type: 'SET_STRUCTURE', structure, now: 5_000 })
+
+    expect(result.runtime).toMatchObject({
+      currentEntryIndex: structure.length - 1,
+      remainingMs: 0,
+      baselineAt: null,
+      status: 'running',
+    })
+  })
+
+  it('makes a completed timed level resumable when it becomes untimed', () => {
+    const state = createInitialState()
+    state.runtime.currentEntryIndex = state.structure.length - 1
+    state.runtime.status = 'complete'
+    state.runtime.remainingMs = 0
+    state.runtime.baselineAt = null
+    const current = state.structure.at(-1)!
+    if (current.kind !== 'level') throw new Error('Expected a poker level.')
+    current.durationSeconds = 600
+    const structure = structuredClone(state.structure)
+    const final = structure.at(-1)!
+    if (final.kind !== 'level') throw new Error('Expected a poker level.')
+    final.durationSeconds = null
+
+    const result = tournamentReducer(state, { type: 'SET_STRUCTURE', structure, now: 5_000 })
+
+    expect(result.runtime).toMatchObject({
+      currentEntryIndex: structure.length - 1,
+      remainingMs: 0,
+      baselineAt: null,
+      status: 'paused',
+    })
+    expect(tournamentReducer(result, { type: 'START', now: 6_000 }).runtime.status).toBe('running')
+  })
+
   it('ignores direct time edits while the current level is untimed', () => {
     const state = createInitialState()
     state.runtime.currentEntryIndex = state.structure.length - 1

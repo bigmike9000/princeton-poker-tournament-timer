@@ -173,17 +173,26 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
       const index = matchingIndex >= 0
         ? matchingIndex
         : clamp(resolved.runtime.currentEntryIndex, 0, action.structure.length - 1)
-      const running = resolved.runtime.status === 'running'
+      const wasUntimed = isUntimedEntry(
+        resolved.structure[resolved.runtime.currentEntryIndex],
+      )
       const duration = entryDurationMs(action.structure[index])
+      const status = duration === null && resolved.runtime.status === 'complete'
+        ? 'paused'
+        : resolved.runtime.status
+      const running = status === 'running'
       return {
         ...resolved,
         structure: structuredClone(action.structure),
         runtime: {
           ...resolved.runtime,
           currentEntryIndex: index,
+          status,
           remainingMs: duration === null
             ? 0
-            : Math.min(resolved.runtime.remainingMs, duration),
+            : wasUntimed
+              ? duration
+              : Math.min(resolved.runtime.remainingMs, duration),
           baselineAt: running && duration !== null ? action.now : null,
           alertedThresholds: [],
           transitionCause: null,

@@ -1,8 +1,10 @@
 import { createInitialState } from '../domain/sampleStructure'
+import { isUntimedEntry } from '../domain/structure'
 import { resolveTimer } from '../domain/timer'
-import type { StructureEntry, TournamentState } from '../domain/types'
+import type { TournamentState } from '../domain/types'
 import { validateStructure } from '../domain/validation'
 import { isUntouchedFormerDefault } from './legacyDefaults'
+import { parseStructure } from './structureParser'
 
 export const SNAPSHOT_KEY = 'ppc-tournament:v1'
 const SNAPSHOT_VERSION = 1
@@ -27,26 +29,6 @@ function isFiniteNonnegative(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value) && value >= 0
 }
 
-function isStructureEntry(value: unknown): value is StructureEntry {
-  if (!isRecord(value) || typeof value.id !== 'string') {
-    return false
-  }
-  if (value.kind === 'break') {
-    return typeof value.label === 'string' &&
-      isFiniteNonnegative(value.durationSeconds) &&
-      value.durationSeconds > 0
-  }
-  if (value.kind !== 'level') return false
-  return isFiniteNonnegative(value.smallBlind) &&
-    isFiniteNonnegative(value.bigBlind) &&
-    isFiniteNonnegative(value.ante) &&
-    ['none', 'traditional', 'big-blind'].includes(String(value.anteType)) &&
-    (value.durationSeconds === null ||
-      (isFiniteNonnegative(value.durationSeconds) && value.durationSeconds > 0)) &&
-    (value.note === undefined ||
-      (typeof value.note === 'string' && value.note.length <= 80))
-}
-
 function parseSnapshot(value: unknown): Snapshot {
   if (!isRecord(value) || value.version !== SNAPSHOT_VERSION || !isFiniteNonnegative(value.savedAt)) {
     throw new Error('Unsupported saved tournament format.')
@@ -60,7 +42,7 @@ function parseSnapshot(value: unknown): Snapshot {
   const configuration = state.configuration
   const runtime = state.runtime
   const settings = state.settings
-  const structure = state.structure
+  const structure = parseStructure(state.structure)
   const chipLedger = state.chipLedger
 
   if (typeof configuration.organizationName !== 'string' ||
@@ -72,7 +54,7 @@ function parseSnapshot(value: unknown): Snapshot {
     throw new Error('Saved tournament configuration is invalid.')
   }
 
-  if (!Array.isArray(structure) || structure.length === 0 || !structure.every(isStructureEntry) ||
+  if (structure === null || structure.length === 0 ||
       !validateStructure(structure).valid) {
     throw new Error('Saved tournament structure is invalid.')
   }
@@ -118,6 +100,22 @@ function parseSnapshot(value: unknown): Snapshot {
   return snapshot
 }
 
+function canonicalizeUntimedRuntime(state: TournamentState): TournamentState {
+  const currentEntry = state.structure[state.runtime.currentEntryIndex]
+  if (!isUntimedEntry(currentEntry)) return state
+
+  return {
+    ...state,
+    runtime: {
+      ...state.runtime,
+      status: state.runtime.status === 'complete' ? 'paused' : state.runtime.status,
+      remainingMs: 0,
+      baselineAt: null,
+      alertedThresholds: [],
+    },
+  }
+}
+
 export function saveSnapshot(storage: Storage, state: TournamentState, savedAt: number): void {
   const resolved = resolveTimer(state, savedAt)
   const snapshot: Snapshot = {
@@ -139,19 +137,20 @@ export function loadSnapshot(storage: Storage, now: number): LoadResult {
     if (isUntouchedFormerDefault(snapshot.state)) {
       return { state: createInitialState(), recovered: false }
     }
-    if (snapshot.state.settings.closeBehavior === 'continue') {
+    const state = canonicalizeUntimedRuntime(snapshot.state)
+    if (state.settings.closeBehavior === 'continue') {
       return {
-        state: resolveTimer(snapshot.state, now),
+        state: resolveTimer(state, now),
         recovered: false,
       }
     }
 
-    if (snapshot.state.runtime.status === 'running') {
+    if (state.runtime.status === 'running') {
       return {
         state: {
-          ...snapshot.state,
+          ...state,
           runtime: {
-            ...snapshot.state.runtime,
+            ...state.runtime,
             status: 'paused',
             baselineAt: null,
           },
@@ -160,7 +159,7 @@ export function loadSnapshot(storage: Storage, now: number): LoadResult {
       }
     }
 
-    return { state: snapshot.state, recovered: false }
+    return { state, recovered: false }
   } catch {
     return {
       state: createInitialState(),

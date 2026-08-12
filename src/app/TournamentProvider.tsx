@@ -45,7 +45,9 @@ export function TournamentProvider({ children }: PropsWithChildren) {
 
     if (state.settings.muted) return
 
+    const currentEntry = state.structure[state.runtime.currentEntryIndex]
     if (previous.runtime.currentEntryIndex === state.runtime.currentEntryIndex) {
+      if (isUntimedEntry(currentEntry)) return
       const crossed = thresholdsCrossed(
         previous.runtime.remainingMs,
         state.runtime.remainingMs,
@@ -61,7 +63,6 @@ export function TournamentProvider({ children }: PropsWithChildren) {
 
     if (state.runtime.transitionCause !== 'automatic') return
     const previousEntry = previous.structure[previous.runtime.currentEntryIndex]
-    const currentEntry = state.structure[state.runtime.currentEntryIndex]
 
     if (previousEntry?.kind === 'level' && state.settings.alertLevelComplete) {
       audioAlerts.play('level-complete')

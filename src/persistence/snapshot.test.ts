@@ -60,6 +60,54 @@ describe('snapshot persistence', () => {
     expect(restored.state.structure.at(-1)?.durationSeconds).toBeNull()
   })
 
+  it('restores a valid running untimed level without inventing countdown state', () => {
+    const state = createInitialState()
+    state.settings.closeBehavior = 'continue'
+    state.runtime.currentEntryIndex = state.structure.length - 1
+    state.runtime.status = 'running'
+    state.runtime.remainingMs = 0
+    state.runtime.baselineAt = null
+    state.runtime.alertedThresholds = []
+    localStorage.setItem(SNAPSHOT_KEY, JSON.stringify({ version: 1, savedAt: 10_000, state }))
+
+    const restored = loadSnapshot(localStorage, 30_000)
+
+    expect(restored.recovered).toBe(false)
+    expect(restored.state.runtime).toMatchObject({
+      currentEntryIndex: state.structure.length - 1,
+      status: 'running',
+      remainingMs: 0,
+      baselineAt: null,
+      alertedThresholds: [],
+    })
+  })
+
+  it.each([
+    ['running', 'running'],
+    ['paused', 'paused'],
+    ['complete', 'paused'],
+  ] as const)('canonicalizes malformed %s untimed progress to resumable %s state', (status, expectedStatus) => {
+    const state = createInitialState()
+    state.settings.closeBehavior = 'continue'
+    state.runtime.currentEntryIndex = state.structure.length - 1
+    state.runtime.status = status
+    state.runtime.remainingMs = 123_456
+    state.runtime.baselineAt = 9_000
+    state.runtime.alertedThresholds = [300_000, 60_000]
+    localStorage.setItem(SNAPSHOT_KEY, JSON.stringify({ version: 1, savedAt: 10_000, state }))
+
+    const restored = loadSnapshot(localStorage, 30_000)
+
+    expect(restored.recovered).toBe(false)
+    expect(restored.state.runtime).toMatchObject({
+      currentEntryIndex: state.structure.length - 1,
+      status: expectedStatus,
+      remainingMs: 0,
+      baselineAt: null,
+      alertedThresholds: [],
+    })
+  })
+
   it('returns safe defaults and a recovery warning for malformed storage', () => {
     localStorage.setItem(SNAPSHOT_KEY, '{not-json')
 

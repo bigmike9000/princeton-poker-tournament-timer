@@ -69,6 +69,29 @@ describe('preset repository', () => {
     expect(() => repository.save('Bad', [])).toThrow(/valid structure/i)
   })
 
+  it.each([
+    ['a non-string level note', { note: { unsafe: true } }],
+    ['an invalid ante type', { anteType: 'dealer-button', ante: 2 }],
+    ['a non-string break label', { kind: 'break', label: null, durationSeconds: 600 }],
+  ])('filters persisted presets with %s without discarding valid siblings', (_label, malformedFields) => {
+    const valid = persistedPreset({
+      id: 'valid-v2',
+      name: 'Current custom',
+      structure: structuredClone(sampleStructure),
+    })
+    const malformedStructure = structuredClone(sampleStructure) as unknown as Record<string, unknown>[]
+    malformedStructure[0] = { ...malformedStructure[0], ...malformedFields }
+    const malformed = {
+      ...persistedPreset({ id: 'malformed-v2', name: 'Malformed' }),
+      structure: malformedStructure,
+    }
+    localStorage.setItem(PRESETS_KEY, JSON.stringify([valid, malformed]))
+
+    const presets = createPresetRepository(localStorage).list()
+
+    expect(presets).toEqual([valid])
+  })
+
   it('upgrades the former bundled standard preset in place', () => {
     const legacy = persistedPreset()
     localStorage.setItem(PRESETS_KEY, JSON.stringify([legacy]))

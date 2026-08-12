@@ -2,6 +2,7 @@ import { sampleStructure } from '../domain/sampleStructure'
 import type { StructureEntry } from '../domain/types'
 import { validatePresetName, validateStructure } from '../domain/validation'
 import { isFormerBundledStructure } from './legacyDefaults'
+import { parseStructure } from './structureParser'
 
 export const PRESETS_KEY = 'ppc-presets:v1'
 
@@ -33,12 +34,13 @@ function makeId(): string {
 function isPreset(value: unknown): value is StructurePreset {
   if (typeof value !== 'object' || value === null) return false
   const preset = value as Partial<StructurePreset>
+  const structure = parseStructure(preset.structure)
   return typeof preset.id === 'string' &&
     typeof preset.name === 'string' &&
     typeof preset.createdAt === 'string' &&
     typeof preset.updatedAt === 'string' &&
-    Array.isArray(preset.structure) &&
-    validateStructure(preset.structure).valid
+    structure !== null &&
+    validateStructure(structure).valid
 }
 
 export function createPresetRepository(
