@@ -105,6 +105,19 @@ describe('tournamentReducer', () => {
     expect(tournamentReducer(state, { type: 'ADJUST_TIME', deltaMs: 60_000, now: 5_000 })).toBe(state)
   })
 
+  it('ignores SET_TIME when its timestamp advances into the untimed final level', () => {
+    const state = createInitialState()
+    state.runtime.currentEntryIndex = state.structure.length - 2
+    state.runtime.status = 'running'
+    state.runtime.remainingMs = 1_000
+    state.runtime.baselineAt = 10_000
+
+    const result = tournamentReducer(state, { type: 'SET_TIME', remainingMs: 60_000, now: 12_000 })
+
+    expect(result.runtime.currentEntryIndex).toBe(state.structure.length - 1)
+    expect(result.runtime).toMatchObject({ remainingMs: 0, baselineAt: null, status: 'running' })
+  })
+
   it('clamps navigation at the first and last entries', () => {
     const first = createInitialState()
     const beforeFirst = tournamentReducer(first, { type: 'GO_TO_ENTRY', index: -1, now: 0 })

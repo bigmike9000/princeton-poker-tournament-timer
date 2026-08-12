@@ -29,10 +29,10 @@ function clamp(value: number, minimum: number, maximum: number): number {
 }
 
 function updateTime(state: TournamentState, remainingMs: number, now: number): TournamentState {
-  if (isUntimedEntry(state.structure[state.runtime.currentEntryIndex])) return state
-
   const wasRunning = state.runtime.status === 'running'
   const resolved = resolveTimer(state, now)
+  if (isUntimedEntry(resolved.structure[resolved.runtime.currentEntryIndex])) return resolved
+
   const nextRemaining = Math.max(0, Math.round(remainingMs))
   const running = wasRunning && nextRemaining > 0
 
