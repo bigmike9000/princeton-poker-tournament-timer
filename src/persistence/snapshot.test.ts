@@ -3,6 +3,7 @@ import { createInitialState } from '../domain/sampleStructure'
 import {
   DEFAULT_TOURNAMENT_INFORMATION,
   selectTournamentInformation,
+  validateProjectorInformation,
 } from '../domain/tournamentInformation'
 import { loadSnapshot, saveSnapshot, SNAPSHOT_KEY } from './snapshot'
 
@@ -43,6 +44,22 @@ describe('snapshot persistence', () => {
     saveSnapshot(localStorage, state, 1_000)
 
     expect(loadSnapshot(localStorage, 1_000).state.information).toEqual(state.information)
+  })
+
+  it('preserves information that is legacy-valid under the old 24 by 160 envelope', () => {
+    const state = createInitialState()
+    state.information = {
+      chipLines: Array.from({ length: 24 }, (_, index) => `${String(index).padStart(2, '0')}${'x'.repeat(158)}`),
+      prizeLines: ['p'.repeat(160)],
+      houseNotes: ['h'.repeat(160)],
+    }
+    saveRawSnapshot(localStorage, state)
+
+    const restored = loadSnapshot(localStorage, 1_000)
+
+    expect(restored.recovered).toBe(false)
+    expect(restored.state.information).toEqual(state.information)
+    expect(validateProjectorInformation(restored.state.information!)).toMatchObject({ valid: false })
   })
 
   it.each([

@@ -6,6 +6,30 @@ type ReadonlyTournamentInformation = {
   readonly houseNotes: readonly string[]
 }
 
+export type TournamentInformationField = keyof ReadonlyTournamentInformation
+
+export interface ProjectorInformationBudget {
+  readonly maxLines: number
+  readonly maxCharacters: number
+}
+
+export const PROJECTOR_INFORMATION_BUDGETS = {
+  chipLines: { maxLines: 6, maxCharacters: 120 },
+  prizeLines: { maxLines: 4, maxCharacters: 96 },
+  houseNotes: { maxLines: 4, maxCharacters: 120 },
+} as const satisfies Record<TournamentInformationField, ProjectorInformationBudget>
+
+export interface ProjectorInformationFieldValidation {
+  lineCount: number
+  characterCount: number
+  error: string | null
+}
+
+export interface ProjectorInformationValidation {
+  valid: boolean
+  fields: Record<TournamentInformationField, ProjectorInformationFieldValidation>
+}
+
 export const DEFAULT_TOURNAMENT_INFORMATION: ReadonlyTournamentInformation = {
   chipLines: [
     '10 × 1-value chips',
@@ -45,11 +69,46 @@ export function selectTournamentInformation(state: TournamentState): TournamentI
   return cloneInformation(state.information ?? DEFAULT_TOURNAMENT_INFORMATION)
 }
 
+function validateInformationField(
+  lines: readonly string[],
+  budget: ProjectorInformationBudget,
+): ProjectorInformationFieldValidation {
+  const lineCount = lines.length
+  const characterCount = lines.reduce((total, line) => total + line.length, 0)
+  const tooManyLines = lineCount > budget.maxLines
+  const tooManyCharacters = characterCount > budget.maxCharacters
+  let error: string | null = null
+
+  if (tooManyLines && tooManyCharacters) {
+    error = `Use no more than ${budget.maxLines} lines and ${budget.maxCharacters} total characters ` +
+      `(currently ${lineCount} lines and ${characterCount} characters).`
+  } else if (tooManyLines) {
+    error = `Use no more than ${budget.maxLines} lines (currently ${lineCount}).`
+  } else if (tooManyCharacters) {
+    error = `Use no more than ${budget.maxCharacters} total characters (currently ${characterCount}).`
+  }
+
+  return { lineCount, characterCount, error }
+}
+
+export function validateProjectorInformation(
+  information: ReadonlyTournamentInformation,
+): ProjectorInformationValidation {
+  const fields = {
+    chipLines: validateInformationField(information.chipLines, PROJECTOR_INFORMATION_BUDGETS.chipLines),
+    prizeLines: validateInformationField(information.prizeLines, PROJECTOR_INFORMATION_BUDGETS.prizeLines),
+    houseNotes: validateInformationField(information.houseNotes, PROJECTOR_INFORMATION_BUDGETS.houseNotes),
+  }
+
+  return {
+    valid: Object.values(fields).every((field) => field.error === null),
+    fields,
+  }
+}
+
 export function normalizeInformationLines(value: string): string[] {
   return value
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
-    .slice(0, 24)
-    .map((line) => line.slice(0, 160))
 }

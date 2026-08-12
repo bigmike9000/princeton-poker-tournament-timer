@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTournament } from '../../app/useTournament'
 import { ClubLogo } from '../../components/ClubLogo'
-import { selectTournamentInformation } from '../../domain/tournamentInformation'
+import {
+  selectTournamentInformation,
+  validateProjectorInformation,
+} from '../../domain/tournamentInformation'
 import { InfoOverview } from './InfoOverview'
 import { InfoStructure } from './InfoStructure'
 
@@ -20,6 +23,7 @@ export function InfoOverlay({ open, onClose, onAfterClose }: InfoOverlayProps) {
   const overlayRef = useRef<HTMLElement>(null)
   const { state } = useTournament()
   const information = selectTournamentInformation(state)
+  const projectorSafeInformation = validateProjectorInformation(information).valid
 
   useEffect(() => {
     // The overlay persists while closed, so each open cycle deliberately starts on page one.
@@ -142,10 +146,18 @@ export function InfoOverlay({ open, onClose, onAfterClose }: InfoOverlayProps) {
         {page === 'overview' ? (
           <div
             id="info-overview-panel"
-            className="info-page info-page--overview"
+            className={`info-page info-page--overview ${projectorSafeInformation
+              ? 'info-page--projector-safe'
+              : 'info-page--legacy-oversize'}`}
             role="tabpanel"
             aria-labelledby="info-overview-tab"
           >
+            {!projectorSafeInformation && (
+              <p className="info-legacy-notice" role="status">
+                <strong>Legacy information exceeds projector layout</strong>
+                All saved content remains available below. Shorten it in Tournament Director to restore the non-scrolling projector view.
+              </p>
+            )}
             <InfoOverview
               state={state}
               chipLines={information.chipLines}

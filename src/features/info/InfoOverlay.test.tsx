@@ -83,6 +83,49 @@ describe('InfoOverlay', () => {
     expect(inertBackground).toMatch(/overflow:\s*hidden/)
   })
 
+  it('keeps required narrow labels wrapping without ellipsis or nowrap clipping', () => {
+    const totalsRule = cssRule(displayCss, '.info-totals dt')
+    const breakSubtitleRule = cssRule(displayCss, '.info-break-subtitle')
+    const informationItemRule = cssRule(displayCss, '.info-card li')
+
+    for (const rule of [totalsRule, breakSubtitleRule]) {
+      expect(rule).not.toMatch(/text-overflow:\s*ellipsis/)
+      expect(rule).not.toMatch(/white-space:\s*nowrap/)
+      expect(rule).not.toMatch(/overflow:\s*hidden/)
+      expect(rule).toMatch(/white-space:\s*normal/)
+      expect(rule).toMatch(/overflow-wrap:\s*anywhere/)
+    }
+    expect(informationItemRule).toMatch(/overflow-wrap:\s*anywhere/)
+  })
+
+  it('raises essential narrow structure metadata while preserving responsive wrapping', () => {
+    const narrowStart = displayCss.lastIndexOf('@media (max-width: 640px)')
+    const narrowCss = displayCss.slice(narrowStart)
+    const metadataRule = cssRule(narrowCss, `.info-entry-marker,
+  .info-entry-ante,
+  .info-entry-duration`)
+    const breakRule = cssRule(narrowCss, `.info-structure-entry--break strong,
+  .info-break-subtitle`)
+    const currentRule = cssRule(narrowCss, '.info-current-marker')
+    const totalRule = cssRule(narrowCss, '.info-totals dt')
+
+    expect(metadataRule).toMatch(/font-size:\s*\.65rem/)
+    expect(breakRule).toMatch(/font-size:\s*\.65rem/)
+    expect(currentRule).toMatch(/font-size:\s*\.6rem/)
+    expect(totalRule).toMatch(/font-size:\s*\.65rem/)
+  })
+
+  it('uses a non-scrolling safe Overview and a scoped scrolling legacy fallback', () => {
+    const safeRule = cssRule(displayCss, '.info-page--projector-safe')
+    const legacyRule = cssRule(displayCss, '.info-page--legacy-oversize')
+    const legacyCardRule = cssRule(displayCss, '.info-page--legacy-oversize .info-card')
+
+    expect(safeRule).toMatch(/overflow:\s*hidden/)
+    expect(legacyRule).toMatch(/overflow-y:\s*auto/)
+    expect(legacyRule).toMatch(/overflow-x:\s*hidden/)
+    expect(legacyCardRule).toMatch(/overflow:\s*visible/)
+  })
+
   it('opens on Overview, switches pages manually, and resets to Overview after closing', async () => {
     const user = userEvent.setup()
 
@@ -95,6 +138,8 @@ describe('InfoOverlay', () => {
     expect(overlay.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true')
     expect(overlay.getByText('Page 1 of 2')).toBeVisible()
     expect(overlay.getByRole('heading', { name: 'Chip denominations' })).toBeVisible()
+    expect(overlay.getByRole('tabpanel')).toHaveClass('info-page--projector-safe')
+    expect(overlay.queryByText('Legacy information exceeds projector layout')).not.toBeInTheDocument()
     expect(overlay.queryByRole('list', { name: 'Tournament blind structure' })).not.toBeInTheDocument()
     expect(overlay.getByText(
       'Prize structure will be announced by the Tournament Director before play begins.',
@@ -141,6 +186,29 @@ describe('InfoOverlay', () => {
       'true',
     )
     expect(within(reopened.dialog).getByText('Page 1 of 2')).toBeVisible()
+  })
+
+  it('warns about legacy oversize information and keeps every legacy line in the reachable fallback', () => {
+    const state = createInitialState()
+    state.information = {
+      chipLines: Array.from({ length: 24 }, (_, index) => `Legacy chip line ${String(index + 1).padStart(2, '0')} ${'x'.repeat(120)}`),
+      prizeLines: ['Legacy prize ' + 'p'.repeat(120)],
+      houseNotes: ['Legacy house ' + 'h'.repeat(120)],
+    }
+    saveSnapshot(localStorage, state, Date.now())
+
+    render(<App />)
+    const { dialog } = openInfo()
+    const overlay = within(dialog)
+    const overview = overlay.getByRole('tabpanel')
+
+    expect(overlay.getByText('Legacy information exceeds projector layout')).toBeVisible()
+    expect(overview).toHaveClass('info-page--legacy-oversize')
+    expect(overview).not.toHaveClass('info-page--projector-safe')
+    expect(overlay.getByText(/^Legacy chip line 01 /)).toBeVisible()
+    expect(overlay.getByText(/^Legacy chip line 24 /)).toBeVisible()
+    expect(overlay.getByText(/^Legacy prize /)).toBeVisible()
+    expect(overlay.getByText(/^Legacy house /)).toBeVisible()
   })
 
   it('shows canonical chip cards and live tournament totals', () => {

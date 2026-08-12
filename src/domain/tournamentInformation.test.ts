@@ -3,8 +3,10 @@ import { createInitialState } from './sampleStructure'
 import {
   DEFAULT_TOURNAMENT_INFORMATION,
   normalizeInformationLines,
+  PROJECTOR_INFORMATION_BUDGETS,
   selectTournamentInformation,
   TOURNAMENT_RULE_SUMMARY,
+  validateProjectorInformation,
 } from './tournamentInformation'
 
 describe('tournament information', () => {
@@ -68,12 +70,85 @@ describe('tournament information', () => {
     expect(normalizeInformationLines('  First line\n\nSecond line  ')).toEqual(['First line', 'Second line'])
   })
 
-  it('caps normalized input at 24 lines and 160 characters per line', () => {
+  it('normalizes without silently truncating an over-budget editor draft', () => {
     const value = Array.from({ length: 25 }, (_, index) => `${index}:${'x'.repeat(200)}`).join('\n')
     const result = normalizeInformationLines(value)
 
-    expect(result).toHaveLength(24)
-    expect(result[0]).toHaveLength(160)
-    expect(result.at(-1)).toMatch(/^23:/)
+    expect(result).toHaveLength(25)
+    expect(result[0]).toHaveLength(202)
+    expect(result.at(-1)).toMatch(/^24:/)
+  })
+
+  it('accepts the exact measured projector-safe boundary for every collection', () => {
+    expect(PROJECTOR_INFORMATION_BUDGETS).toEqual({
+      chipLines: { maxLines: 6, maxCharacters: 120 },
+      prizeLines: { maxLines: 4, maxCharacters: 96 },
+      houseNotes: { maxLines: 4, maxCharacters: 120 },
+    })
+    const information = {
+      chipLines: Array.from({ length: 6 }, () => 'x'.repeat(20)),
+      prizeLines: Array.from({ length: 4 }, () => 'x'.repeat(24)),
+      houseNotes: Array.from({ length: 4 }, () => 'x'.repeat(30)),
+    }
+
+    expect(validateProjectorInformation(information)).toEqual({
+      valid: true,
+      fields: {
+        chipLines: { lineCount: 6, characterCount: 120, error: null },
+        prizeLines: { lineCount: 4, characterCount: 96, error: null },
+        houseNotes: { lineCount: 4, characterCount: 120, error: null },
+      },
+    })
+  })
+
+  it('accepts the measured budget even when each collection uses one maximum-total line', () => {
+    const information = {
+      chipLines: ['x'.repeat(120)],
+      prizeLines: ['x'.repeat(96)],
+      houseNotes: ['x'.repeat(120)],
+    }
+
+    expect(validateProjectorInformation(information)).toMatchObject({ valid: true })
+  })
+
+  it('rejects a line or total-character count one beyond its collection budget', () => {
+    const tooManyChipLines = validateProjectorInformation({
+      chipLines: Array.from({ length: 7 }, () => 'x'),
+      prizeLines: ['Prize'],
+      houseNotes: ['House'],
+    })
+    const tooManyPrizeCharacters = validateProjectorInformation({
+      chipLines: ['Chips'],
+      prizeLines: ['x'.repeat(97)],
+      houseNotes: ['House'],
+    })
+    const tooManyHouseCharacters = validateProjectorInformation({
+      chipLines: ['Chips'],
+      prizeLines: ['Prize'],
+      houseNotes: ['x'.repeat(121)],
+    })
+
+    expect(tooManyChipLines.fields.chipLines).toEqual({
+      lineCount: 7,
+      characterCount: 7,
+      error: 'Use no more than 6 lines (currently 7).',
+    })
+    expect(tooManyPrizeCharacters.fields.prizeLines).toEqual({
+      lineCount: 1,
+      characterCount: 97,
+      error: 'Use no more than 96 total characters (currently 97).',
+    })
+    expect(tooManyHouseCharacters.fields.houseNotes).toEqual({
+      lineCount: 1,
+      characterCount: 121,
+      error: 'Use no more than 120 total characters (currently 121).',
+    })
+    expect(tooManyChipLines.valid).toBe(false)
+    expect(tooManyPrizeCharacters.valid).toBe(false)
+    expect(tooManyHouseCharacters.valid).toBe(false)
+  })
+
+  it('keeps the shipped defaults inside the projector-safe budget', () => {
+    expect(validateProjectorInformation(DEFAULT_TOURNAMENT_INFORMATION).valid).toBe(true)
   })
 })

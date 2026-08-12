@@ -353,8 +353,8 @@ describe('Structure editor responsive CSS', () => {
     expect(breakRule).toMatch(/background:/)
   })
 
-  it('collapses Director navigation by 820px before the medium structure grid can overflow', () => {
-    const collapseStart = directorCss.indexOf('@media (max-width: 820px)')
+  it('collapses Director navigation through the measured 821 to 863 overflow band', () => {
+    const collapseStart = directorCss.indexOf('@media (max-width: 864px)')
     const mediumStart = directorCss.indexOf('@media (max-width: 1180px)')
     const collapseCss = collapseStart < 0
       ? ''
