@@ -120,7 +120,7 @@ describe('DirectorOverlay', () => {
 
     expect(screen.getByText('Fall Championship')).toBeVisible()
     expect(screen.getByText('80 / 100')).toBeVisible()
-    expect(screen.getByText('5,000,000')).toBeVisible()
+    expect(screen.getByText('62,500')).toBeVisible()
   })
 
   it('returns focus to the director trigger when closed', async () => {
