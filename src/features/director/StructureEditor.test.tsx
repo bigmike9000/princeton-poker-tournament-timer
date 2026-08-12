@@ -18,15 +18,15 @@ async function openTab(user: ReturnType<typeof userEvent.setup>, name: 'Structur
 
 function StructureStateHarness() {
   const [state, dispatch] = useReducer(tournamentReducer, undefined, createInitialState)
-  const first = state.structure[0]
-  const note = first.kind === 'level' && first.note !== undefined
-    ? JSON.stringify(first.note)
+  const level = state.structure.find((entry) => entry.id === 'level-6')
+  const note = level?.kind === 'level' && level.note !== undefined
+    ? JSON.stringify(level.note)
     : 'absent'
 
   return (
     <TournamentContext.Provider value={{ state, now: 0, dispatch, persistenceError: null }}>
       <StructureEditor />
-      <output aria-label="Applied first entry">{first.kind === 'level' ? `${first.bigBlind}:${note}` : 'unexpected'}</output>
+      <output aria-label="Applied level 6 note">{note}</output>
     </TournamentContext.Provider>
   )
 }
@@ -85,19 +85,18 @@ describe('StructureEditor', () => {
     expect(onChange).toHaveBeenLastCalledWith({ ...entry, note: '  Final table  ' })
   })
 
-  it('removes a whitespace-only note when the draft is applied while preserving the typed draft', async () => {
+  it('removes a cleared note when the draft is applied while preserving the whitespace draft', async () => {
     const user = userEvent.setup()
     render(<StructureStateHarness />)
-    const firstLevel = screen.getByRole('group', { name: 'Level 1' })
-    const note = within(firstLevel).getByRole('textbox', { name: 'Level note' })
+    const level = screen.getByRole('group', { name: 'Level 6' })
+    const note = within(level).getByRole('textbox', { name: 'Level note' })
+    await user.clear(note)
     fireEvent.change(note, { target: { value: '   ' } })
-    await user.clear(within(firstLevel).getByLabelText('Big blind'))
-    await user.type(within(firstLevel).getByLabelText('Big blind'), '3')
 
     expect(note).toHaveValue('   ')
     await user.click(screen.getByRole('button', { name: 'Apply structure' }))
 
-    expect(screen.getByLabelText('Applied first entry')).toHaveTextContent('3:absent')
+    expect(screen.getByLabelText('Applied level 6 note')).toHaveTextContent('absent')
   })
 
   it('inserts a break, reorders it, and applies the draft atomically', async () => {

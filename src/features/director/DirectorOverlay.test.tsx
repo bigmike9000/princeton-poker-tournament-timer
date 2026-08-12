@@ -1,7 +1,10 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import { StrictMode } from 'react'
 import { App } from '../../app/App'
+import { TournamentProvider } from '../../app/TournamentProvider'
+import { DirectorOverlay } from './DirectorOverlay'
 
 async function openDirector(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('button', { name: 'Open Tournament Director' }))
@@ -56,6 +59,20 @@ describe('DirectorOverlay', () => {
 
     expect(screen.getByRole('button', { name: 'Structure' })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByRole('heading', { name: 'Edit remaining time' })).toBeVisible()
+  })
+
+  it('does not report a close during StrictMode effect rehearsal', () => {
+    const onAfterClose = vi.fn()
+
+    render(
+      <StrictMode>
+        <TournamentProvider>
+          <DirectorOverlay open onClose={vi.fn()} onAfterClose={onAfterClose} />
+        </TournamentProvider>
+      </StrictMode>,
+    )
+
+    expect(onAfterClose).not.toHaveBeenCalled()
   })
 
   it('edits remaining time from Structure', async () => {

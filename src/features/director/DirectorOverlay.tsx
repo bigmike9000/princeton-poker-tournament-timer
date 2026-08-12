@@ -24,6 +24,7 @@ interface DirectorOverlayProps {
 export function DirectorOverlay({ open, onClose, onAfterClose }: DirectorOverlayProps) {
   const [tab, setTab] = useState<DirectorTab>('structure')
   const closeRef = useRef<HTMLButtonElement>(null)
+  const closeRequestedRef = useRef(false)
   const overlayRef = useRef<HTMLElement>(null)
   const { state } = useTournament()
 
@@ -37,11 +38,16 @@ export function DirectorOverlay({ open, onClose, onAfterClose }: DirectorOverlay
     return () => {
       document.body.style.overflow = previousOverflow
       background?.removeAttribute('inert')
-      onAfterClose()
+      if (closeRequestedRef.current) onAfterClose()
     }
   }, [onAfterClose, open])
 
   if (!open) return null
+
+  const requestClose = () => {
+    closeRequestedRef.current = true
+    onClose()
+  }
 
   return (
     <section
@@ -53,7 +59,7 @@ export function DirectorOverlay({ open, onClose, onAfterClose }: DirectorOverlay
       onKeyDown={(event) => {
         if (event.key === 'Escape') {
           event.preventDefault()
-          onClose()
+          requestClose()
           return
         }
         if (event.key !== 'Tab') return
@@ -76,7 +82,7 @@ export function DirectorOverlay({ open, onClose, onAfterClose }: DirectorOverlay
       <header className="director-header">
         <div className="director-brand"><ClubLogo className="director-logo" size={46} /><div><p>{state.configuration.organizationName}</p><h1 id="director-title">Tournament Director</h1></div></div>
         <div className="director-header-note"><i aria-hidden="true" />Changes update the live display</div>
-        <button ref={closeRef} className="director-close" onClick={onClose} aria-label="Close Tournament Director">Close <span aria-hidden="true">×</span></button>
+        <button ref={closeRef} className="director-close" onClick={requestClose} aria-label="Close Tournament Director">Close <span aria-hidden="true">×</span></button>
       </header>
 
       <div className="director-layout">
