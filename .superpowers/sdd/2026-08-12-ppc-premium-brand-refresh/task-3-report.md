@@ -74,3 +74,67 @@ Browser QA used the local Vite application at 1920x1080, 1366x768, and 390x844:
 ## Concerns
 
 None. The decorative texture, blur, and drop-shadow treatments degrade safely in browsers that do not support those effects; content, contrast, layout, and behavior remain intact.
+
+## Fix Round 1
+
+### Review finding addressed
+
+Essential operational field labels, structure labels, preset labels, settings explanations, and the close-behavior legend were using `--slate-500` (`#756b5b`) at `.56rem`–`.66rem`. Updated only those five selector groups to the higher-contrast `--slate-400` token. Decorative console headings, timestamps, empty-state copy, reset metadata, placeholders, and sticky status metadata remain on `--slate-500`.
+
+### Exact command and output
+
+```sh
+git diff --check && npm run lint && npm run build && npm test -- --run src/features/director/DirectorOverlay.test.tsx src/features/director/DirectorSettings.test.tsx src/features/director/StructureEditor.test.tsx
+```
+
+```text
+git diff --check produced no output and exited 0.
+
+> princeton-poker-tournament-timer@0.1.0 lint
+> eslint .
+
+> princeton-poker-tournament-timer@0.1.0 build
+> npm run typecheck && vite build
+
+> princeton-poker-tournament-timer@0.1.0 typecheck
+> tsc -b --pretty false
+
+vite v8.2.1 building client environment for production...
+transforming...✓ 51 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/manifest.webmanifest                          0.51 kB
+dist/index.html                                    0.97 kB │ gzip:  0.47 kB
+dist/assets/index-Ck-5B_-S.css                    36.23 kB │ gzip:  7.74 kB
+dist/assets/workbox-window.prod.es5-Bd17z0YL.js    5.65 kB │ gzip:  2.20 kB
+dist/assets/index-CbqBncgY.js                    248.44 kB │ gzip: 74.77 kB
+
+✓ built in 126ms
+
+PWA v1.3.0
+mode      generateSW
+precache  13 entries (555.30 KiB)
+files generated
+  dist/sw.js
+  dist/workbox-2fbc6a65.js
+
+> princeton-poker-tournament-timer@0.1.0 test
+> vitest --run src/features/director/DirectorOverlay.test.tsx src/features/director/DirectorSettings.test.tsx src/features/director/StructureEditor.test.tsx
+
+ RUN  v4.1.10 /Users/michaelfang/Documents/ChatGPT/PPC/.worktrees/premium-ppc-design
+
+ Test Files  3 passed (3)
+      Tests  19 passed (19)
+   Duration  2.36s
+```
+
+### Fix self-review
+
+- Confirmed the product diff contains only five `--slate-500` to `--slate-400` substitutions in the cited essential operational selectors.
+- Confirmed no font sizes, spacing, layout, component structure, labels, state, services, or behavior changed.
+- Confirmed genuinely decorative metadata remains on `--slate-500` and error, danger, success, focus, and primary states are untouched.
+- Confirmed the focused Director suite covers run/form labels and dialogs, settings explanations and legends, structure fields, and preset operations.
+
+### Fix concerns
+
+None.

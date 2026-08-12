@@ -295,7 +295,7 @@
 .player-edit-row label > span {
   display: block;
   margin-bottom: .3rem;
-  color: var(--slate-500);
+  color: var(--slate-400);
   font-size: .61rem;
   font-weight: 820;
   letter-spacing: .11em;
@@ -718,7 +718,7 @@
 .structure-fields label > span {
   display: block;
   margin-bottom: .28rem;
-  color: var(--slate-500);
+  color: var(--slate-400);
   font-size: .56rem;
   font-weight: 820;
   letter-spacing: .1em;
@@ -786,7 +786,7 @@
 .preset-details label > span {
   display: block;
   margin-bottom: .3rem;
-  color: var(--slate-500);
+  color: var(--slate-400);
   font-size: .58rem;
   font-weight: 820;
   letter-spacing: .11em;
@@ -941,7 +941,7 @@
 
 .setting-toggle small,
 .setting-fieldset small {
-  color: var(--slate-500);
+  color: var(--slate-400);
   font-size: .66rem;
   line-height: 1.45;
 }
@@ -957,7 +957,7 @@
 
 .setting-fieldset legend {
   margin-bottom: .55rem;
-  color: var(--slate-500);
+  color: var(--slate-400);
   font-size: .6rem;
   font-weight: 820;
   letter-spacing: .11em;
