@@ -27,13 +27,21 @@ export function validateStructure(entries: StructureEntry[]): ValidationResult {
     })
   }
 
-  for (const entry of entries) {
+  for (const [index, entry] of entries.entries()) {
     if (seenIds.has(entry.id)) {
       issues.push({ entryId: entry.id, field: 'id', message: 'Every entry needs a unique identifier.' })
     }
     seenIds.add(entry.id)
 
-    if (!Number.isInteger(entry.durationSeconds) || entry.durationSeconds <= 0 || entry.durationSeconds % 60 !== 0) {
+    const isTerminalUntimedLevel = entry.kind === 'level'
+      && entry.durationSeconds === null
+      && index === entries.length - 1
+    if (!isTerminalUntimedLevel && (
+      entry.durationSeconds === null
+      || !Number.isInteger(entry.durationSeconds)
+      || entry.durationSeconds <= 0
+      || entry.durationSeconds % 60 !== 0
+    )) {
       issues.push({
         entryId: entry.id,
         field: 'durationSeconds',
@@ -63,6 +71,9 @@ export function validateStructure(entries: StructureEntry[]): ValidationResult {
       issues.push({ entryId: entry.id, field: 'ante', message: 'Ante must be zero when ante type is None.' })
     } else if (entry.anteType !== 'none' && entry.ante <= 0) {
       issues.push({ entryId: entry.id, field: 'ante', message: 'This ante type requires a positive ante.' })
+    }
+    if (entry.note !== undefined && entry.note.length > 80) {
+      issues.push({ entryId: entry.id, field: 'note', message: 'Note must be 80 characters or fewer.' })
     }
   }
 

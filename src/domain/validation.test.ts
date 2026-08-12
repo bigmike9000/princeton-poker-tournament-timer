@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createInitialState } from './sampleStructure'
+import { createInitialState, sampleStructure } from './sampleStructure'
 import { validatePresetName, validateStructure } from './validation'
 
 describe('validateStructure', () => {
@@ -45,6 +45,28 @@ describe('validateStructure', () => {
     expect(result.issues.map((issue) => issue.field)).toEqual(
       expect.arrayContaining(['ante', 'id']),
     )
+  })
+
+  it('accepts one untimed final poker level', () => {
+    expect(validateStructure(structuredClone(sampleStructure)).valid).toBe(true)
+  })
+
+  it('rejects an untimed non-final level', () => {
+    const structure = structuredClone(sampleStructure)
+    const first = structure[0]
+    if (first.kind === 'level') first.durationSeconds = null
+    expect(validateStructure(structure).issues).toEqual(expect.arrayContaining([
+      expect.objectContaining({ entryId: 'level-1', field: 'durationSeconds' }),
+    ]))
+  })
+
+  it('rejects notes longer than 80 characters', () => {
+    const structure = structuredClone(sampleStructure)
+    const level = structure.find((entry) => entry.kind === 'level')!
+    level.note = 'x'.repeat(81)
+    expect(validateStructure(structure).issues).toEqual(expect.arrayContaining([
+      expect.objectContaining({ entryId: level.id, field: 'note' }),
+    ]))
   })
 })
 

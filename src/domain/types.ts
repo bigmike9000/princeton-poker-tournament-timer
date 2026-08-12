@@ -3,11 +3,12 @@ export type AnteType = 'none' | 'traditional' | 'big-blind'
 export interface PokerLevel {
   id: string
   kind: 'level'
-  durationSeconds: number
+  durationSeconds: number | null
   smallBlind: number
   bigBlind: number
   ante: number
   anteType: AnteType
+  note?: string
 }
 
 export interface BreakLevel {
