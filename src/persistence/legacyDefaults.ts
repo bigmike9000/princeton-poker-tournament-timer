@@ -15,6 +15,39 @@ const formerBundledStructure: StructureEntry[] = [
   { id: 'level-10', kind: 'level', durationSeconds: 1_200, smallBlind: 1_500, bigBlind: 3_000, ante: 3_000, anteType: 'big-blind' },
 ]
 
+const formerBundledState: TournamentState = {
+  configuration: {
+    organizationName: 'PRINCETON POKER CLUB',
+    tournamentName: 'Princeton Poker Club Standard',
+    startingPlayers: 80,
+    startingStack: 30_000,
+    sponsorLabels: ['SPONSOR', 'SPONSOR'],
+  },
+  structure: formerBundledStructure,
+  runtime: {
+    currentEntryIndex: 0,
+    status: 'idle',
+    remainingMs: 1_200_000,
+    baselineAt: null,
+    playersRemaining: 80,
+    alertedThresholds: [],
+    transitionCause: null,
+  },
+  chipLedger: [
+    { id: 'initial-chips', kind: 'initial', chips: 2_400_000 },
+  ],
+  settings: {
+    autoAdvance: true,
+    closeBehavior: 'pause',
+    muted: false,
+    alertAtFiveMinutes: true,
+    alertAtOneMinute: true,
+    alertLevelComplete: true,
+    alertBreakBeginning: true,
+    alertBreakEnding: true,
+  },
+}
+
 function deepEqual(left: unknown, right: unknown): boolean {
   if (Object.is(left, right)) return true
   if (typeof left !== 'object' || left === null ||
@@ -39,12 +72,5 @@ export function isFormerBundledStructure(structure: StructureEntry[]): boolean {
 }
 
 export function isUntouchedFormerDefault(state: TournamentState): boolean {
-  return state.configuration.startingPlayers === 80 &&
-    state.configuration.startingStack === 30_000 &&
-    state.configuration.organizationName === 'PRINCETON POKER CLUB' &&
-    state.configuration.tournamentName === 'Princeton Poker Club Standard' &&
-    state.runtime.status === 'idle' &&
-    state.runtime.currentEntryIndex === 0 &&
-    state.runtime.playersRemaining === 80 &&
-    isFormerBundledStructure(state.structure)
+  return deepEqual(state, formerBundledState)
 }

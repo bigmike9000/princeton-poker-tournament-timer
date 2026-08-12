@@ -58,6 +58,16 @@ describe('former bundled defaults', () => {
     ['progressed to index one', (state: TournamentState) => { state.runtime.currentEntryIndex = 1 }],
     ['progressed to 79 players', (state: TournamentState) => { state.runtime.playersRemaining = 79 }],
     ['customized its structure', (state: TournamentState) => { state.structure[0].durationSeconds = 1_140 }],
+    ['customized its organization metadata', (state: TournamentState) => { state.configuration.organizationName = 'PPC ALUMNI' }],
+    ['customized its sponsor labels', (state: TournamentState) => { state.configuration.sponsorLabels[0] = 'LOCAL SPONSOR' }],
+    ['customized its settings', (state: TournamentState) => { state.settings.muted = true }],
+    ['edited its remaining time', (state: TournamentState) => { state.runtime.remainingMs = 1_199_000 }],
+    ['stored a runtime baseline', (state: TournamentState) => { state.runtime.baselineAt = 9_000 }],
+    ['recorded an alert threshold', (state: TournamentState) => { state.runtime.alertedThresholds = [300_000] }],
+    ['recorded a transition cause', (state: TournamentState) => { state.runtime.transitionCause = 'manual' }],
+    ['customized its chip ledger', (state: TournamentState) => {
+      state.chipLedger.push({ id: 'addon-1', kind: 'addon', chips: 20_000 })
+    }],
   ])('preserves a former state that has %s', (_label, customize) => {
     const legacy = formerDefaultState()
     customize(legacy)
