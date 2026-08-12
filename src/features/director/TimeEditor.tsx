@@ -1,8 +1,27 @@
 import { useState } from 'react'
 import { useTournament } from '../../app/useTournament'
+import { isUntimedEntry } from '../../domain/structure'
 import { selectRemainingMs } from '../../state/selectors'
 
 export function TimeEditor() {
+  const { state } = useTournament()
+  const currentEntry = state.structure[state.runtime.currentEntryIndex]
+
+  if (isUntimedEntry(currentEntry)) {
+    return (
+      <section className="director-card time-editor time-editor--untimed" aria-labelledby="time-editor-title">
+        <div className="director-card-heading">
+          <div><span>Clock</span><h3 id="time-editor-title">Untimed final level</h3></div>
+        </div>
+        <p>This level runs until the tournament ends; there is no countdown to edit.</p>
+      </section>
+    )
+  }
+
+  return <TimedEditor />
+}
+
+function TimedEditor() {
   const { state, now, dispatch } = useTournament()
   const remainingSeconds = Math.ceil(selectRemainingMs(state, now) / 1_000)
   const liveMinutes = String(Math.floor(remainingSeconds / 60))

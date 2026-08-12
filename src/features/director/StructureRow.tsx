@@ -45,11 +45,23 @@ export function StructureRow({
 
       {entry.kind === 'level' ? (
         <div className="structure-fields structure-fields--level">
-          <label>
-            <span>Duration minutes</span>
-            <input aria-label="Duration minutes" type="number" min="1" step="1" value={entry.durationSeconds === null ? '' : entry.durationSeconds / 60} onChange={(event) => updateNumber('durationSeconds', String(Number(event.target.value) * 60))} />
+          <div className="structure-duration-field">
+            {entry.durationSeconds !== null && (
+              <label>
+                <span>Duration minutes</span>
+                <input aria-label="Duration minutes" type="number" min="1" step="1" value={entry.durationSeconds / 60} onChange={(event) => updateNumber('durationSeconds', String(Number(event.target.value) * 60))} />
+              </label>
+            )}
+            <label className="structure-until-end">
+              <input
+                type="checkbox"
+                checked={entry.durationSeconds === null}
+                onChange={(event) => onChange({ ...entry, durationSeconds: event.target.checked ? null : 900 })}
+              />
+              <span>Until end</span>
+            </label>
             <FieldIssue field="durationSeconds" issues={issues} />
-          </label>
+          </div>
           <label>
             <span>Small blind</span>
             <input aria-label="Small blind" type="number" min="0" step="1" value={entry.smallBlind} onChange={(event) => updateNumber('smallBlind', event.target.value)} />
@@ -79,6 +91,11 @@ export function StructureRow({
               <option value="traditional">Traditional ante</option>
               <option value="big-blind">Big Blind Ante</option>
             </select>
+          </label>
+          <label className="structure-level-note">
+            <span>Level note</span>
+            <input aria-label="Level note" value={entry.note ?? ''} maxLength={80} onChange={(event) => onChange({ ...entry, note: event.target.value })} />
+            <FieldIssue field="note" issues={issues} />
           </label>
         </div>
       ) : (

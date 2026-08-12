@@ -1,9 +1,12 @@
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { App } from '../../app/App'
+import { TournamentContext } from '../../app/useTournament'
 import { createInitialState } from '../../domain/sampleStructure'
 import { createPresetRepository } from '../../persistence/presets'
+import { StructureRow } from './StructureRow'
+import { TimeEditor } from './TimeEditor'
 
 async function openTab(user: ReturnType<typeof userEvent.setup>, name: 'Structure' | 'Presets') {
   await user.click(screen.getByRole('button', { name: 'Open Tournament Director' }))
@@ -11,6 +14,59 @@ async function openTab(user: ReturnType<typeof userEvent.setup>, name: 'Structur
 }
 
 describe('StructureEditor', () => {
+  it('shows an explanatory state instead of time inputs for the final untimed level', () => {
+    const state = createInitialState()
+    state.runtime.currentEntryIndex = state.structure.length - 1
+    state.runtime.remainingMs = 0
+
+    render(
+      <TournamentContext.Provider value={{ state, now: 0, dispatch: vi.fn(), persistenceError: null }}>
+        <TimeEditor />
+      </TournamentContext.Provider>,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Untimed final level' })).toBeVisible()
+    expect(screen.getByText('This level runs until the tournament ends; there is no countdown to edit.')).toBeVisible()
+    expect(screen.queryByLabelText('Minutes remaining')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Seconds remaining')).not.toBeInTheDocument()
+  })
+
+  it('switches a poker level to Until end and removes timed duration editing', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    const entry = createInitialState().structure[0]
+    if (entry.kind !== 'level') throw new Error('Expected the opening entry to be a poker level')
+
+    const { rerender } = render(
+      <StructureRow entry={entry} label="Level 1" index={0} total={1} issues={[]} onChange={onChange} onMove={vi.fn()} onDelete={vi.fn()} />,
+    )
+    await user.click(screen.getByRole('checkbox', { name: 'Until end' }))
+    expect(onChange).toHaveBeenLastCalledWith({ ...entry, durationSeconds: null })
+
+    rerender(
+      <StructureRow entry={{ ...entry, durationSeconds: null }} label="Level 1" index={0} total={1} issues={[]} onChange={onChange} onMove={vi.fn()} onDelete={vi.fn()} />,
+    )
+    expect(screen.getByRole('checkbox', { name: 'Until end' })).toBeChecked()
+    expect(screen.queryByLabelText('Duration minutes')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('checkbox', { name: 'Until end' }))
+    expect(onChange).toHaveBeenLastCalledWith({ ...entry, durationSeconds: 900 })
+  })
+
+  it('emits the raw Level note draft and leaves length validation to the field contract', async () => {
+    const onChange = vi.fn()
+    const entry = createInitialState().structure[0]
+    if (entry.kind !== 'level') throw new Error('Expected the opening entry to be a poker level')
+
+    render(
+      <StructureRow entry={entry} label="Level 1" index={0} total={1} issues={[]} onChange={onChange} onMove={vi.fn()} onDelete={vi.fn()} />,
+    )
+    const note = screen.getByRole('textbox', { name: 'Level note' })
+    expect(note).toHaveAttribute('maxlength', '80')
+    fireEvent.change(note, { target: { value: '  Final table  ' } })
+
+    expect(onChange).toHaveBeenLastCalledWith({ ...entry, note: '  Final table  ' })
+  })
+
   it('inserts a break, reorders it, and applies the draft atomically', async () => {
     const user = userEvent.setup()
     render(<App />)
@@ -19,12 +75,26 @@ describe('StructureEditor', () => {
     await user.click(screen.getByRole('button', { name: 'Insert break' }))
     const breakRows = screen.getAllByRole('group', { name: /Break/ })
     const newBreak = breakRows[breakRows.length - 1]
+    expect(within(newBreak).getByLabelText('Duration minutes')).toHaveValue(10)
     await user.clear(within(newBreak).getByLabelText('Duration minutes'))
-    await user.type(within(newBreak).getByLabelText('Duration minutes'), '10')
+    await user.type(within(newBreak).getByLabelText('Duration minutes'), '11')
     await user.click(within(newBreak).getByRole('button', { name: 'Move up' }))
     await user.click(screen.getByRole('button', { name: 'Apply structure' }))
 
-    expect(screen.getAllByRole('listitem', { name: 'BREAK — 10 MIN' })).toHaveLength(3)
+    expect(screen.getByRole('listitem', { name: 'BREAK — 11 MIN' })).toBeVisible()
+  })
+
+  it('adds a timed 15-minute level after an untimed final level', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await openTab(user, 'Structure')
+
+    await user.click(screen.getByRole('button', { name: /Add level/ }))
+    const levels = screen.getAllByRole('group', { name: /Level/ })
+    const addedLevel = levels[levels.length - 1]
+
+    expect(within(addedLevel).getByLabelText('Duration minutes')).toHaveValue(15)
+    expect(within(addedLevel).getByRole('checkbox', { name: 'Until end' })).not.toBeChecked()
   })
 
   it('shows field validation and blocks malformed levels', async () => {

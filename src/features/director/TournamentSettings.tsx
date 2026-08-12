@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useTournament } from '../../app/useTournament'
+import { DEFAULT_STACK_ALLOCATION_LABEL } from '../../domain/sampleStructure'
 
 export function TournamentSettings() {
   const { state, dispatch } = useTournament()
@@ -10,6 +11,10 @@ export function TournamentSettings() {
   const [sponsorOne, setSponsorOne] = useState(state.configuration.sponsorLabels[0] ?? 'SPONSOR')
   const [sponsorTwo, setSponsorTwo] = useState(state.configuration.sponsorLabels[1] ?? 'SPONSOR')
   const [error, setError] = useState<string | null>(null)
+  const draftPlayers = Number(startingPlayers)
+  const draftStack = Number(startingStack)
+  const validChipDraft = Number.isInteger(draftPlayers) && draftPlayers > 0
+    && Number.isInteger(draftStack) && draftStack > 0
 
   const submit = (event: FormEvent) => {
     event.preventDefault()
@@ -46,6 +51,12 @@ export function TournamentSettings() {
         <label className="field-wide"><span>Tournament name</span><input value={tournamentName} maxLength={80} onChange={(event) => setTournamentName(event.target.value)} /></label>
         <label><span>Starting player count</span><input type="number" min="1" value={startingPlayers} onChange={(event) => setStartingPlayers(event.target.value)} /></label>
         <label><span>Starting chip stack</span><input type="number" min="1" value={startingStack} onChange={(event) => setStartingStack(event.target.value)} /></label>
+        {validChipDraft && (
+          <div className="field-wide tournament-chip-helper">
+            <p>Starting chips in play: {(draftPlayers * draftStack).toLocaleString('en-US')}</p>
+            {draftStack === 200 && <p>Default allocation: {DEFAULT_STACK_ALLOCATION_LABEL}</p>}
+          </div>
+        )}
       </section>
       <section className="director-card form-grid">
         <div className="field-wide director-card-heading"><div><span>Branding</span><h3>Neutral sponsor placeholders</h3></div></div>

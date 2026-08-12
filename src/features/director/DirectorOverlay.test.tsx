@@ -30,7 +30,21 @@ describe('DirectorOverlay', () => {
     expect(within(screen.getByRole('dialog')).getByText('Garden State Poker Society')).toBeVisible()
   })
 
-  it('edits remaining time and players from the run panel', async () => {
+  it('opens on Structure with integrated clock and reset controls', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await openDirector(user)
+
+    expect(within(screen.getByRole('navigation', { name: 'Tournament Director sections' })).getAllByRole('button')).toHaveLength(4)
+    expect(screen.getByRole('button', { name: 'Structure' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.queryByRole('button', { name: 'Run' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Progression')).not.toBeInTheDocument()
+    expect(screen.queryByText('Field')).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Edit remaining time' })).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Reset current level' })).toBeVisible()
+  })
+
+  it('edits remaining time from Structure', async () => {
     const user = userEvent.setup()
     render(<App />)
     await openDirector(user)
@@ -43,37 +57,6 @@ describe('DirectorOverlay', () => {
     await user.click(director.getByRole('button', { name: 'Apply time' }))
 
     expect(screen.getByRole('timer')).toHaveTextContent('12:30')
-
-    await user.clear(director.getByLabelText('Players remaining'))
-    await user.type(director.getByLabelText('Players remaining'), '53')
-    await user.click(director.getByRole('button', { name: 'Apply player count' }))
-    expect(screen.getAllByText('53 / 80').length).toBeGreaterThan(0)
-  })
-
-  it('jumps directly to a chosen tournament entry', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-    await openDirector(user)
-
-    await user.selectOptions(screen.getByLabelText('Choose level or break'), '6')
-
-    expect(screen.getAllByText('LEVEL 6').length).toBeGreaterThan(0)
-    expect(screen.getByRole('timer')).toHaveTextContent('15:00')
-  })
-
-  it('refreshes the time draft when moving to an entry with another duration', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-    await openDirector(user)
-
-    expect(screen.getByLabelText('Minutes remaining')).toHaveValue(12)
-    await user.selectOptions(screen.getByLabelText('Choose level or break'), '5')
-
-    expect(screen.getByLabelText('Minutes remaining')).toHaveValue(10)
-    await user.click(screen.getByRole('button', { name: 'Subtract one minute' }))
-    expect(screen.getByLabelText('Minutes remaining')).toHaveValue(9)
-    await user.click(screen.getByRole('button', { name: 'Apply time' }))
-    expect(screen.getByRole('timer')).toHaveTextContent('09:00')
   })
 
   it('requires explicit confirmation before resetting the current level', async () => {
@@ -94,7 +77,7 @@ describe('DirectorOverlay', () => {
     const user = userEvent.setup()
     render(<App />)
     await openDirector(user)
-    await user.click(screen.getByRole('button', { name: 'Next level' }))
+    await user.click(screen.getByRole('button', { name: 'Subtract one minute' }))
     await user.click(screen.getByRole('button', { name: 'Reset tournament' }))
 
     const confirmation = screen.getByRole('alertdialog', { name: 'Reset the entire tournament?' })
@@ -103,6 +86,7 @@ describe('DirectorOverlay', () => {
 
     expect(screen.getAllByText('LEVEL 1').length).toBeGreaterThan(0)
     expect(screen.getAllByText('80 / 80').length).toBeGreaterThan(0)
+    expect(screen.getByRole('timer')).toHaveTextContent('12:00')
   })
 
   it('updates tournament information atomically', async () => {
@@ -110,6 +94,9 @@ describe('DirectorOverlay', () => {
     render(<App />)
     await openDirector(user)
     await user.click(screen.getByRole('button', { name: 'Tournament' }))
+
+    expect(screen.getByText('Starting chips in play: 16,000')).toBeVisible()
+    expect(screen.getByText('Default allocation: 10 × 1 · 8 × 5 · 6 × 25 = 200')).toBeVisible()
 
     await user.clear(screen.getByLabelText('Tournament name'))
     await user.type(screen.getByLabelText('Tournament name'), 'Fall Championship')
@@ -121,7 +108,8 @@ describe('DirectorOverlay', () => {
 
     expect(screen.getByText('Fall Championship')).toBeVisible()
     expect(screen.getByText('80 / 100')).toBeVisible()
-    expect(screen.getByText('62,500')).toBeVisible()
+    expect(screen.getByText('Starting chips in play: 5,000,000')).toBeVisible()
+    expect(screen.queryByText('Default allocation: 10 × 1 · 8 × 5 · 6 × 25 = 200')).not.toBeInTheDocument()
   })
 
   it('returns focus to the director trigger when closed', async () => {

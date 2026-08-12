@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import { useTournament } from '../../app/useTournament'
 import { Dialog } from '../../components/Dialog'
+import { durationLabel } from '../../domain/structure'
 import type { PokerLevel, StructureEntry } from '../../domain/types'
 import { validateStructure } from '../../domain/validation'
+import { selectEntryLabel } from '../../state/selectors'
+import { ResetControls } from './ResetControls'
 import { StructureRow } from './StructureRow'
+import { TimeEditor } from './TimeEditor'
 
 function newId(prefix: string): string {
   return globalThis.crypto?.randomUUID?.() ?? `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`
@@ -44,7 +48,7 @@ export function StructureEditor() {
     setDraft((current) => [...current, {
       id: newId('level'),
       kind: 'level',
-      durationSeconds: previous?.durationSeconds ?? 1_200,
+      durationSeconds: previous?.durationSeconds ?? 900,
       smallBlind: previous?.bigBlind ?? 100,
       bigBlind: previous ? previous.bigBlind * 2 : 200,
       ante: previous ? previous.bigBlind * 2 : 200,
@@ -56,13 +60,24 @@ export function StructureEditor() {
     setDraft((current) => [...current, {
       id: newId('break'),
       kind: 'break',
-      durationSeconds: 900,
+      durationSeconds: 600,
       label: 'Break',
     }])
   }
 
   return (
     <div className="director-section structure-editor">
+      <div className="structure-live-tools">
+        <div className="section-intro structure-live-heading">
+          <div>
+            <span className="section-kicker">Live entry</span>
+            <h2>{selectEntryLabel(state, state.runtime.currentEntryIndex)}</h2>
+            <p>Entry {state.runtime.currentEntryIndex + 1} of {state.structure.length} · {durationLabel(state.structure[state.runtime.currentEntryIndex])}</p>
+          </div>
+        </div>
+        <TimeEditor key={state.structure[state.runtime.currentEntryIndex].id} />
+      </div>
+
       <div className="structure-editor-heading">
         <div className="section-intro">
           <div><span className="section-kicker">Blind schedule</span><h2>Structure editor</h2><p>Edit a draft, validate it, then apply every change at once.</p></div>
@@ -109,6 +124,8 @@ export function StructureEditor() {
           onClick={() => dispatch({ type: 'SET_STRUCTURE', structure: draft, now: Date.now() })}
         >Apply structure</button>
       </div>
+
+      <ResetControls />
 
       {deleteIndex !== null && draft[deleteIndex] && (
         <Dialog

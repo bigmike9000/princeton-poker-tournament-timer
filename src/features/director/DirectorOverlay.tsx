@@ -1,21 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTournament } from '../../app/useTournament'
 import { ClubLogo } from '../../components/ClubLogo'
-import { DirectorRun } from './DirectorRun'
 import { DirectorSettings } from './DirectorSettings'
 import { PresetManager } from './PresetManager'
 import { StructureEditor } from './StructureEditor'
 import { TournamentSettings } from './TournamentSettings'
 
-export type DirectorTab = 'run' | 'structure' | 'presets' | 'tournament' | 'settings'
+export type DirectorTab = 'structure' | 'presets' | 'tournament' | 'settings'
 
-const tabs: { id: DirectorTab; label: string; marker: string }[] = [
-  { id: 'run', label: 'Run', marker: '01' },
-  { id: 'structure', label: 'Structure', marker: '02' },
-  { id: 'presets', label: 'Presets', marker: '03' },
-  { id: 'tournament', label: 'Tournament', marker: '04' },
-  { id: 'settings', label: 'Settings', marker: '05' },
-]
+const tabs = [
+  { id: 'structure', label: 'Structure', marker: '01' },
+  { id: 'presets', label: 'Presets', marker: '02' },
+  { id: 'tournament', label: 'Tournament', marker: '03' },
+  { id: 'settings', label: 'Settings', marker: '04' },
+] satisfies { id: DirectorTab; label: string; marker: string }[]
 
 interface DirectorOverlayProps {
   open: boolean
@@ -23,7 +21,7 @@ interface DirectorOverlayProps {
 }
 
 export function DirectorOverlay({ open, onClose }: DirectorOverlayProps) {
-  const [tab, setTab] = useState<DirectorTab>('run')
+  const [tab, setTab] = useState<DirectorTab>('structure')
   const closeRef = useRef<HTMLButtonElement>(null)
   const overlayRef = useRef<HTMLElement>(null)
   const { state } = useTournament()
@@ -95,7 +93,6 @@ export function DirectorOverlay({ open, onClose }: DirectorOverlayProps) {
         </nav>
 
         <div className="director-content">
-          {tab === 'run' && <DirectorRun />}
           {tab === 'structure' && <StructureEditor />}
           {tab === 'presets' && <PresetManager />}
           {tab === 'tournament' && <TournamentSettings />}
