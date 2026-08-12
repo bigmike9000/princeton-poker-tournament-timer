@@ -683,6 +683,16 @@ select:focus-visible {
   background: rgb(217 121 43 / 9%);
 }
 
+.control-button--start:hover {
+  border-color: var(--orange-400);
+  color: var(--ink-950);
+  background: var(--orange-400);
+}
+
+.control-button--start:focus-visible {
+  outline-color: var(--ivory-50);
+}
+
 .player-stepper {
   display: grid;
   grid-template-columns: 3.4rem minmax(5.2rem, auto) 3.4rem;
@@ -712,7 +722,7 @@ select:focus-visible {
 }
 
 .player-stepper span {
-  color: var(--slate-500);
+  color: var(--slate-400);
   font-size: .55rem;
   font-weight: 800;
   letter-spacing: .12em;

@@ -178,7 +178,7 @@
   margin-top: auto;
   border-top: 1px solid var(--line);
   padding: 1rem .65rem 0;
-  color: var(--slate-500);
+  color: var(--slate-400);
   font-size: .6rem;
 }
 
@@ -456,7 +456,7 @@
 
 .danger-zone p {
   margin: .25rem 0 0;
-  color: var(--slate-500);
+  color: var(--slate-400);
   font-size: .7rem;
 }
 
@@ -749,7 +749,7 @@
 
 .structure-sticky-actions span {
   margin-right: auto;
-  color: var(--slate-500);
+  color: var(--slate-400);
   font-size: .68rem;
 }
 

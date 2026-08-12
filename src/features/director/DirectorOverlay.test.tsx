@@ -17,6 +17,19 @@ describe('DirectorOverlay', () => {
     expect(within(screen.getByRole('dialog')).getByRole('img', { name: 'Princeton Poker Club logo' })).toBeVisible()
   })
 
+  it('shows the configured organization name in the director header', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await openDirector(user)
+    await user.click(screen.getByRole('button', { name: 'Tournament' }))
+
+    await user.clear(screen.getByLabelText('Organization name'))
+    await user.type(screen.getByLabelText('Organization name'), 'Garden State Poker Society')
+    await user.click(screen.getByRole('button', { name: 'Apply tournament details' }))
+
+    expect(within(screen.getByRole('dialog')).getByText('Garden State Poker Society')).toBeVisible()
+  })
+
   it('edits remaining time and players from the run panel', async () => {
     const user = userEvent.setup()
     render(<App />)
