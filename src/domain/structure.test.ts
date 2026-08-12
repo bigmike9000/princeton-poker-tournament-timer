@@ -4,27 +4,26 @@ import { durationLabel, entryDurationMs, isUntimedEntry } from './structure'
 
 describe('PPC default structure', () => {
   it('matches every approved schedule entry exactly', () => {
-    expect(sampleStructure).toEqual([
-      { id: 'level-1', kind: 'level', durationSeconds: 720, smallBlind: 1, bigBlind: 2, ante: 0, anteType: 'none' },
-      { id: 'level-2', kind: 'level', durationSeconds: 720, smallBlind: 2, bigBlind: 4, ante: 0, anteType: 'none' },
-      { id: 'level-3', kind: 'level', durationSeconds: 720, smallBlind: 3, bigBlind: 6, ante: 0, anteType: 'none' },
-      { id: 'level-4', kind: 'level', durationSeconds: 720, smallBlind: 5, bigBlind: 10, ante: 0, anteType: 'none' },
-      { id: 'level-5', kind: 'level', durationSeconds: 720, smallBlind: 8, bigBlind: 16, ante: 0, anteType: 'none' },
-      { id: 'break-1', kind: 'break', durationSeconds: 600, label: 'Chip up to 5s' },
-      { id: 'level-6', kind: 'level', durationSeconds: 900, smallBlind: 10, bigBlind: 20, ante: 20, anteType: 'big-blind' },
-      { id: 'level-7', kind: 'level', durationSeconds: 900, smallBlind: 15, bigBlind: 30, ante: 30, anteType: 'big-blind' },
-      { id: 'level-8', kind: 'level', durationSeconds: 900, smallBlind: 20, bigBlind: 40, ante: 40, anteType: 'big-blind' },
-      { id: 'level-9', kind: 'level', durationSeconds: 900, smallBlind: 30, bigBlind: 60, ante: 60, anteType: 'big-blind' },
-      { id: 'level-10', kind: 'level', durationSeconds: 900, smallBlind: 40, bigBlind: 80, ante: 80, anteType: 'big-blind' },
-      { id: 'break-2', kind: 'break', durationSeconds: 600, label: 'Chip up to 25s and 100s' },
-      { id: 'level-11', kind: 'level', durationSeconds: 900, smallBlind: 50, bigBlind: 100, ante: 100, anteType: 'big-blind' },
-      { id: 'level-12', kind: 'level', durationSeconds: 900, smallBlind: 75, bigBlind: 150, ante: 150, anteType: 'big-blind' },
-      { id: 'level-13', kind: 'level', durationSeconds: 900, smallBlind: 100, bigBlind: 200, ante: 200, anteType: 'big-blind' },
-      { id: 'level-14', kind: 'level', durationSeconds: 900, smallBlind: 200, bigBlind: 400, ante: 400, anteType: 'big-blind' },
-      { id: 'level-15', kind: 'level', durationSeconds: 900, smallBlind: 300, bigBlind: 600, ante: 600, anteType: 'big-blind' },
-      { id: 'level-16', kind: 'level', durationSeconds: 900, smallBlind: 400, bigBlind: 800, ante: 800, anteType: 'big-blind' },
-      { id: 'level-17', kind: 'level', durationSeconds: null, smallBlind: 500, bigBlind: 1_000, ante: 1_000, anteType: 'big-blind' },
+    const state = createInitialState()
+
+    expect(state.structure.map((entry) => entry.kind === 'break'
+      ? ['break', entry.durationSeconds, entry.label]
+      : [entry.smallBlind, entry.bigBlind, entry.ante, entry.anteType, entry.durationSeconds]
+    )).toEqual([
+      [1, 2, 0, 'none', 720], [2, 4, 0, 'none', 720], [3, 6, 0, 'none', 720],
+      [5, 10, 0, 'none', 720], [8, 16, 0, 'none', 720],
+      ['break', 600, 'Chip up to 5s'],
+      [10, 20, 20, 'big-blind', 900], [15, 30, 30, 'big-blind', 900],
+      [20, 40, 40, 'big-blind', 900], [30, 60, 60, 'big-blind', 900],
+      [40, 80, 80, 'big-blind', 900],
+      ['break', 600, 'Chip up to 25s and 100s'],
+      [50, 100, 100, 'big-blind', 900], [75, 150, 150, 'big-blind', 900],
+      [100, 200, 200, 'big-blind', 900], [200, 400, 400, 'big-blind', 900],
+      [300, 600, 600, 'big-blind', 900], [400, 800, 800, 'big-blind', 900],
+      [500, 1000, 1000, 'big-blind', null],
     ])
+    expect(state.configuration).toMatchObject({ startingPlayers: 80, startingStack: 200 })
+    expect(state.chipLedger).toContainEqual({ id: 'initial-chips', kind: 'initial', chips: 16_000 })
   })
 
   it('uses the exact 80-player 200-chip configuration', () => {

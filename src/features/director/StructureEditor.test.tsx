@@ -355,6 +355,20 @@ describe('Structure editor responsive CSS', () => {
 })
 
 describe('PresetManager', () => {
+  it('identifies and protects the built-in preset row', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await openTab(user, 'Presets')
+
+    const builtIn = screen.getByRole('group', { name: 'Preset Princeton Poker Club Standard' })
+    expect(within(builtIn).getByText('Built-in')).toBeVisible()
+    expect(within(builtIn).getByLabelText('Preset name')).toHaveAttribute('readonly')
+    expect(within(builtIn).getByRole('button', { name: 'Load' })).toBeEnabled()
+    expect(within(builtIn).getByRole('button', { name: 'Duplicate' })).toBeEnabled()
+    expect(within(builtIn).queryByRole('button', { name: 'Rename' })).not.toBeInTheDocument()
+    expect(within(builtIn).queryByRole('button', { name: 'Delete' })).not.toBeInTheDocument()
+  })
+
   it('keeps the tournament operational when preset storage is unavailable', async () => {
     const originalSetItem = localStorage.setItem
     localStorage.setItem = () => { throw new Error('quota unavailable') }

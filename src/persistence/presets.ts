@@ -6,6 +6,8 @@ import { isFormerBundledStructure } from './legacyDefaults'
 import { parseStructure } from './structureParser'
 
 export const PRESETS_KEY = 'ppc-presets:v1'
+export const BUILT_IN_PRESET_ID = 'ppc-standard-v1'
+export const BUILT_IN_PRESET_NAME = 'Princeton Poker Club Standard'
 
 export interface StructurePreset {
   id: string
@@ -22,6 +24,10 @@ export interface PresetRepository {
   rename(id: string, name: string): StructurePreset
   remove(id: string): void
   load(id: string): StructurePreset
+}
+
+export function isBuiltInPreset(value: StructurePreset | string): boolean {
+  return (typeof value === 'string' ? value : value.id) === BUILT_IN_PRESET_ID
 }
 
 function clone<T>(value: T): T {
@@ -49,24 +55,49 @@ export function createPresetRepository(
   now: () => number = Date.now,
   idFactory: () => string = makeId,
 ): PresetRepository {
-  const read = (): StructurePreset[] => {
-    const raw = storage.getItem(PRESETS_KEY)
-    if (raw === null) return []
-    try {
-      const value = JSON.parse(raw) as unknown
-      return Array.isArray(value)
-        ? clone(value.filter(isPreset).map((preset) => ({
-            ...preset,
-            structure: removeObsoleteBundledNotes(preset.structure),
-          })))
-        : []
-    } catch {
-      return []
-    }
-  }
-
   const write = (presets: StructurePreset[]) => {
     storage.setItem(PRESETS_KEY, JSON.stringify(presets))
+  }
+
+  const read = (): StructurePreset[] => {
+    const raw = storage.getItem(PRESETS_KEY)
+    const persisted = (() => {
+      try {
+        const value = raw === null ? [] : JSON.parse(raw) as unknown
+        return Array.isArray(value)
+          ? clone(value.filter(isPreset).map((preset) => ({
+              ...preset,
+              structure: removeObsoleteBundledNotes(preset.structure),
+            })))
+          : []
+      } catch {
+        return []
+      }
+    })()
+
+    const stablePresets = persisted.filter((preset) => isBuiltInPreset(preset))
+    const formerBundledIndex = persisted.findIndex((preset) =>
+      preset.name === BUILT_IN_PRESET_NAME && isFormerBundledStructure(preset.structure))
+    const replacedPresets = stablePresets.concat(formerBundledIndex >= 0 ? [persisted[formerBundledIndex]] : [])
+    const createdAt = replacedPresets
+      .map((preset) => preset.createdAt)
+      .filter((timestamp) => Number.isFinite(Date.parse(timestamp)))
+      .sort((left, right) => Date.parse(left) - Date.parse(right))[0] ?? new Date(now()).toISOString()
+    const timestamp = new Date(now()).toISOString()
+    const builtIn: StructurePreset = {
+      id: BUILT_IN_PRESET_ID,
+      name: BUILT_IN_PRESET_NAME,
+      structure: clone(sampleStructure),
+      createdAt,
+      updatedAt: stablePresets[0]?.updatedAt ?? timestamp,
+    }
+    const normalized = [
+      builtIn,
+      ...persisted.filter((preset, index) => !isBuiltInPreset(preset) && index !== formerBundledIndex),
+    ]
+
+    if (raw === null || JSON.stringify(persisted) !== JSON.stringify(normalized)) write(normalized)
+    return clone(normalized)
   }
 
   const create = (name: string, structure: StructureEntry[]): StructurePreset => {
@@ -86,29 +117,6 @@ export function createPresetRepository(
     return clone(preset)
   }
 
-  if (storage.getItem(PRESETS_KEY) === null) {
-    const timestamp = new Date(now()).toISOString()
-    write([{
-      id: idFactory(),
-      name: 'Princeton Poker Club Standard',
-      structure: clone(sampleStructure),
-      createdAt: timestamp,
-      updatedAt: timestamp,
-    }])
-  } else {
-    const presets = read()
-    const legacyStandard = presets.findIndex((preset) =>
-      preset.name === 'Princeton Poker Club Standard' &&
-      isFormerBundledStructure(preset.structure))
-    if (legacyStandard >= 0) {
-      presets[legacyStandard] = {
-        ...presets[legacyStandard],
-        structure: clone(sampleStructure),
-      }
-      write(presets)
-    }
-  }
-
   return {
     list: () => read(),
     save: create,
@@ -116,6 +124,7 @@ export function createPresetRepository(
       return create(name, this.load(id).structure)
     },
     rename(id, name) {
+      if (isBuiltInPreset(id)) throw new Error('The built-in preset cannot be renamed.')
       const presets = read()
       const index = presets.findIndex((preset) => preset.id === id)
       if (index < 0) throw new Error('Preset was not found.')
@@ -130,6 +139,7 @@ export function createPresetRepository(
       return clone(presets[index])
     },
     remove(id) {
+      if (isBuiltInPreset(id)) throw new Error('The built-in preset cannot be deleted.')
       const presets = read()
       if (!presets.some((preset) => preset.id === id)) throw new Error('Preset was not found.')
       write(presets.filter((preset) => preset.id !== id))

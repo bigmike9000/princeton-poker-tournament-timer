@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTournament } from '../../app/useTournament'
 import { Dialog } from '../../components/Dialog'
-import { createPresetRepository, type PresetRepository, type StructurePreset } from '../../persistence/presets'
+import { createPresetRepository, isBuiltInPreset, type PresetRepository, type StructurePreset } from '../../persistence/presets'
 
 interface PresetRowProps {
   preset: StructurePreset
@@ -13,6 +13,7 @@ interface PresetRowProps {
 
 function PresetRow({ preset, onLoad, onDuplicate, onRename, onDelete }: PresetRowProps) {
   const [name, setName] = useState(preset.name)
+  const builtIn = isBuiltInPreset(preset)
   const levels = preset.structure.filter((entry) => entry.kind === 'level').length
   const breaks = preset.structure.length - levels
 
@@ -20,14 +21,15 @@ function PresetRow({ preset, onLoad, onDuplicate, onRename, onDelete }: PresetRo
     <article className="preset-row" role="group" aria-label={`Preset ${preset.name}`}>
       <div className="preset-symbol" aria-hidden="true">{String(levels).padStart(2, '0')}</div>
       <div className="preset-details">
-        <label><span>Preset name</span><input value={name} maxLength={60} onChange={(event) => setName(event.target.value)} /></label>
+        <label><span>Preset name</span><input value={name} maxLength={60} readOnly={builtIn} onChange={(event) => setName(event.target.value)} /></label>
+        {builtIn && <span className="preset-built-in">Built-in</span>}
         <p>{levels} levels · {breaks} breaks · Updated {new Date(preset.updatedAt).toLocaleDateString()}</p>
       </div>
       <div className="preset-actions">
         <button onClick={onLoad}>Load</button>
         <button onClick={onDuplicate}>Duplicate</button>
-        <button onClick={() => onRename(name)}>Rename</button>
-        <button className="delete-preset" onClick={onDelete}>Delete</button>
+        {!builtIn && <button onClick={() => onRename(name)}>Rename</button>}
+        {!builtIn && <button className="delete-preset" onClick={onDelete}>Delete</button>}
       </div>
     </article>
   )
