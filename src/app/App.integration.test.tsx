@@ -35,6 +35,7 @@ describe('representative tournament flow', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Next level' }))
     fireEvent.click(screen.getByRole('button', { name: 'Start tournament' }))
     fireEvent.click(screen.getByRole('button', { name: 'Open tournament information' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Blind structure' }))
     const structure = screen.getByRole('list', { name: 'Tournament blind structure' })
     expect(within(structure).getAllByRole('listitem')[1]).toHaveAttribute('aria-current', 'step')
 

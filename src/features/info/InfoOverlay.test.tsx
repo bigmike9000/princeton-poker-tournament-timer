@@ -53,15 +53,19 @@ describe('InfoOverlay', () => {
     }
   })
 
-  it('shows the complete read-only tournament information and schedule', () => {
+  it('opens on Overview, switches pages manually, and resets to Overview after closing', async () => {
+    const user = userEvent.setup()
+
     render(<App />)
     const { dialog } = openInfo()
     const overlay = within(dialog)
 
     expect(overlay.getByRole('img', { name: 'Princeton Poker Club logo' })).toBeVisible()
     expect(overlay.getByRole('heading', { name: 'Princeton Poker Club Standard' })).toBeVisible()
-    expect(overlay.getByText('10 × 1-value chips')).toBeVisible()
-    expect(overlay.getByText('Starting stack: 200 chips')).toBeVisible()
+    expect(overlay.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true')
+    expect(overlay.getByText('Page 1 of 2')).toBeVisible()
+    expect(overlay.getByRole('heading', { name: 'Chip denominations' })).toBeVisible()
+    expect(overlay.queryByRole('list', { name: 'Tournament blind structure' })).not.toBeInTheDocument()
     expect(overlay.getByText(
       'Prize structure will be announced by the Tournament Director before play begins.',
     )).toBeVisible()
@@ -69,27 +73,6 @@ describe('InfoOverlay', () => {
     expect(overlay.getByText(
       'Chip-ups occur during the scheduled breaks shown in the structure.',
     )).toBeVisible()
-
-    const structure = overlay.getByRole('list', { name: 'Tournament blind structure' })
-    const entries = within(structure).getAllByRole('listitem')
-    expect(entries).toHaveLength(19)
-    expect(entries[0]).toHaveAttribute('aria-current', 'step')
-    expect(entries[0]).toHaveAttribute('data-state', 'current')
-    expect(entries[0]).toHaveTextContent('Level 1')
-    expect(entries[0]).toHaveTextContent('1 / 2')
-    expect(entries[0]).toHaveTextContent('NO ANTE')
-    expect(entries[0]).toHaveTextContent('12 min')
-    expect(entries[5]).toHaveTextContent('Chip up to 5s')
-    expect(entries[5]).toHaveTextContent('10 min')
-    expect(entries[18]).toHaveTextContent('Level 17')
-    expect(entries[18]).toHaveTextContent('500 / 1,000')
-    expect(entries[18]).toHaveTextContent('BIG BLIND ANTE: 1,000')
-    expect(entries[18]).toHaveTextContent('Until end')
-    expect(structure).not.toHaveTextContent('BB ante begins')
-    expect(structure).not.toHaveTextContent('Final table target')
-    expect(structure).not.toHaveTextContent('Expected finish')
-    expect(structure).not.toHaveTextContent('Final level')
-    expect(scrollIntoView).toHaveBeenCalledWith({ block: 'nearest' })
 
     const rules = [
       'Fairness and the best interest of the game guide floor decisions.',
@@ -114,16 +97,84 @@ describe('InfoOverlay', () => {
     expect(overlay.getByText(
       'PPC house rules and Tournament Director decisions govern this event.',
     )).toBeVisible()
+
+    await user.click(overlay.getByRole('tab', { name: 'Blind structure' }))
+    expect(overlay.getByRole('tab', { name: 'Blind structure' })).toHaveAttribute('aria-selected', 'true')
+    expect(overlay.getByText('Page 2 of 2')).toBeVisible()
+    expect(overlay.getByRole('list', { name: 'Tournament blind structure' })).toBeVisible()
+    expect(overlay.queryByRole('heading', { name: 'Chip denominations' })).not.toBeInTheDocument()
+
+    await user.click(overlay.getByRole('button', { name: 'Close tournament information' }))
+    const reopened = openInfo()
+    expect(within(reopened.dialog).getByRole('tab', { name: 'Overview' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    )
+    expect(within(reopened.dialog).getByText('Page 1 of 2')).toBeVisible()
   })
 
-  it('shows configured denominations with exactly one current starting-stack line', () => {
+  it('shows canonical chip cards and live tournament totals', () => {
+    render(<App />)
+    const { dialog } = openInfo()
+    const overlay = within(dialog)
+
+    const one = overlay.getByRole('group', { name: '10 white 1-value chips' })
+    expect(within(one).getByText('1')).toBeVisible()
+    expect(within(one).getByText('White')).toBeVisible()
+    expect(within(one).getByText('10 chips')).toBeVisible()
+
+    const five = overlay.getByRole('group', { name: '8 red 5-value chips' })
+    expect(within(five).getByText('5')).toBeVisible()
+    expect(within(five).getByText('Red')).toBeVisible()
+    expect(within(five).getByText('8 chips')).toBeVisible()
+
+    const twentyFive = overlay.getByRole('group', { name: '6 green 25-value chips' })
+    expect(within(twentyFive).getByText('25')).toBeVisible()
+    expect(within(twentyFive).getByText('Green')).toBeVisible()
+    expect(within(twentyFive).getByText('6 chips')).toBeVisible()
+
+    expect(overlay.getByText('Starting stack')).toBeVisible()
+    expect(overlay.getByText('200')).toBeVisible()
+    expect(overlay.getByText('Players')).toBeVisible()
+    expect(overlay.getByText('80')).toBeVisible()
+    expect(overlay.getByText('Chips in play')).toBeVisible()
+    expect(overlay.getByText('16,000')).toBeVisible()
+  })
+
+  it('moves between tabs with arrow keys and exposes only the selected tab in the tab order', () => {
+    render(<App />)
+    const { dialog } = openInfo()
+    const overlay = within(dialog)
+    const overview = overlay.getByRole('tab', { name: 'Overview' })
+    const structure = overlay.getByRole('tab', { name: 'Blind structure' })
+
+    expect(overview).toHaveAttribute('tabindex', '0')
+    expect(structure).toHaveAttribute('tabindex', '-1')
+    overview.focus()
+    fireEvent.keyDown(overview, { key: 'ArrowRight' })
+
+    expect(structure).toHaveFocus()
+    expect(structure).toHaveAttribute('aria-selected', 'true')
+    expect(structure).toHaveAttribute('tabindex', '0')
+    expect(overview).toHaveAttribute('tabindex', '-1')
+    fireEvent.keyDown(structure, { key: 'ArrowLeft' })
+    expect(overview).toHaveFocus()
+    expect(overview).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('filters canonical allocations and every stale stack line before supplemental chip copy', () => {
     const state = createInitialState()
     state.configuration.startingStack = 50_000
     state.information = {
       chipLines: [
+        '10 × 1-value chips',
+        '8 × 5-value chips',
+        '6 × 25-value chips',
         '20 × 100-value chips',
         'Starting stack: 200 chips',
         '8 × 5,000-value chips',
+        '18 × 5-value chips for alternates',
+        '110 × 1-value chips in reserve',
         'Starting stack: 999 chips',
       ],
       prizeLines: [...state.information!.prizeLines],
@@ -138,9 +189,67 @@ describe('InfoOverlay', () => {
     expect(chips).not.toBeNull()
     expect(within(chips as HTMLElement).getByText('20 × 100-value chips')).toBeVisible()
     expect(within(chips as HTMLElement).getByText('8 × 5,000-value chips')).toBeVisible()
-    expect(within(chips as HTMLElement).getAllByText('Starting stack: 50,000 chips')).toHaveLength(1)
+    expect(within(chips as HTMLElement).getByText('18 × 5-value chips for alternates')).toBeVisible()
+    expect(within(chips as HTMLElement).getByText('110 × 1-value chips in reserve')).toBeVisible()
+    expect(within(chips as HTMLElement).queryByText('10 × 1-value chips')).not.toBeInTheDocument()
+    expect(within(chips as HTMLElement).queryByText('8 × 5-value chips')).not.toBeInTheDocument()
+    expect(within(chips as HTMLElement).queryByText('6 × 25-value chips')).not.toBeInTheDocument()
     expect(within(chips as HTMLElement).queryByText('Starting stack: 200 chips')).not.toBeInTheDocument()
     expect(within(chips as HTMLElement).queryByText('Starting stack: 999 chips')).not.toBeInTheDocument()
+    expect(within(dialog).getByText('Starting stack')).toBeVisible()
+    expect(within(dialog).getByText('50,000')).toBeVisible()
+  })
+
+  it('shows all structure entries in two ordered columns with concise shared break copy', async () => {
+    const user = userEvent.setup()
+
+    render(<App />)
+    const { dialog } = openInfo()
+    const overlay = within(dialog)
+    scrollIntoView.mockClear()
+    await user.click(overlay.getByRole('tab', { name: 'Blind structure' }))
+
+    const structure = overlay.getByRole('list', { name: 'Tournament blind structure' })
+    const entries = within(structure).getAllByRole('listitem')
+    expect(entries).toHaveLength(19)
+    entries.slice(0, 10).forEach((entry, index) => {
+      expect(entry).toHaveAttribute('data-column', '1')
+      expect(entry).toHaveAttribute('data-sequence', String(index + 1))
+    })
+    entries.slice(10).forEach((entry, index) => {
+      expect(entry).toHaveAttribute('data-column', '2')
+      expect(entry).toHaveAttribute('data-sequence', String(index + 11))
+    })
+
+    expect(entries[0]).toHaveAttribute('aria-current', 'step')
+    expect(entries[0]).toHaveAttribute('data-state', 'current')
+    expect(entries[0]).toHaveTextContent('CURRENT')
+    expect(entries[0]).toHaveTextContent('Level 1')
+    expect(entries[0]).toHaveTextContent('1 / 2')
+    expect(entries[0]).toHaveTextContent('NO ANTE')
+    expect(entries[0]).toHaveTextContent('12 min')
+
+    const firstBreak = entries[5]
+    expect(firstBreak).toHaveAccessibleName('Break, 10 min, Chip up to 5s')
+    expect(within(firstBreak).getAllByText(/break/i)).toHaveLength(1)
+    expect(within(firstBreak).getByText('BREAK · 10 MIN')).toBeVisible()
+    expect(within(firstBreak).getByText('Chip up to 5s')).toBeVisible()
+
+    const secondBreak = entries[11]
+    expect(secondBreak).toHaveAccessibleName('Break, 10 min, Chip up to 25s and 100s')
+    expect(within(secondBreak).getAllByText(/break/i)).toHaveLength(1)
+    expect(within(secondBreak).getByText('BREAK · 10 MIN')).toBeVisible()
+    expect(within(secondBreak).getByText('Chip up to 25s and 100s')).toBeVisible()
+
+    expect(entries[18]).toHaveTextContent('Level 17')
+    expect(entries[18]).toHaveTextContent('500 / 1,000')
+    expect(entries[18]).toHaveTextContent('BBA 1,000')
+    expect(entries[18]).toHaveTextContent('Until end')
+    expect(structure).not.toHaveTextContent('BB ante begins')
+    expect(structure).not.toHaveTextContent('Final table target')
+    expect(structure).not.toHaveTextContent('Expected finish')
+    expect(structure).not.toHaveTextContent('Final level')
+    expect(scrollIntoView).not.toHaveBeenCalled()
   })
 
   it('keeps a newly announced application-update control inside the inert background', () => {
@@ -172,13 +281,15 @@ describe('InfoOverlay', () => {
       await user.click(trigger)
       const dialog = screen.getByRole('dialog', { name: 'Tournament information' })
       const close = within(dialog).getByRole('button', { name: 'Close tournament information' })
-      const rulesLink = within(dialog).getByRole('link', { name: '2024 Poker TDA rules' })
+      const structureTab = within(dialog).getByRole('tab', { name: 'Blind structure' })
 
       expect(document.querySelector('.app-background')).toHaveAttribute('inert')
       expect(close).toHaveFocus()
+      await user.click(structureTab)
+      close.focus()
       fireEvent.keyDown(close, { key: 'Tab', shiftKey: true })
-      expect(rulesLink).toHaveFocus()
-      fireEvent.keyDown(rulesLink, { key: 'Tab' })
+      expect(structureTab).toHaveFocus()
+      fireEvent.keyDown(structureTab, { key: 'Tab' })
       expect(close).toHaveFocus()
       fireEvent.keyDown(close, { key: 'Escape' })
 
@@ -222,11 +333,12 @@ describe('InfoOverlay', () => {
 
     fireEvent.click(infoTrigger)
     const infoDialog = screen.getByRole('dialog', { name: 'Tournament information' })
+    fireEvent.click(within(infoDialog).getByRole('tab', { name: 'Blind structure' }))
     const structure = within(infoDialog).getByRole('list', { name: 'Tournament blind structure' })
     const firstEntry = within(structure).getAllByRole('listitem')[0]
-    const rulesLink = within(infoDialog).getByRole('link', { name: '2024 Poker TDA rules' })
-    fireEvent.keyDown(rulesLink, { key: 'ArrowRight' })
-    fireEvent.keyDown(rulesLink, { key: ' ' })
+    const structureTab = within(infoDialog).getByRole('tab', { name: 'Blind structure' })
+    fireEvent.keyDown(structureTab, { key: 'ArrowRight' })
+    fireEvent.keyDown(structureTab, { key: ' ' })
     fireEvent.click(directorTrigger)
 
     expect(firstEntry).toHaveAttribute('aria-current', 'step')

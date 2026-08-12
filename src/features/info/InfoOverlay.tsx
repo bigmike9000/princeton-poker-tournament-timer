@@ -1,11 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTournament } from '../../app/useTournament'
 import { ClubLogo } from '../../components/ClubLogo'
-import { formatChips } from '../../domain/calculations'
-import {
-  selectTournamentInformation,
-  TOURNAMENT_RULE_SUMMARY,
-} from '../../domain/tournamentInformation'
+import { selectTournamentInformation } from '../../domain/tournamentInformation'
+import { InfoOverview } from './InfoOverview'
 import { InfoStructure } from './InfoStructure'
 
 interface InfoOverlayProps {
@@ -15,15 +12,20 @@ interface InfoOverlayProps {
 }
 
 export function InfoOverlay({ open, onClose, onAfterClose }: InfoOverlayProps) {
+  const [page, setPage] = useState<'overview' | 'structure'>('overview')
   const closeRef = useRef<HTMLButtonElement>(null)
+  const overviewTabRef = useRef<HTMLButtonElement>(null)
+  const structureTabRef = useRef<HTMLButtonElement>(null)
   const closeRequestedRef = useRef(false)
   const overlayRef = useRef<HTMLElement>(null)
   const { state } = useTournament()
   const information = selectTournamentInformation(state)
-  const chipLines = [
-    ...information.chipLines.filter((line) => !/^starting stack\s*:/i.test(line.trim())),
-    `Starting stack: ${formatChips(state.configuration.startingStack)} chips`,
-  ]
+
+  useEffect(() => {
+    // The overlay persists while closed, so each open cycle deliberately starts on page one.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (open) setPage('overview')
+  }, [open])
 
   useEffect(() => {
     if (!open) return
@@ -68,6 +70,7 @@ export function InfoOverlay({ open, onClose, onAfterClose }: InfoOverlayProps) {
           .filter((element) => element.matches(
             'button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), a[href], [tabindex]:not([tabindex="-1"])',
           ))
+          .filter((element) => element.tabIndex >= 0)
         if (focusable.length === 0) return
         const first = focusable[0]
         const last = focusable[focusable.length - 1]
@@ -97,59 +100,73 @@ export function InfoOverlay({ open, onClose, onAfterClose }: InfoOverlayProps) {
             onClick={requestClose}
             aria-label="Close tournament information"
           >Close <span aria-hidden="true">×</span></button>
+          <div className="info-navigation">
+            <div className="info-tabs" role="tablist" aria-label="Tournament information pages">
+              <button
+                ref={overviewTabRef}
+                id="info-overview-tab"
+                type="button"
+                role="tab"
+                aria-selected={page === 'overview'}
+                aria-controls="info-overview-panel"
+                tabIndex={page === 'overview' ? 0 : -1}
+                onClick={() => setPage('overview')}
+                onKeyDown={(event) => {
+                  if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
+                  event.preventDefault()
+                  setPage('structure')
+                  structureTabRef.current?.focus()
+                }}
+              >Overview</button>
+              <button
+                ref={structureTabRef}
+                id="info-structure-tab"
+                type="button"
+                role="tab"
+                aria-selected={page === 'structure'}
+                aria-controls="info-structure-panel"
+                tabIndex={page === 'structure' ? 0 : -1}
+                onClick={() => setPage('structure')}
+                onKeyDown={(event) => {
+                  if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
+                  event.preventDefault()
+                  setPage('overview')
+                  overviewTabRef.current?.focus()
+                }}
+              >Blind structure</button>
+            </div>
+            <span className="info-page-count">Page {page === 'overview' ? 1 : 2} of 2</span>
+          </div>
         </header>
 
-        <div className="info-grid">
-          <section className="info-card" aria-labelledby="info-chips-title">
-            <p className="info-kicker">At the table</p>
-            <h2 id="info-chips-title">Chip denominations</h2>
-            <ul>
-              {chipLines.map((line, index) => <li key={`${line}-${index}`}>{line}</li>)}
-            </ul>
-          </section>
-
-          <section className="info-card" aria-labelledby="info-prizes-title">
-            <p className="info-kicker">Awards</p>
-            <h2 id="info-prizes-title">Prize structure</h2>
-            <ul>
-              {information.prizeLines.map((line, index) => <li key={`${line}-${index}`}>{line}</li>)}
-            </ul>
-          </section>
-
-          <section className="info-card info-structure" aria-labelledby="info-structure-title">
-            <p className="info-kicker">Full schedule</p>
-            <h2 id="info-structure-title">Blind structure</h2>
+        {page === 'overview' ? (
+          <div
+            id="info-overview-panel"
+            className="info-page info-page--overview"
+            role="tabpanel"
+            aria-labelledby="info-overview-tab"
+          >
+            <InfoOverview
+              state={state}
+              chipLines={information.chipLines}
+              prizeLines={information.prizeLines}
+              houseNotes={information.houseNotes}
+            />
+          </div>
+        ) : (
+          <section
+            id="info-structure-panel"
+            className="info-page info-page--structure"
+            role="tabpanel"
+            aria-labelledby="info-structure-tab"
+          >
+            <div className="info-structure-heading">
+              <p className="info-kicker">Full schedule</p>
+              <h2 id="info-structure-title">Blind structure</h2>
+            </div>
             <InfoStructure state={state} />
           </section>
-
-          <section className="info-card info-rules" aria-labelledby="info-rules-title">
-            <p className="info-kicker">Play well</p>
-            <h2 id="info-rules-title">Tournament rules &amp; information</h2>
-            <div className="info-rules-grid">
-              <div>
-                <h3>House notes</h3>
-                <ul>
-                  {information.houseNotes.map((line, index) => <li key={`${line}-${index}`}>{line}</li>)}
-                </ul>
-              </div>
-              <div>
-                <h3>Rules summary</h3>
-                <ul>
-                  {TOURNAMENT_RULE_SUMMARY.map((rule) => <li key={rule}>{rule}</li>)}
-                </ul>
-              </div>
-            </div>
-          </section>
-        </div>
-
-        <footer className="info-footer">
-          <p>Reference: <a
-            href="https://www.pokertda.com/view-poker-tda-rules/"
-            target="_blank"
-            rel="noreferrer"
-          >2024 Poker TDA rules</a></p>
-          <p>PPC house rules and Tournament Director decisions govern this event.</p>
-        </footer>
+        )}
       </article>
     </section>
   )

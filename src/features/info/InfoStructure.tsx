@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { breakPresentation } from '../../domain/breakPresentation'
 import { durationLabel } from '../../domain/structure'
 import type { PokerLevel, TournamentState } from '../../domain/types'
 import { selectPokerLevelNumber } from '../../state/selectors'
@@ -9,8 +9,8 @@ function formatNumber(value: number): string {
 
 function anteLabel(entry: PokerLevel): string {
   if (entry.anteType === 'none' || entry.ante === 0) return 'NO ANTE'
-  const prefix = entry.anteType === 'big-blind' ? 'BIG BLIND ANTE' : 'ANTE'
-  return `${prefix}: ${formatNumber(entry.ante)}`
+  const prefix = entry.anteType === 'big-blind' ? 'BBA' : 'ANTE'
+  return `${prefix} ${formatNumber(entry.ante)}`
 }
 
 interface InfoStructureProps {
@@ -18,30 +18,29 @@ interface InfoStructureProps {
 }
 
 export function InfoStructure({ state }: InfoStructureProps) {
-  const currentRef = useRef<HTMLLIElement>(null)
-
-  useEffect(() => {
-    currentRef.current?.scrollIntoView?.({ block: 'nearest' })
-  }, [state.runtime.currentEntryIndex])
-
   return (
     <ol className="info-structure-list" aria-label="Tournament blind structure">
       {state.structure.map((entry, index) => {
         const current = index === state.runtime.currentEntryIndex
         if (entry.kind === 'break') {
-          const duration = durationLabel(entry)
+          const presentation = breakPresentation(entry)
           return (
             <li
               key={entry.id}
-              ref={current ? currentRef : undefined}
               aria-current={current ? 'step' : undefined}
-              aria-label={`Break ${entry.label}, ${duration}`}
+              aria-label={presentation.accessibleLabel}
               data-state={current ? 'current' : undefined}
+              data-column={index < 10 ? '1' : '2'}
+              data-sequence={index + 1}
               className="info-structure-entry info-structure-entry--break"
             >
-              <span className="info-entry-marker">Break</span>
-              <strong>{entry.label}</strong>
-              <span className="info-entry-duration">{duration}</span>
+              <div className="info-entry-heading">
+                <strong>{presentation.heading}</strong>
+                {current && <span className="info-current-marker">CURRENT</span>}
+              </div>
+              {presentation.subtitle && (
+                <span className="info-break-subtitle">{presentation.subtitle}</span>
+              )}
             </li>
           )
         }
@@ -61,13 +60,17 @@ export function InfoStructure({ state }: InfoStructureProps) {
         return (
           <li
             key={entry.id}
-            ref={current ? currentRef : undefined}
             aria-current={current ? 'step' : undefined}
             aria-label={label}
             data-state={current ? 'current' : undefined}
+            data-column={index < 10 ? '1' : '2'}
+            data-sequence={index + 1}
             className="info-structure-entry"
           >
-            <span className="info-entry-marker">Level {levelNumber}</span>
+            <div className="info-entry-heading">
+              <span className="info-entry-marker">Level {levelNumber}</span>
+              {current && <span className="info-current-marker">CURRENT</span>}
+            </div>
             <strong>{blinds}</strong>
             <span className="info-entry-ante">{ante}</span>
             <span className="info-entry-duration">{duration}</span>
