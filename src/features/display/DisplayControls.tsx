@@ -8,7 +8,7 @@ interface DisplayControlsProps {
   state: TournamentState
   dispatch: Dispatch<TournamentAction>
   onOpenDirector: () => void
-  onOpenInfo: () => void
+  onOpenInfo: (trigger: HTMLButtonElement) => void
   fullscreen: boolean
   fullscreenError: string | null
   onToggleFullscreen: () => Promise<void>
@@ -70,7 +70,7 @@ export function DisplayControls({
         <button
           className="icon-button info-button"
           aria-label="Open tournament information"
-          onClick={onOpenInfo}
+          onClick={(event) => onOpenInfo(event.currentTarget)}
         >Info</button>
         <button
           className="icon-button"

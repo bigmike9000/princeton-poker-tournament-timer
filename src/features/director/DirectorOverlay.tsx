@@ -32,7 +32,7 @@ export function DirectorOverlay({ open, onClose, onAfterClose }: DirectorOverlay
     if (!open) return
     closeRef.current?.focus()
     const previousOverflow = document.body.style.overflow
-    const background = document.querySelector<HTMLElement>('.tournament-shell')
+    const background = document.querySelector<HTMLElement>('.app-background')
     document.body.style.overflow = 'hidden'
     background?.setAttribute('inert', '')
     return () => {

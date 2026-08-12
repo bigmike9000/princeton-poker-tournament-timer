@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useTournament } from '../../app/useTournament'
 import { ClubLogo } from '../../components/ClubLogo'
+import { formatChips } from '../../domain/calculations'
 import {
   selectTournamentInformation,
   TOURNAMENT_RULE_SUMMARY,
@@ -19,11 +20,15 @@ export function InfoOverlay({ open, onClose, onAfterClose }: InfoOverlayProps) {
   const overlayRef = useRef<HTMLElement>(null)
   const { state } = useTournament()
   const information = selectTournamentInformation(state)
+  const chipLines = [
+    ...information.chipLines.filter((line) => !/^starting stack\s*:/i.test(line.trim())),
+    `Starting stack: ${formatChips(state.configuration.startingStack)} chips`,
+  ]
 
   useEffect(() => {
     if (!open) return
     const previousOverflow = document.body.style.overflow
-    const background = document.querySelector<HTMLElement>('.tournament-shell')
+    const background = document.querySelector<HTMLElement>('.app-background')
     document.body.style.overflow = 'hidden'
     background?.setAttribute('inert', '')
     closeRef.current?.focus()
@@ -99,7 +104,7 @@ export function InfoOverlay({ open, onClose, onAfterClose }: InfoOverlayProps) {
             <p className="info-kicker">At the table</p>
             <h2 id="info-chips-title">Chip denominations</h2>
             <ul>
-              {information.chipLines.map((line, index) => <li key={`${line}-${index}`}>{line}</li>)}
+              {chipLines.map((line, index) => <li key={`${line}-${index}`}>{line}</li>)}
             </ul>
           </section>
 

@@ -10,6 +10,17 @@ function saveRawSnapshot(storage: Storage, state: unknown): void {
   storage.setItem(SNAPSHOT_KEY, JSON.stringify({ version: 1, savedAt: 1_000, state }))
 }
 
+function setLevelNote(state: ReturnType<typeof createInitialState>, id: string, note: string): void {
+  const entry = state.structure.find((candidate) => candidate.id === id)
+  if (entry?.kind !== 'level') throw new Error(`Missing test level ${id}`)
+  entry.note = note
+}
+
+function noteFor(state: ReturnType<typeof createInitialState>, id: string): string | undefined {
+  const entry = state.structure.find((candidate) => candidate.id === id)
+  return entry?.kind === 'level' ? entry.note : undefined
+}
+
 describe('snapshot persistence', () => {
   beforeEach(() => localStorage.clear())
 
@@ -105,6 +116,37 @@ describe('snapshot persistence', () => {
     expect(restored.recovered).toBe(false)
     expect(restored.state.structure).toEqual(state.structure)
     expect(restored.state.structure.at(-1)?.durationSeconds).toBeNull()
+  })
+
+  it('removes obsolete bundled level notes from an existing saved tournament', () => {
+    const state = createInitialState()
+    setLevelNote(state, 'level-6', 'BB ante begins')
+    setLevelNote(state, 'level-13', 'Final table target · chip up to 100s and 500s')
+    setLevelNote(state, 'level-15', 'Expected finish')
+    setLevelNote(state, 'level-17', 'Final level')
+    setLevelNote(state, 'level-7', 'Custom note to preserve')
+    saveRawSnapshot(localStorage, state)
+
+    const restored = loadSnapshot(localStorage, 1_000)
+
+    expect(restored.recovered).toBe(false)
+    expect(noteFor(restored.state, 'level-6')).toBeUndefined()
+    expect(noteFor(restored.state, 'level-13')).toBeUndefined()
+    expect(noteFor(restored.state, 'level-15')).toBeUndefined()
+    expect(noteFor(restored.state, 'level-17')).toBeUndefined()
+    expect(noteFor(restored.state, 'level-7')).toBe('Custom note to preserve')
+  })
+
+  it('preserves custom text on a migrated ID and obsolete text on another ID', () => {
+    const state = createInitialState()
+    setLevelNote(state, 'level-6', 'BB ante begins after dinner')
+    setLevelNote(state, 'level-7', 'Expected finish')
+    saveRawSnapshot(localStorage, state)
+
+    const restored = loadSnapshot(localStorage, 1_000)
+
+    expect(noteFor(restored.state, 'level-6')).toBe('BB ante begins after dinner')
+    expect(noteFor(restored.state, 'level-7')).toBe('Expected finish')
   })
 
   it('restores a valid running untimed level without inventing countdown state', () => {

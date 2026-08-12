@@ -73,11 +73,9 @@ function AppContent() {
     setDirectorOpen(false)
   }
 
-  const openInfo = () => {
+  const openInfo = (trigger: HTMLButtonElement) => {
     if (directorOpen) return
-    infoTrigger.current = document.activeElement instanceof HTMLElement
-      ? document.activeElement
-      : null
+    infoTrigger.current = trigger
     setInfoOpen(true)
   }
 
@@ -95,13 +93,16 @@ function AppContent() {
 
   return (
     <>
-      <TournamentDisplay
-        onOpenDirector={openDirector}
-        onOpenInfo={openInfo}
-        fullscreen={fullscreen}
-        fullscreenError={fullscreenError}
-        onToggleFullscreen={handleFullscreen}
-      />
+      <div className="app-background">
+        <TournamentDisplay
+          onOpenDirector={openDirector}
+          onOpenInfo={openInfo}
+          fullscreen={fullscreen}
+          fullscreenError={fullscreenError}
+          onToggleFullscreen={handleFullscreen}
+        />
+        <PwaUpdatePrompt />
+      </div>
       {directorOpen && !infoOpen && (
         <DirectorOverlay
           open
@@ -116,7 +117,6 @@ function AppContent() {
           onAfterClose={restoreInfoFocus}
         />
       )}
-      <PwaUpdatePrompt />
     </>
   )
 }

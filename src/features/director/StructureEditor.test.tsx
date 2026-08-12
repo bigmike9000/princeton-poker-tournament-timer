@@ -305,6 +305,20 @@ describe('StructureEditor', () => {
 })
 
 describe('Structure editor responsive CSS', () => {
+  it('collapses Director navigation by 820px before the medium structure grid can overflow', () => {
+    const collapseStart = directorCss.indexOf('@media (max-width: 820px)')
+    const mediumStart = directorCss.indexOf('@media (max-width: 1180px)')
+    const collapseCss = collapseStart < 0
+      ? ''
+      : directorCss.slice(collapseStart, directorCss.indexOf('.structure-editor {', collapseStart))
+
+    expect(collapseStart).toBeGreaterThan(-1)
+    expect(collapseStart).toBeLessThan(mediumStart)
+    expect(cssRule(collapseCss, '.director-layout')).toMatch(/grid-template-columns:\s*1fr/)
+    expect(cssRule(collapseCss, '.director-nav')).toMatch(/flex-direction:\s*row/)
+    expect(cssRule(collapseCss, '.director-nav')).toMatch(/overflow-x:\s*auto/)
+  })
+
   it('wraps before the desktop grid can overflow the Director content column', () => {
     const mediumStart = directorCss.indexOf('@media (max-width: 1180px)')
     const mobileStart = directorCss.indexOf('@media (max-width: 620px)')

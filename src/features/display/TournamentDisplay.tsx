@@ -11,7 +11,7 @@ import { SponsorStrip } from './SponsorStrip'
 
 export interface TournamentDisplayProps {
   onOpenDirector: () => void
-  onOpenInfo: () => void
+  onOpenInfo: (trigger: HTMLButtonElement) => void
   fullscreen: boolean
   fullscreenError: string | null
   onToggleFullscreen: () => Promise<void>

@@ -87,20 +87,25 @@ describe('TournamentDisplay', () => {
     expect(screen.getByRole('timer')).toHaveTextContent('12:00')
   })
 
-  it('renders schedule notes and the untimed terminal clock', async () => {
+  it('keeps break actions but omits bundled level commentary from the untimed schedule', async () => {
     const user = userEvent.setup()
     renderDisplay()
 
     expect(screen.getByText(/Chip up to 5s/)).toBeVisible()
-    expect(screen.getByText(/Final table target/)).toBeVisible()
+    expect(screen.getByText(/Chip up to 25s and 100s/)).toBeVisible()
+    expect(screen.queryByText(/Final table target/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Expected finish/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/^BB ante begins$/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/^Final level$/)).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Break Chip up to 5s, 10 min' })).toBeVisible()
     expect(screen.getByRole('button', {
-      name: 'Level 13 100 / 200, BIG BLIND ANTE: 200, 15 min, Final table target · chip up to 100s and 500s',
+      name: 'Level 13 100 / 200, BIG BLIND ANTE: 200, 15 min',
     })).toBeVisible()
 
     await user.click(screen.getByRole('button', { name: /^Level 17 500 \/ 1,000/ }))
 
-    expect(screen.getByRole('region', { name: 'Current poker level' })).toHaveTextContent('Final level')
+    expect(screen.getByRole('region', { name: 'Current poker level' })).toHaveTextContent('LEVEL 17')
+    expect(screen.getByRole('region', { name: 'Current poker level' })).not.toHaveTextContent('Final level')
     expect(screen.getByRole('timer')).toHaveTextContent('UNTIL END')
   })
 
@@ -128,6 +133,7 @@ describe('TournamentDisplay', () => {
     expect(info.compareDocumentPosition(fullscreen) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     fireEvent.click(info)
     expect(onOpenInfo).toHaveBeenCalledOnce()
+    expect(onOpenInfo).toHaveBeenCalledWith(info)
   })
 
   it('updates player statistics from the editable player count', async () => {

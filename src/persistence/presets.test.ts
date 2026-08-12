@@ -29,6 +29,17 @@ function persistedPreset(overrides: Partial<StructurePreset> = {}): StructurePre
   }
 }
 
+function setStructureNote(structure: StructureEntry[], id: string, note: string): void {
+  const entry = structure.find((candidate) => candidate.id === id)
+  if (entry?.kind !== 'level') throw new Error(`Missing test level ${id}`)
+  entry.note = note
+}
+
+function structureNote(structure: StructureEntry[], id: string): string | undefined {
+  const entry = structure.find((candidate) => candidate.id === id)
+  return entry?.kind === 'level' ? entry.note : undefined
+}
+
 describe('preset repository', () => {
   beforeEach(() => localStorage.clear())
 
@@ -99,6 +110,33 @@ describe('preset repository', () => {
     const [upgraded] = createPresetRepository(localStorage).list()
 
     expect(upgraded).toEqual({ ...legacy, structure: sampleStructure })
+  })
+
+  it('strips obsolete bundled notes when an existing preset is read or loaded', () => {
+    const structure = structuredClone(sampleStructure)
+    setStructureNote(structure, 'level-6', 'BB ante begins')
+    setStructureNote(structure, 'level-13', 'Final table target · chip up to 100s and 500s')
+    setStructureNote(structure, 'level-15', 'Expected finish')
+    setStructureNote(structure, 'level-17', 'Final level')
+    setStructureNote(structure, 'level-7', 'Custom note to preserve')
+    const persisted = persistedPreset({
+      id: 'saved-with-old-notes',
+      name: 'Saved before upgrade',
+      structure,
+    })
+    localStorage.setItem(PRESETS_KEY, JSON.stringify([persisted]))
+
+    const repository = createPresetRepository(localStorage)
+    const listed = repository.list()[0]
+    const loaded = repository.load(persisted.id)
+
+    for (const migrated of [listed.structure, loaded.structure]) {
+      expect(structureNote(migrated, 'level-6')).toBeUndefined()
+      expect(structureNote(migrated, 'level-13')).toBeUndefined()
+      expect(structureNote(migrated, 'level-15')).toBeUndefined()
+      expect(structureNote(migrated, 'level-17')).toBeUndefined()
+      expect(structureNote(migrated, 'level-7')).toBe('Custom note to preserve')
+    }
   })
 
   it.each([

@@ -23,14 +23,14 @@ export const DEFAULT_TOURNAMENT_INFORMATION: ReadonlyTournamentInformation = {
 }
 
 export const TOURNAMENT_RULE_SUMMARY = [
-  'The floor may make fair decisions in the best interest of the game.',
-  'Act clearly and in turn; out-of-turn action may be binding.',
-  'Only one player may play a hand.',
-  'Keep chips visible and higher denominations identifiable.',
-  'Do not use devices while holding a live hand.',
-  'All hands must be tabled face up at an all-in showdown.',
-  'Verbal declarations made in turn are binding.',
-  'Call the clock only after a reasonable amount of time.',
+  'Fairness and the best interest of the game guide floor decisions.',
+  'Protect your hand, act in turn, and make actions clear.',
+  'One player to a hand; no coaching during a live hand.',
+  'Keep chips visible and countable.',
+  'Do not use electronic devices while holding a live hand.',
+  'Table all hands face up at an all-in showdown.',
+  'Clear verbal declarations made in turn are binding.',
+  'The Tournament Director administers clock calls and makes final rulings.',
 ] as const
 
 function cloneInformation(information: ReadonlyTournamentInformation): TournamentInformation {

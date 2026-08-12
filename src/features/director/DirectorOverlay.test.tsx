@@ -156,7 +156,7 @@ describe('DirectorOverlay', () => {
       await user.click(trigger)
       await user.click(screen.getByRole('button', { name: 'Close Tournament Director' }))
 
-      expect(document.querySelector('.tournament-shell')).not.toHaveAttribute('inert')
+      expect(document.querySelector('.app-background')).not.toHaveAttribute('inert')
       expect(trigger).toHaveFocus()
     } finally {
       focus.mockRestore()
@@ -169,7 +169,7 @@ describe('DirectorOverlay', () => {
     await openDirector(user)
     const close = screen.getByRole('button', { name: 'Close Tournament Director' })
 
-    expect(document.querySelector('.tournament-shell')).toHaveAttribute('inert')
+    expect(document.querySelector('.app-background')).toHaveAttribute('inert')
     expect(close).toHaveFocus()
     const last = screen.getByRole('button', { name: 'Reset tournament' })
     fireEvent.keyDown(close, { key: 'Tab', shiftKey: true })

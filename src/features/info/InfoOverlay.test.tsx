@@ -1,10 +1,23 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { StrictMode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from '../../app/App'
 import { TournamentProvider } from '../../app/TournamentProvider'
+import { createInitialState } from '../../domain/sampleStructure'
+import { saveSnapshot } from '../../persistence/snapshot'
 import { InfoOverlay } from './InfoOverlay'
+
+const updateRegistration = vi.hoisted(() => ({
+  announce: undefined as (() => void) | undefined,
+}))
+
+vi.mock('virtual:pwa-register', () => ({
+  registerSW: (options: { onNeedRefresh?: () => void }) => {
+    updateRegistration.announce = options.onNeedRefresh
+    return async () => undefined
+  },
+}))
 
 const originalScrollIntoView = Object.getOwnPropertyDescriptor(
   HTMLElement.prototype,
@@ -24,6 +37,7 @@ describe('InfoOverlay', () => {
   const scrollIntoView = vi.fn()
 
   beforeEach(() => {
+    updateRegistration.announce = undefined
     scrollIntoView.mockReset()
     Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
       configurable: true,
@@ -71,18 +85,21 @@ describe('InfoOverlay', () => {
     expect(entries[18]).toHaveTextContent('500 / 1,000')
     expect(entries[18]).toHaveTextContent('BIG BLIND ANTE: 1,000')
     expect(entries[18]).toHaveTextContent('Until end')
-    expect(entries[18]).toHaveTextContent('Final level')
+    expect(structure).not.toHaveTextContent('BB ante begins')
+    expect(structure).not.toHaveTextContent('Final table target')
+    expect(structure).not.toHaveTextContent('Expected finish')
+    expect(structure).not.toHaveTextContent('Final level')
     expect(scrollIntoView).toHaveBeenCalledWith({ block: 'nearest' })
 
     const rules = [
-      'The floor may make fair decisions in the best interest of the game.',
-      'Act clearly and in turn; out-of-turn action may be binding.',
-      'Only one player may play a hand.',
-      'Keep chips visible and higher denominations identifiable.',
-      'Do not use devices while holding a live hand.',
-      'All hands must be tabled face up at an all-in showdown.',
-      'Verbal declarations made in turn are binding.',
-      'Call the clock only after a reasonable amount of time.',
+      'Fairness and the best interest of the game guide floor decisions.',
+      'Protect your hand, act in turn, and make actions clear.',
+      'One player to a hand; no coaching during a live hand.',
+      'Keep chips visible and countable.',
+      'Do not use electronic devices while holding a live hand.',
+      'Table all hands face up at an all-in showdown.',
+      'Clear verbal declarations made in turn are binding.',
+      'The Tournament Director administers clock calls and makes final rulings.',
     ]
     rules.forEach((rule) => expect(overlay.getByText(rule)).toBeVisible())
 
@@ -97,6 +114,46 @@ describe('InfoOverlay', () => {
     expect(overlay.getByText(
       'PPC house rules and Tournament Director decisions govern this event.',
     )).toBeVisible()
+  })
+
+  it('shows configured denominations with exactly one current starting-stack line', () => {
+    const state = createInitialState()
+    state.configuration.startingStack = 50_000
+    state.information = {
+      chipLines: [
+        '20 × 100-value chips',
+        'Starting stack: 200 chips',
+        '8 × 5,000-value chips',
+        'Starting stack: 999 chips',
+      ],
+      prizeLines: [...state.information!.prizeLines],
+      houseNotes: [...state.information!.houseNotes],
+    }
+    saveSnapshot(localStorage, state, Date.now())
+
+    render(<App />)
+    const { dialog } = openInfo()
+    const chips = within(dialog).getByRole('heading', { name: 'Chip denominations' }).closest('section')
+
+    expect(chips).not.toBeNull()
+    expect(within(chips as HTMLElement).getByText('20 × 100-value chips')).toBeVisible()
+    expect(within(chips as HTMLElement).getByText('8 × 5,000-value chips')).toBeVisible()
+    expect(within(chips as HTMLElement).getAllByText('Starting stack: 50,000 chips')).toHaveLength(1)
+    expect(within(chips as HTMLElement).queryByText('Starting stack: 200 chips')).not.toBeInTheDocument()
+    expect(within(chips as HTMLElement).queryByText('Starting stack: 999 chips')).not.toBeInTheDocument()
+  })
+
+  it('keeps a newly announced application-update control inside the inert background', () => {
+    render(<App />)
+    openInfo()
+
+    act(() => updateRegistration.announce?.())
+    const updateControl = screen.getByRole('button', { name: 'Review application update' })
+    const background = updateControl.closest('.app-background')
+
+    expect(background).not.toBeNull()
+    expect(background).toHaveAttribute('inert')
+    expect(background).toContainElement(screen.getByRole('button', { name: 'Open tournament information' }))
   })
 
   it('traps focus and restores the Info trigger after Escape removes inert', async () => {
@@ -117,7 +174,7 @@ describe('InfoOverlay', () => {
       const close = within(dialog).getByRole('button', { name: 'Close tournament information' })
       const rulesLink = within(dialog).getByRole('link', { name: '2024 Poker TDA rules' })
 
-      expect(document.querySelector('.tournament-shell')).toHaveAttribute('inert')
+      expect(document.querySelector('.app-background')).toHaveAttribute('inert')
       expect(close).toHaveFocus()
       fireEvent.keyDown(close, { key: 'Tab', shiftKey: true })
       expect(rulesLink).toHaveFocus()
@@ -126,11 +183,24 @@ describe('InfoOverlay', () => {
       fireEvent.keyDown(close, { key: 'Escape' })
 
       expect(screen.queryByRole('dialog', { name: 'Tournament information' })).not.toBeInTheDocument()
-      expect(document.querySelector('.tournament-shell')).not.toHaveAttribute('inert')
+      expect(document.querySelector('.app-background')).not.toHaveAttribute('inert')
       expect(trigger).toHaveFocus()
     } finally {
       focus.mockRestore()
     }
+  })
+
+  it('restores the actual Info button after programmatic activation from elsewhere', () => {
+    render(<App />)
+    const infoTrigger = screen.getByRole('button', { name: 'Open tournament information' })
+    const otherControl = screen.getByRole('button', { name: 'Open Tournament Director' })
+    otherControl.focus()
+
+    act(() => infoTrigger.click())
+    expect(screen.getByRole('button', { name: 'Close tournament information' })).toHaveFocus()
+    fireEvent.click(screen.getByRole('button', { name: 'Close tournament information' }))
+
+    expect(infoTrigger).toHaveFocus()
   })
 
   it('closes from the backdrop but not from the information panel', () => {

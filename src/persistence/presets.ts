@@ -1,4 +1,5 @@
 import { sampleStructure } from '../domain/sampleStructure'
+import { removeObsoleteBundledNotes } from '../domain/structureMigrations'
 import type { StructureEntry } from '../domain/types'
 import { validatePresetName, validateStructure } from '../domain/validation'
 import { isFormerBundledStructure } from './legacyDefaults'
@@ -53,7 +54,12 @@ export function createPresetRepository(
     if (raw === null) return []
     try {
       const value = JSON.parse(raw) as unknown
-      return Array.isArray(value) ? clone(value.filter(isPreset)) : []
+      return Array.isArray(value)
+        ? clone(value.filter(isPreset).map((preset) => ({
+            ...preset,
+            structure: removeObsoleteBundledNotes(preset.structure),
+          })))
+        : []
     } catch {
       return []
     }
