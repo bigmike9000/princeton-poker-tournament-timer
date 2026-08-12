@@ -61,9 +61,9 @@ export function TournamentSettings() {
           )}
         </section>
         <section className="director-card form-grid">
-          <div className="field-wide director-card-heading"><div><span>Branding</span><h3>Neutral sponsor placeholders</h3></div></div>
-          <label><span>Sponsor slot one</span><input value={sponsorOne} maxLength={30} onChange={(event) => setSponsorOne(event.target.value)} /></label>
-          <label><span>Sponsor slot two</span><input value={sponsorTwo} maxLength={30} onChange={(event) => setSponsorTwo(event.target.value)} /></label>
+          <div className="field-wide director-card-heading"><div><span>Branding</span><h3>Sponsors</h3></div></div>
+          <label><span>Sponsor display name one</span><input value={sponsorOne} maxLength={30} onChange={(event) => setSponsorOne(event.target.value)} /></label>
+          <label><span>Sponsor display name two</span><input value={sponsorTwo} maxLength={30} onChange={(event) => setSponsorTwo(event.target.value)} /></label>
         </section>
         {error && <p role="alert" className="field-error">{error}</p>}
         <div className="sticky-form-actions"><button type="submit" className="primary-action">Apply tournament details</button></div>

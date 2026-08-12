@@ -37,7 +37,7 @@ export function createInitialState(): TournamentState {
       tournamentName: 'Princeton Poker Club Standard',
       startingPlayers,
       startingStack,
-      sponsorLabels: ['SPONSOR', 'SPONSOR'],
+      sponsorLabels: ['Jane Street', 'Susquehanna'],
     },
     structure,
     runtime: {

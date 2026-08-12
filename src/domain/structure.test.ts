@@ -31,6 +31,7 @@ describe('PPC default structure', () => {
     const state = createInitialState()
     expect(state.configuration.startingPlayers).toBe(80)
     expect(state.configuration.startingStack).toBe(200)
+    expect(state.configuration.sponsorLabels).toEqual(['Jane Street', 'Susquehanna'])
     expect(state.chipLedger[0].chips).toBe(16_000)
   })
 

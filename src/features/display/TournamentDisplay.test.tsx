@@ -27,6 +27,13 @@ describe('TournamentDisplay', () => {
     expect(screen.getByRole('img', { name: 'Princeton Poker Club logo' })).toBeVisible()
   })
 
+  it('renders the default sponsor marks in the public footer', () => {
+    renderDisplay()
+
+    expect(screen.getByRole('img', { name: 'Jane Street' })).toHaveAttribute('src', '/branding/jane-street.png')
+    expect(screen.getByRole('img', { name: 'Susquehanna' })).toHaveAttribute('src', '/branding/susquehanna.png')
+  })
+
   it('shows the dominant timer, current blinds, and player statistics', () => {
     renderDisplay()
 

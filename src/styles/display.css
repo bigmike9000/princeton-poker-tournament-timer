@@ -424,7 +424,8 @@ select:focus-visible {
 
 .sponsor-strip {
   display: flex;
-  min-height: 2.1rem;
+  height: 2rem;
+  flex: 0 0 auto;
   align-items: center;
   gap: .75rem;
   margin-top: .8rem;
@@ -435,7 +436,28 @@ select:focus-visible {
   text-transform: uppercase;
 }
 
-.sponsor-strip strong {
+.sponsor-logo-card {
+  display: grid;
+  width: 7.5rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  place-items: center;
+}
+
+.sponsor-logo-card--jane-street {
+  border-radius: .12rem;
+  padding: .18rem .38rem;
+  background: var(--ivory-50);
+}
+
+.sponsor-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.sponsor-text-mark {
   border-left: 1px solid var(--brass-500);
   padding: .22rem 0 .22rem .65rem;
   color: var(--slate-400);
@@ -863,7 +885,9 @@ select:focus-visible {
   .club-logo { width: 3.2rem; height: 3.2rem; }
   .stage-content { padding-top: .75rem; }
   .clock { margin: .7rem 0 1rem; padding-bottom: .65rem; font-size: clamp(6.5rem, 12.2vw, 12rem); }
-  .sponsor-strip { display: none; }
+  .sponsor-strip { height: 1.5rem; gap: .5rem; margin-top: .5rem; font-size: .5rem; }
+  .sponsor-logo-card { width: 5.5rem; height: 1.5rem; }
+  .sponsor-logo-card--jane-street { padding: .14rem .28rem; }
   .structure-header { min-height: 5.8rem; }
   .structure-row { min-height: 3.65rem; }
 }
@@ -911,13 +935,15 @@ select:focus-visible {
   .clock { font-size: 24vw; }
   .clock.clock--untimed { font-size: 15vw; }
   .stats-grid { grid-template-columns: 1fr; }
-  .sponsor-strip { flex-wrap: wrap; }
+  .sponsor-strip { height: 1.5rem; gap: .5rem; overflow: hidden; white-space: nowrap; }
+  .sponsor-logo-card { width: 5.5rem; height: 1.5rem; }
+  .sponsor-logo-card--jane-street { padding: .14rem .28rem; }
   .control-group { flex-wrap: wrap; }
 }
 
 @media (max-width: 430px) {
   .status-pill { margin-left: 0; }
-  .sponsor-strip > span { flex-basis: 100%; }
+  .sponsor-strip > span { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

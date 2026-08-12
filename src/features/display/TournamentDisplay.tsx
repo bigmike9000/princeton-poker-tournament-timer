@@ -7,6 +7,7 @@ import { Clock } from './Clock'
 import { CurrentLevel } from './CurrentLevel'
 import { DisplayControls } from './DisplayControls'
 import { PlayerStats } from './PlayerStats'
+import { SponsorStrip } from './SponsorStrip'
 
 export interface TournamentDisplayProps {
   onOpenDirector: () => void
@@ -51,12 +52,7 @@ export function TournamentDisplay({
             <PlayerStats state={state} />
           </div>
 
-          <footer className="sponsor-strip" aria-label="Tournament sponsors">
-            <span>Presented with support from</span>
-            {state.configuration.sponsorLabels.map((label, index) => (
-              <strong key={`${label}-${index}`}>{label}</strong>
-            ))}
-          </footer>
+          <SponsorStrip labels={state.configuration.sponsorLabels} />
         </section>
 
         <BlindStructure
