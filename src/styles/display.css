@@ -11,6 +11,12 @@ body {
   min-height: 100dvh;
 }
 
+.app-background[inert] {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
 button {
   color: inherit;
 }
@@ -1187,7 +1193,7 @@ select:focus-visible {
   margin: .6rem 0 0;
   padding-left: 1.1rem;
   color: var(--slate-300);
-  font-size: clamp(.62rem, .85vw, .76rem);
+  font-size: clamp(.82rem, .85vw, 1rem);
   line-height: 1.35;
 }
 
@@ -1414,7 +1420,7 @@ select:focus-visible {
 
 .info-entry-marker {
   color: var(--brass-400);
-  font-size: .66rem;
+  font-size: clamp(.82rem, .85vw, 1rem);
   font-weight: 850;
   letter-spacing: .11em;
   text-transform: uppercase;
@@ -1431,7 +1437,7 @@ select:focus-visible {
   border: 1px solid rgb(217 121 43 / 48%);
   padding: .1rem .22rem;
   color: var(--orange-400);
-  font-size: .47rem;
+  font-size: clamp(.625rem, .68vw, .8rem);
   font-weight: 900;
   letter-spacing: .08em;
 }
@@ -1449,7 +1455,7 @@ select:focus-visible {
 .info-entry-ante,
 .info-entry-duration {
   color: var(--slate-300);
-  font-size: .68rem;
+  font-size: clamp(.82rem, .85vw, 1rem);
   font-weight: 750;
   letter-spacing: .055em;
 }
@@ -1494,7 +1500,7 @@ select:focus-visible {
   grid-row: auto;
   grid-column: auto;
   font-family: inherit;
-  font-size: .66rem;
+  font-size: clamp(.82rem, .85vw, 1rem);
   letter-spacing: .07em;
 }
 
@@ -1503,7 +1509,7 @@ select:focus-visible {
   grid-column: 1;
   overflow: hidden;
   color: var(--brass-400);
-  font-size: .61rem;
+  font-size: clamp(.8rem, .82vw, .96rem);
   font-weight: 750;
   letter-spacing: .035em;
   text-overflow: ellipsis;

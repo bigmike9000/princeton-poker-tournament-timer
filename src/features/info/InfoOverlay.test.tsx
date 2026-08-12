@@ -6,6 +6,7 @@ import { App } from '../../app/App'
 import { TournamentProvider } from '../../app/TournamentProvider'
 import { createInitialState } from '../../domain/sampleStructure'
 import { saveSnapshot } from '../../persistence/snapshot'
+import displayCss from '../../styles/display.css?raw'
 import { InfoOverlay } from './InfoOverlay'
 
 const updateRegistration = vi.hoisted(() => ({
@@ -33,6 +34,19 @@ function openInfo() {
   }
 }
 
+function cssRule(source: string, selector: string): string {
+  const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return source.match(new RegExp(`(?:^|\\n)\\s*${escapedSelector}\\s*\\{([^}]*)\\}`))?.[1] ?? ''
+}
+
+function fluidFontFloor(selector: string): number {
+  const declaration = cssRule(displayCss, selector).match(/font-size:\s*([^;]+)/)?.[1] ?? ''
+  expect(declaration).toMatch(/^clamp\(/)
+  const floor = declaration.match(/clamp\(\s*([\d.]+)rem/)?.[1]
+  expect(floor).toBeDefined()
+  return Number(floor)
+}
+
 describe('InfoOverlay', () => {
   const scrollIntoView = vi.fn()
 
@@ -51,6 +65,22 @@ describe('InfoOverlay', () => {
     } else {
       Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', originalScrollIntoView)
     }
+  })
+
+  it('keeps essential projector information fluid and above readable desktop floors', () => {
+    expect(fluidFontFloor('.info-entry-marker')).toBeGreaterThanOrEqual(0.75)
+    expect(fluidFontFloor('.info-entry-ante,\n.info-entry-duration')).toBeGreaterThanOrEqual(0.75)
+    expect(fluidFontFloor('.info-break-subtitle')).toBeGreaterThanOrEqual(0.75)
+    expect(fluidFontFloor('.info-current-marker')).toBeGreaterThanOrEqual(0.625)
+    expect(fluidFontFloor('.info-card ul')).toBeGreaterThanOrEqual(0.82)
+  })
+
+  it('removes the inert application background from document flow while Info is open', () => {
+    const inertBackground = cssRule(displayCss, '.app-background[inert]')
+
+    expect(inertBackground).toMatch(/position:\s*fixed/)
+    expect(inertBackground).toMatch(/inset:\s*0/)
+    expect(inertBackground).toMatch(/overflow:\s*hidden/)
   })
 
   it('opens on Overview, switches pages manually, and resets to Overview after closing', async () => {
