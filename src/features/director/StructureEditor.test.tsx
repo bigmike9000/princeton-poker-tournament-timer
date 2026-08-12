@@ -157,7 +157,7 @@ describe('StructureEditor', () => {
       <StructureRow entry={level} label="Level 1" tone="odd" index={0} total={2} issues={[]} onChange={vi.fn()} onMove={vi.fn()} onDelete={vi.fn()} />,
     )
     const levelGroup = screen.getByRole('group', { name: 'Level 1' })
-    expect(levelGroup.querySelector('legend')).toHaveTextContent('Poker levelLevel 1')
+    expect.soft(levelGroup.querySelector('legend')).toHaveTextContent(/^Level 1$/)
     expect(levelGroup.querySelector('.structure-row-grid > .structure-actions-cell')).toContainElement(
       within(levelGroup).getByRole('button', { name: 'Delete' }),
     )
@@ -166,7 +166,7 @@ describe('StructureEditor', () => {
       <StructureRow entry={breakEntry} label="Break 1" tone="even" index={1} total={2} issues={[]} onChange={vi.fn()} onMove={vi.fn()} onDelete={vi.fn()} />,
     )
     const breakGroup = screen.getByRole('group', { name: 'Break 1' })
-    expect(breakGroup.querySelector('legend')).toHaveTextContent('BreakBreak 1')
+    expect.soft(breakGroup.querySelector('legend')).toHaveTextContent(/^Break 1$/)
     expect(breakGroup.querySelector('.structure-row-identity')).toHaveTextContent(/^Break 01$/)
     expect(breakGroup.querySelector('.structure-row-identity')).not.toHaveTextContent('BreakBreak 1')
     expect(within(breakGroup).getByRole('textbox', { name: 'Break label' })).toBeEnabled()

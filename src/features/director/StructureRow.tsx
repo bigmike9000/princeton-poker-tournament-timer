@@ -38,10 +38,7 @@ export function StructureRow({
 
   return (
     <fieldset className={`structure-editor-row structure-editor-row--${entry.kind}`} aria-label={label} data-row-tone={tone}>
-      <legend className="structure-row-legend">
-        <span className="entry-kind">{entry.kind === 'break' ? 'Break' : 'Poker level'}</span>
-        <strong>{label}</strong>
-      </legend>
+      <legend className="structure-row-legend">{label}</legend>
       <div className="structure-row-grid">
         <div className="structure-row-identity" aria-hidden="true">
           <strong>{displayLabel}</strong>
