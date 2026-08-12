@@ -790,7 +790,7 @@ select:focus-visible {
   .tournament-stage { min-height: 100dvh; }
   .tournament-stage::after { width: min(78vw, 38rem); }
   .structure-panel { min-height: 45rem; border-top: 1px solid var(--line); border-left: 0; }
-  .control-rail { position: sticky; grid-template-columns: 1fr; }
+  .control-rail { position: relative; grid-template-columns: 1fr; }
   .control-group,
   .control-group--utility { justify-content: center; }
 }
