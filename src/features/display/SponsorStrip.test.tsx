@@ -34,6 +34,17 @@ describe('SponsorStrip', () => {
     expect(cardRule).toMatch(/height:\s*2rem/)
   })
 
+  it('gives the Susquehanna mark a light contrast plaque', () => {
+    render(<SponsorStrip labels={['Jane Street', 'Susquehanna']} />)
+    const susquehannaRule = cssRule(displayCss, '.sponsor-logo-card--susquehanna')
+
+    expect(screen.getByRole('img', { name: 'Susquehanna' }).parentElement).toHaveClass('sponsor-logo-card--susquehanna')
+    expect(susquehannaRule).toMatch(/background:\s*#[a-f0-9]{6}|background:\s*rgb/i)
+    expect(susquehannaRule).toMatch(/border:\s*1px solid/)
+    expect(susquehannaRule).toMatch(/padding:/)
+    expect(susquehannaRule).toMatch(/border-radius:/)
+  })
+
   it('maps the two exact legacy placeholders by slot', () => {
     render(<SponsorStrip labels={['SPONSOR', 'SPONSOR']} />)
 

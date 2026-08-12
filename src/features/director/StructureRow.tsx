@@ -4,6 +4,7 @@ import type { ValidationIssue } from '../../domain/validation'
 interface StructureRowProps {
   entry: StructureEntry
   label: string
+  tone: 'odd' | 'even'
   index: number
   total: number
   issues: ValidationIssue[]
@@ -20,6 +21,7 @@ function FieldIssue({ field, issues }: { field: string; issues: ValidationIssue[
 export function StructureRow({
   entry,
   label,
+  tone,
   index,
   total,
   issues,
@@ -27,20 +29,22 @@ export function StructureRow({
   onMove,
   onDelete,
 }: StructureRowProps) {
+  const [kind, number] = label.split(' ')
+  const displayLabel = `${kind} ${String(Number(number)).padStart(2, '0')}`
+
   const updateNumber = (field: string, value: string) => {
     onChange({ ...entry, [field]: Number(value) } as StructureEntry)
   }
 
   return (
-    <fieldset className={`structure-editor-row structure-editor-row--${entry.kind}`} aria-label={label}>
+    <fieldset className={`structure-editor-row structure-editor-row--${entry.kind}`} aria-label={label} data-row-tone={tone}>
       <legend className="structure-row-legend">
         <span className="entry-kind">{entry.kind === 'break' ? 'Break' : 'Poker level'}</span>
         <strong>{label}</strong>
       </legend>
       <div className="structure-row-grid">
         <div className="structure-row-identity" aria-hidden="true">
-          <span className="entry-kind">{entry.kind === 'break' ? 'Break' : 'Poker level'}</span>
-          <strong>{label}</strong>
+          <strong>{displayLabel}</strong>
         </div>
 
         {entry.kind === 'level' ? (

@@ -125,6 +125,7 @@ export function StructureEditor() {
               key={entry.id}
               entry={entry}
               label={label}
+              tone={index % 2 === 0 ? 'odd' : 'even'}
               index={index}
               total={draft.length}
               issues={validation.issues.filter((issue) => issue.entryId === entry.id)}

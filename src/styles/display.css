@@ -456,6 +456,14 @@ select:focus-visible {
   background: var(--ivory-50);
 }
 
+.sponsor-logo-card--susquehanna {
+  border: 1px solid rgb(30 83 137 / 55%);
+  border-radius: .375rem;
+  padding: .24rem .46rem;
+  background: #eef3f7;
+  box-shadow: inset 0 1px rgb(255 255 255 / 75%);
+}
+
 .sponsor-logo {
   display: block;
   width: auto;

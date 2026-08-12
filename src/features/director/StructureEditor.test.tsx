@@ -56,6 +56,19 @@ describe('StructureEditor', () => {
     ])
   })
 
+  it('marks every structure row with its list-position tone', () => {
+    const { container } = render(<StructureStateHarness />)
+    const tones = Array.from(
+      container.querySelectorAll('.structure-editor-list > .structure-editor-row'),
+      (row) => row.getAttribute('data-row-tone'),
+    )
+
+    expect(tones).toEqual([
+      'odd', 'even', 'odd', 'even', 'odd', 'even', 'odd', 'even', 'odd', 'even',
+      'odd', 'even', 'odd', 'even', 'odd', 'even', 'odd', 'even', 'odd',
+    ])
+  })
+
   it('keeps every poker field editable and applies the complete draft', async () => {
     const user = userEvent.setup()
     render(<StructureStateHarness />)
@@ -141,7 +154,7 @@ describe('StructureEditor', () => {
     if (!level || !breakEntry) throw new Error('Expected level and break fixtures')
 
     const { rerender } = render(
-      <StructureRow entry={level} label="Level 1" index={0} total={2} issues={[]} onChange={vi.fn()} onMove={vi.fn()} onDelete={vi.fn()} />,
+      <StructureRow entry={level} label="Level 1" tone="odd" index={0} total={2} issues={[]} onChange={vi.fn()} onMove={vi.fn()} onDelete={vi.fn()} />,
     )
     const levelGroup = screen.getByRole('group', { name: 'Level 1' })
     expect(levelGroup.querySelector('legend')).toHaveTextContent('Poker levelLevel 1')
@@ -150,10 +163,12 @@ describe('StructureEditor', () => {
     )
 
     rerender(
-      <StructureRow entry={breakEntry} label="Break 1" index={1} total={2} issues={[]} onChange={vi.fn()} onMove={vi.fn()} onDelete={vi.fn()} />,
+      <StructureRow entry={breakEntry} label="Break 1" tone="even" index={1} total={2} issues={[]} onChange={vi.fn()} onMove={vi.fn()} onDelete={vi.fn()} />,
     )
     const breakGroup = screen.getByRole('group', { name: 'Break 1' })
     expect(breakGroup.querySelector('legend')).toHaveTextContent('BreakBreak 1')
+    expect(breakGroup.querySelector('.structure-row-identity')).toHaveTextContent(/^Break 01$/)
+    expect(breakGroup.querySelector('.structure-row-identity')).not.toHaveTextContent('BreakBreak 1')
     expect(within(breakGroup).getByRole('textbox', { name: 'Break label' })).toBeEnabled()
     expect(within(breakGroup).getByRole('spinbutton', { name: 'Duration minutes' })).toBeEnabled()
     expect(within(breakGroup).queryByRole('spinbutton', { name: 'Small blind' })).not.toBeInTheDocument()
@@ -203,13 +218,13 @@ describe('StructureEditor', () => {
     if (entry.kind !== 'level') throw new Error('Expected the opening entry to be a poker level')
 
     const { rerender } = render(
-      <StructureRow entry={entry} label="Level 1" index={0} total={1} issues={[]} onChange={onChange} onMove={vi.fn()} onDelete={vi.fn()} />,
+      <StructureRow entry={entry} label="Level 1" tone="odd" index={0} total={1} issues={[]} onChange={onChange} onMove={vi.fn()} onDelete={vi.fn()} />,
     )
     await user.click(screen.getByRole('checkbox', { name: 'Until end' }))
     expect(onChange).toHaveBeenLastCalledWith({ ...entry, durationSeconds: null })
 
     rerender(
-      <StructureRow entry={{ ...entry, durationSeconds: null }} label="Level 1" index={0} total={1} issues={[]} onChange={onChange} onMove={vi.fn()} onDelete={vi.fn()} />,
+      <StructureRow entry={{ ...entry, durationSeconds: null }} label="Level 1" tone="odd" index={0} total={1} issues={[]} onChange={onChange} onMove={vi.fn()} onDelete={vi.fn()} />,
     )
     expect(screen.getByRole('checkbox', { name: 'Until end' })).toBeChecked()
     expect(screen.queryByLabelText('Duration minutes')).not.toBeInTheDocument()
@@ -223,7 +238,7 @@ describe('StructureEditor', () => {
     if (entry.kind !== 'level') throw new Error('Expected the opening entry to be a poker level')
 
     render(
-      <StructureRow entry={entry} label="Level 1" index={0} total={1} issues={[]} onChange={onChange} onMove={vi.fn()} onDelete={vi.fn()} />,
+      <StructureRow entry={entry} label="Level 1" tone="odd" index={0} total={1} issues={[]} onChange={onChange} onMove={vi.fn()} onDelete={vi.fn()} />,
     )
     const note = screen.getByRole('textbox', { name: 'Level note' })
     expect(note).toHaveAttribute('maxlength', '80')
@@ -305,6 +320,39 @@ describe('StructureEditor', () => {
 })
 
 describe('Structure editor responsive CSS', () => {
+  it('keeps the desktop column heading visible above scrolling rows', () => {
+    const headingRule = cssRule(directorCss, '.structure-editor-columns')
+
+    expect(headingRule).toMatch(/position:\s*sticky/)
+    expect(headingRule).toMatch(/z-index:\s*[1-9]\d*/)
+    expect(headingRule).toMatch(/background:/)
+  })
+
+  it('uses a consistent six-pixel radius for rows, editor inputs, and the action well', () => {
+    const rowRule = cssRule(directorCss, '.structure-editor-row')
+    const inputRule = cssRule(directorCss, `.director-overlay .structure-editor-row input,
+.director-overlay .structure-editor-row select`)
+    const actionRule = cssRule(directorCss, '.row-order-actions')
+
+    expect(rowRule).toMatch(/border-radius:\s*(?:\.375rem|6px)/)
+    expect(inputRule).toMatch(/border-radius:\s*(?:\.375rem|6px)/)
+    expect(actionRule).toMatch(/border-radius:\s*(?:\.375rem|6px)/)
+  })
+
+  it('uses tabular numeric typography for structure number inputs', () => {
+    const numericRule = cssRule(directorCss, `.director-overlay .structure-editor-row input[type='number']`)
+
+    expect(numericRule).toMatch(/font-family:\s*var\(--font-numeric\)/)
+    expect(numericRule).toMatch(/font-variant-numeric:\s*tabular-nums/)
+  })
+
+  it('separates break rows with a stronger copper edge and tinted background', () => {
+    const breakRule = cssRule(directorCss, '.structure-editor-row--break')
+
+    expect(breakRule).toMatch(/border-left:\s*[2-9]px solid/)
+    expect(breakRule).toMatch(/background:/)
+  })
+
   it('collapses Director navigation by 820px before the medium structure grid can overflow', () => {
     const collapseStart = directorCss.indexOf('@media (max-width: 820px)')
     const mediumStart = directorCss.indexOf('@media (max-width: 1180px)')
@@ -336,7 +384,11 @@ describe('Structure editor responsive CSS', () => {
 
   it('keeps actions in the desktop grid and makes the full Until end target 44 pixels', () => {
     expect(cssRule(directorCss, '.row-order-actions')).toMatch(/display:\s*grid/)
+    expect(cssRule(directorCss, '.row-order-actions')).toMatch(/grid-template-columns:\s*repeat\(3, 2\.75rem\)/)
     expect(cssRule(directorCss, '.row-order-actions')).not.toMatch(/position:\s*absolute/)
+    expect(cssRule(directorCss, '.row-order-actions button')).toMatch(/width:\s*2\.75rem/)
+    expect(cssRule(directorCss, '.row-order-actions button')).toMatch(/height:\s*2\.75rem/)
+    expect(cssRule(directorCss, '.row-order-actions button')).not.toMatch(/position:\s*absolute/)
     expect(cssRule(directorCss, '.structure-actions-cell')).toMatch(/grid-column:\s*8/)
     expect(cssRule(directorCss, '.structure-until-end')).toMatch(/min-width:\s*2\.75rem/)
     expect(cssRule(directorCss, '.structure-until-end')).toMatch(/min-height:\s*2\.75rem/)
