@@ -36,6 +36,7 @@ export function createInitialState(): TournamentState {
       baselineAt: null,
       playersRemaining: startingPlayers,
       alertedThresholds: [],
+      transitionCause: null,
     },
     chipLedger: [
       { id: 'initial-chips', kind: 'initial', chips: startingPlayers * startingStack },

@@ -46,6 +46,7 @@ export interface TournamentRuntime {
   baselineAt: number | null
   playersRemaining: number
   alertedThresholds: number[]
+  transitionCause: 'automatic' | 'manual' | null
 }
 
 export interface ChipContribution {

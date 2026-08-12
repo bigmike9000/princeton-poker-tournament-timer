@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { DirectorRun } from './DirectorRun'
+import { DirectorSettings } from './DirectorSettings'
 import { PresetManager } from './PresetManager'
 import { StructureEditor } from './StructureEditor'
 import { TournamentSettings } from './TournamentSettings'
@@ -72,7 +73,7 @@ export function DirectorOverlay({ open, onClose }: DirectorOverlayProps) {
           {tab === 'structure' && <StructureEditor />}
           {tab === 'presets' && <PresetManager />}
           {tab === 'tournament' && <TournamentSettings />}
-          {tab === 'settings' && <div className="section-intro"><span className="section-kicker">Application</span><h2>Settings</h2><p>Audio, clock, and display preferences are available in the final controls section.</p></div>}
+          {tab === 'settings' && <DirectorSettings />}
         </div>
       </div>
     </section>

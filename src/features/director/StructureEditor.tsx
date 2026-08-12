@@ -61,9 +61,6 @@ export function StructureEditor() {
     }])
   }
 
-  let pokerLevel = 0
-  let breakNumber = 0
-
   return (
     <div className="director-section structure-editor">
       <div className="structure-editor-heading">
@@ -82,9 +79,11 @@ export function StructureEditor() {
 
       <div className="structure-editor-list">
         {draft.map((entry, index) => {
-          if (entry.kind === 'level') pokerLevel += 1
-          else breakNumber += 1
-          const label = entry.kind === 'level' ? `Level ${pokerLevel}` : `Break ${breakNumber}`
+          const entryNumber = draft
+            .slice(0, index + 1)
+            .filter((candidate) => candidate.kind === entry.kind)
+            .length
+          const label = entry.kind === 'level' ? `Level ${entryNumber}` : `Break ${entryNumber}`
           return (
             <StructureRow
               key={entry.id}

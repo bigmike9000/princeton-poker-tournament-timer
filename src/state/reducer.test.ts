@@ -40,6 +40,7 @@ describe('tournamentReducer', () => {
     expect(result.runtime.currentEntryIndex).toBe(5)
     expect(result.runtime.remainingMs).toBe(1_200_000)
     expect(result.runtime.baselineAt).toBe(2_000)
+    expect(result.runtime.transitionCause).toBe('manual')
   })
 
   it('clamps navigation at the first and last entries', () => {

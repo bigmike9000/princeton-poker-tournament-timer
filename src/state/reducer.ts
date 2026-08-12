@@ -42,6 +42,7 @@ function updateTime(state: TournamentState, remainingMs: number, now: number): T
       baselineAt: running ? now : null,
       status: running ? 'running' : 'paused',
       alertedThresholds: resolved.runtime.alertedThresholds.filter((threshold) => threshold > nextRemaining),
+      transitionCause: null,
     },
   }
 }
@@ -58,6 +59,7 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
           ...state.runtime,
           status: 'running',
           baselineAt: action.now,
+          transitionCause: null,
         },
       }
     case 'PAUSE': {
@@ -65,7 +67,7 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
       if (resolved.runtime.status !== 'running') return resolved
       return {
         ...resolved,
-        runtime: { ...resolved.runtime, status: 'paused', baselineAt: null },
+        runtime: { ...resolved.runtime, status: 'paused', baselineAt: null, transitionCause: null },
       }
     }
     case 'RESET_CURRENT': {
@@ -79,6 +81,7 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
           remainingMs: duration,
           baselineAt: running ? action.now : null,
           alertedThresholds: [],
+          transitionCause: null,
         },
       }
     }
@@ -109,6 +112,7 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
           baselineAt: running ? action.now : null,
           status: running ? 'running' : state.runtime.status === 'idle' ? 'idle' : 'paused',
           alertedThresholds: [],
+          transitionCause: 'manual',
         },
       }
     }
@@ -172,6 +176,7 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
           ),
           baselineAt: running ? action.now : null,
           alertedThresholds: [],
+          transitionCause: null,
         },
       }
     }

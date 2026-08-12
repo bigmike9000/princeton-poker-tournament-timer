@@ -1,5 +1,7 @@
-import type { Dispatch } from 'react'
+import { useEffect, useState, type Dispatch } from 'react'
 import type { TournamentState } from '../../domain/types'
+import { audioAlerts } from '../../services/audio'
+import { toggleFullscreen } from '../../services/fullscreen'
 import type { TournamentAction } from '../../state/reducer'
 
 interface DisplayControlsProps {
@@ -10,14 +12,35 @@ interface DisplayControlsProps {
 
 export function DisplayControls({ state, dispatch, onOpenDirector }: DisplayControlsProps) {
   const running = state.runtime.status === 'running'
+  const [fullscreen, setFullscreen] = useState(Boolean(document.fullscreenElement))
+  const [fullscreenError, setFullscreenError] = useState<string | null>(null)
   const now = () => Date.now()
+
+  useEffect(() => {
+    const updateFullscreen = () => setFullscreen(Boolean(document.fullscreenElement))
+    document.addEventListener('fullscreenchange', updateFullscreen)
+    return () => document.removeEventListener('fullscreenchange', updateFullscreen)
+  }, [])
+
+  const handleFullscreen = async () => {
+    try {
+      await toggleFullscreen(document)
+      setFullscreen(Boolean(document.fullscreenElement))
+      setFullscreenError(null)
+    } catch {
+      setFullscreenError('Fullscreen is unavailable in this browser.')
+    }
+  }
 
   return (
     <nav className="control-rail" aria-label="Tournament controls">
       <div className="control-group control-group--primary">
         <button
           className={running ? 'control-button control-button--pause' : 'control-button control-button--start'}
-          onClick={() => dispatch({ type: running ? 'PAUSE' : 'START', now: now() })}
+          onClick={() => {
+            audioAlerts.unlock()
+            dispatch({ type: running ? 'PAUSE' : 'START', now: now() })
+          }}
           aria-label={running ? 'Pause tournament' : 'Start tournament'}
         >
           <span aria-hidden="true">{running ? 'Ⅱ' : '▶'}</span>
@@ -59,11 +82,20 @@ export function DisplayControls({ state, dispatch, onOpenDirector }: DisplayCont
       </div>
 
       <div className="control-group control-group--utility">
+        {fullscreenError && <span role="status" className="control-status">{fullscreenError}</span>}
+        <button
+          className="icon-button"
+          aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+          onClick={() => void handleFullscreen()}
+        >{fullscreen ? 'Exit screen' : 'Full screen'}</button>
         <button
           className="icon-button"
           aria-pressed={state.settings.muted}
           aria-label={state.settings.muted ? 'Unmute alerts' : 'Mute alerts'}
-          onClick={() => dispatch({ type: 'SET_SETTINGS', settings: { ...state.settings, muted: !state.settings.muted } })}
+          onClick={() => {
+            audioAlerts.unlock()
+            dispatch({ type: 'SET_SETTINGS', settings: { ...state.settings, muted: !state.settings.muted } })
+          }}
         >{state.settings.muted ? 'Sound off' : 'Sound on'}</button>
         <button className="director-button" onClick={onOpenDirector} aria-label="Open Tournament Director">
           TD Controls <span aria-hidden="true">↗</span>

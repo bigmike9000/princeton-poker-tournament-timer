@@ -64,7 +64,7 @@ export function PresetManager() {
     return name
   }
 
-  const loadPreset = (preset: StructurePreset) => {
+  const loadPreset = (preset: StructurePreset, now: number) => {
     const progressed = state.runtime.currentEntryIndex !== 0 ||
       state.runtime.status !== 'idle' ||
       state.runtime.playersRemaining !== state.configuration.startingPlayers
@@ -72,8 +72,8 @@ export function PresetManager() {
       setPendingLoad(preset)
       return
     }
-    dispatch({ type: 'SET_STRUCTURE', structure: preset.structure, now: Date.now() })
-    dispatch({ type: 'RESET_TOURNAMENT', now: Date.now() })
+    dispatch({ type: 'SET_STRUCTURE', structure: preset.structure, now })
+    dispatch({ type: 'RESET_TOURNAMENT', now })
   }
 
   return (
@@ -95,7 +95,7 @@ export function PresetManager() {
           <PresetRow
             key={preset.id}
             preset={preset}
-            onLoad={() => loadPreset(preset)}
+            onLoad={() => loadPreset(preset, Date.now())}
             onDuplicate={() => run(() => { repository.duplicate(preset.id, duplicateName(preset.name)) })}
             onRename={(name) => run(() => { repository.rename(preset.id, name) })}
             onDelete={() => setPendingDelete(preset)}

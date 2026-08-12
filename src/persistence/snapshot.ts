@@ -76,7 +76,9 @@ function parseSnapshot(value: unknown): Snapshot {
       !(runtime.baselineAt === null || isFiniteNonnegative(runtime.baselineAt)) ||
       !isFiniteNonnegative(runtime.playersRemaining) || Number(runtime.playersRemaining) < 1 ||
       !Array.isArray(runtime.alertedThresholds) ||
-      !runtime.alertedThresholds.every(isFiniteNonnegative)) {
+      !runtime.alertedThresholds.every(isFiniteNonnegative) ||
+      !(runtime.transitionCause === undefined || runtime.transitionCause === null ||
+        ['automatic', 'manual'].includes(String(runtime.transitionCause)))) {
     throw new Error('Saved tournament progress is invalid.')
   }
 
@@ -102,7 +104,9 @@ function parseSnapshot(value: unknown): Snapshot {
     throw new Error('Saved tournament settings are invalid.')
   }
 
-  return structuredClone(value) as unknown as Snapshot
+  const snapshot = structuredClone(value) as unknown as Snapshot
+  snapshot.state.runtime.transitionCause ??= null
+  return snapshot
 }
 
 export function saveSnapshot(storage: Storage, state: TournamentState, savedAt: number): void {

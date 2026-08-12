@@ -24,6 +24,7 @@ describe('resolveTimer', () => {
     expect(result.runtime.currentEntryIndex).toBe(1)
     expect(result.runtime.remainingMs).toBe(nextDuration - 1_500)
     expect(result.runtime.baselineAt).toBe(12_500)
+    expect(result.runtime.transitionCause).toBe('automatic')
   })
 
   it('automatically enters a break and carries overflow', () => {

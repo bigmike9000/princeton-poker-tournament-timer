@@ -25,6 +25,7 @@ export function resolveTimer(state: TournamentState, now: number): TournamentSta
       remainingMs: 0,
       baselineAt: null,
       status: 'paused',
+      transitionCause: null,
     })
   }
 
@@ -42,5 +43,6 @@ export function resolveTimer(state: TournamentState, now: number): TournamentSta
     baselineAt: complete ? null : now,
     status: complete ? 'complete' : 'running',
     alertedThresholds: changedEntry ? [] : state.runtime.alertedThresholds,
+    transitionCause: changedEntry ? 'automatic' : null,
   })
 }
