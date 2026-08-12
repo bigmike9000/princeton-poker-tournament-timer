@@ -33,11 +33,24 @@ describe('ResetControls', () => {
     await user.click(screen.getByRole('button', { name: 'Shorten clock' }))
     expect(screen.getByLabelText('Remaining time')).toHaveTextContent('60000')
 
-    await user.click(screen.getByRole('button', { name: 'Reset current level' }))
+    const resetCurrent = screen.getByRole('button', { name: 'Reset current level' })
+    await user.click(resetCurrent)
     expect(screen.getByRole('alertdialog', { name: 'Reset current level?' })).toBeVisible()
     await user.click(screen.getByRole('button', { name: 'Confirm level reset' }))
 
     expect(screen.getByLabelText('Remaining time')).toHaveTextContent('720000')
+    expect(resetCurrent).toHaveFocus()
+  })
+
+  it('returns focus to Reset current level after cancellation', async () => {
+    const user = userEvent.setup()
+    renderControls()
+    const resetCurrent = screen.getByRole('button', { name: 'Reset current level' })
+
+    await user.click(resetCurrent)
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(resetCurrent).toHaveFocus()
   })
 
   it('uses stronger confirmation before resetting all tournament progress', async () => {
@@ -46,7 +59,8 @@ describe('ResetControls', () => {
     await user.click(screen.getByRole('button', { name: 'Advance entry' }))
     await user.click(screen.getByRole('button', { name: 'Reduce field' }))
 
-    await user.click(screen.getByRole('button', { name: 'Reset tournament' }))
+    const resetTournament = screen.getByRole('button', { name: 'Reset tournament' })
+    await user.click(resetTournament)
     const confirmation = screen.getByRole('alertdialog', { name: 'Reset the entire tournament?' })
     expect(confirmation).toHaveTextContent('level, clock, and player progress')
     await user.click(screen.getByRole('button', { name: 'Confirm full reset' }))
@@ -54,5 +68,6 @@ describe('ResetControls', () => {
     expect(screen.getByLabelText('Current entry')).toHaveTextContent('1')
     expect(screen.getByLabelText('Remaining time')).toHaveTextContent('720000')
     expect(screen.getByLabelText('Players remaining')).toHaveTextContent('80')
+    expect(resetTournament).toHaveFocus()
   })
 })
