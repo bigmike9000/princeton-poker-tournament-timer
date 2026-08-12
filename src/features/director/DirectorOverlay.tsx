@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { ClubLogo } from '../../components/ClubLogo'
 import { DirectorRun } from './DirectorRun'
 import { DirectorSettings } from './DirectorSettings'
 import { PresetManager } from './PresetManager'
@@ -71,7 +72,7 @@ export function DirectorOverlay({ open, onClose }: DirectorOverlayProps) {
       }}
     >
       <header className="director-header">
-        <div className="director-brand"><span className="director-monogram">TD</span><div><p>Princeton Poker Club</p><h1 id="director-title">Tournament Director</h1></div></div>
+        <div className="director-brand"><ClubLogo className="director-logo" size={46} /><div><p>Princeton Poker Club</p><h1 id="director-title">Tournament Director</h1></div></div>
         <div className="director-header-note"><i aria-hidden="true" />Changes update the live display</div>
         <button ref={closeRef} className="director-close" onClick={onClose} aria-label="Close Tournament Director">Close <span aria-hidden="true">×</span></button>
       </header>

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { App } from '../../app/App'
@@ -9,6 +9,14 @@ async function openDirector(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('DirectorOverlay', () => {
+  it('shows the Princeton Poker Club logo when open', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await openDirector(user)
+
+    expect(within(screen.getByRole('dialog')).getByRole('img', { name: 'Princeton Poker Club logo' })).toBeVisible()
+  })
+
   it('edits remaining time and players from the run panel', async () => {
     const user = userEvent.setup()
     render(<App />)

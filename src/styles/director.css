@@ -27,17 +27,11 @@
   gap: .9rem;
 }
 
-.director-monogram {
-  display: grid;
+.director-logo {
   width: 2.85rem;
   height: 2.85rem;
-  place-items: center;
-  border: 1px solid var(--orange-500);
-  color: var(--orange-400);
-  background: rgb(245 128 37 / 8%);
-  font-size: .75rem;
-  font-weight: 900;
-  letter-spacing: .08em;
+  flex: 0 0 auto;
+  object-fit: contain;
 }
 
 .director-brand p,

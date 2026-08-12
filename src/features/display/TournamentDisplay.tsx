@@ -1,4 +1,5 @@
 import { useTournament } from '../../app/useTournament'
+import { ClubLogo } from '../../components/ClubLogo'
 import { selectRemainingMs } from '../../state/selectors'
 import { BlindStructure } from './BlindStructure'
 import { Clock } from './Clock'
@@ -29,7 +30,7 @@ export function TournamentDisplay({
       <main className="display-grid">
         <section className="tournament-stage">
           <header className="brand-header">
-            <div className="club-mark" aria-hidden="true"><span>P</span><i /></div>
+            <ClubLogo className="club-logo" size={56} />
             <div className="brand-copy">
               <p>{state.configuration.organizationName}</p>
               <h1>{state.configuration.tournamentName}</h1>

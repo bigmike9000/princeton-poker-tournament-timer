@@ -73,34 +73,11 @@ select:focus-visible {
   padding-bottom: 1.2rem;
 }
 
-.club-mark {
-  position: relative;
-  display: grid;
+.club-logo {
   width: 3.5rem;
   height: 3.5rem;
   flex: 0 0 auto;
-  place-items: center;
-  border: 1px solid rgb(245 128 37 / 55%);
-  background: linear-gradient(145deg, rgb(245 128 37 / 24%), rgb(245 128 37 / 4%));
-  box-shadow: inset 0 0 22px rgb(245 128 37 / 10%);
-  transform: rotate(45deg);
-}
-
-.club-mark span {
-  color: var(--orange-400);
-  font-family: Georgia, serif;
-  font-size: 1.8rem;
-  font-weight: 700;
-  transform: rotate(-45deg);
-}
-
-.club-mark i {
-  position: absolute;
-  right: -.28rem;
-  bottom: -.28rem;
-  width: .58rem;
-  height: .58rem;
-  background: var(--orange-500);
+  object-fit: contain;
 }
 
 .brand-copy {

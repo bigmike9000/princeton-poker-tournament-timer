@@ -19,6 +19,12 @@ function renderDisplay(onOpenDirector = vi.fn()) {
 }
 
 describe('TournamentDisplay', () => {
+  it('shows the Princeton Poker Club logo', () => {
+    renderDisplay()
+
+    expect(screen.getByRole('img', { name: 'Princeton Poker Club logo' })).toBeVisible()
+  })
+
   it('shows the dominant timer, current blinds, and player statistics', () => {
     renderDisplay()
 
