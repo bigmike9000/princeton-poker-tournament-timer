@@ -1,5 +1,6 @@
 @import './tokens.css';
 @import './display.css';
+@import './director.css';
 
 :root {
   color: var(--ivory-100);
