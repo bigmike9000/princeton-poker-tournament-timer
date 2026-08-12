@@ -62,17 +62,17 @@ describe('representative tournament flow', () => {
     act(() => vi.advanceTimersByTime(15_000))
 
     breakButton.focus()
-    fireEvent.keyDown(breakButton, { key: ' ' })
+    expect(fireEvent.keyDown(breakButton, { key: ' ' })).toBe(false)
 
     expect(screen.getByRole('timer')).toHaveTextContent('09:45')
     expect(screen.getByRole('button', { name: 'Start tournament' })).toHaveTextContent('Resume')
 
-    fireEvent.keyDown(breakButton, { key: ' ' })
+    expect(fireEvent.keyDown(breakButton, { key: ' ' })).toBe(false)
     act(() => vi.advanceTimersByTime(2_000))
 
     expect(screen.getByRole('timer')).toHaveTextContent('09:43')
 
-    fireEvent.keyDown(breakButton, { key: 'ArrowRight' })
+    expect(fireEvent.keyDown(breakButton, { key: 'ArrowRight' })).toBe(false)
 
     expect(screen.getByRole('region', { name: 'Current poker level' })).toHaveTextContent('LEVEL 6')
     expect(screen.getByRole('timer')).toHaveTextContent('15:00')
