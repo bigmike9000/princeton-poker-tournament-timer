@@ -27,18 +27,22 @@ function isFiniteNonnegative(value: unknown): value is number {
 }
 
 function isStructureEntry(value: unknown): value is StructureEntry {
-  if (!isRecord(value) || typeof value.id !== 'string' || !isFiniteNonnegative(value.durationSeconds)) {
+  if (!isRecord(value) || typeof value.id !== 'string') {
     return false
   }
   if (value.kind === 'break') {
-    return typeof value.label === 'string' && value.durationSeconds > 0
+    return typeof value.label === 'string' &&
+      isFiniteNonnegative(value.durationSeconds) &&
+      value.durationSeconds > 0
   }
   if (value.kind !== 'level') return false
   return isFiniteNonnegative(value.smallBlind) &&
     isFiniteNonnegative(value.bigBlind) &&
     isFiniteNonnegative(value.ante) &&
     ['none', 'traditional', 'big-blind'].includes(String(value.anteType)) &&
-    value.durationSeconds > 0
+    (value.durationSeconds === null ||
+      (isFiniteNonnegative(value.durationSeconds) && value.durationSeconds > 0)) &&
+    (value.note === undefined || typeof value.note === 'string')
 }
 
 function parseSnapshot(value: unknown): Snapshot {

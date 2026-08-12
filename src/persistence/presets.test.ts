@@ -11,7 +11,7 @@ describe('preset repository', () => {
 
     expect(sample.name).toBe('Princeton Poker Club Standard')
     sample.structure[0].durationSeconds = 60
-    expect(repository.load(sample.id).structure[0].durationSeconds).toBe(1_200)
+    expect(repository.load(sample.id).structure[0].durationSeconds).toBe(720)
   })
 
   it('saves and duplicates presets without shared entry references', () => {
@@ -20,7 +20,7 @@ describe('preset repository', () => {
     const copy = repository.duplicate(original.id, 'Turbo Copy')
     copy.structure[0].durationSeconds = 60
 
-    expect(repository.load(original.id).structure[0].durationSeconds).toBe(1_200)
+    expect(repository.load(original.id).structure[0].durationSeconds).toBe(720)
     expect(repository.load(copy.id).name).toBe('Turbo Copy')
   })
 

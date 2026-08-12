@@ -68,6 +68,16 @@ describe('validateStructure', () => {
       expect.objectContaining({ entryId: level.id, field: 'note' }),
     ]))
   })
+
+  it('accepts notes that are exactly 80 characters', () => {
+    const structure = structuredClone(sampleStructure)
+    const level = structure.find((entry) => entry.kind === 'level')!
+    level.note = 'x'.repeat(80)
+
+    expect(validateStructure(structure).issues).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({ entryId: level.id, field: 'note' }),
+    ]))
+  })
 })
 
 describe('validatePresetName', () => {

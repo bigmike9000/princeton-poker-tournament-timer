@@ -1,3 +1,4 @@
+import { entryDurationMs } from './structure'
 import type { TournamentRuntime, TournamentState } from './types'
 
 function withRuntime(state: TournamentState, runtime: Partial<TournamentRuntime>): TournamentState {
@@ -31,7 +32,7 @@ export function resolveTimer(state: TournamentState, now: number): TournamentSta
 
   while (remainingMs <= 0 && currentEntryIndex < state.structure.length - 1) {
     currentEntryIndex += 1
-    remainingMs += state.structure[currentEntryIndex].durationSeconds * 1_000
+    remainingMs += entryDurationMs(state.structure[currentEntryIndex]) ?? 0
     changedEntry = true
   }
 

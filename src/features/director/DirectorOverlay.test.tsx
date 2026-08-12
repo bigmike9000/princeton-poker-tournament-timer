@@ -54,10 +54,10 @@ describe('DirectorOverlay', () => {
     render(<App />)
     await openDirector(user)
 
-    await user.selectOptions(screen.getByLabelText('Choose level or break'), '5')
+    await user.selectOptions(screen.getByLabelText('Choose level or break'), '6')
 
-    expect(screen.getAllByText('LEVEL 5').length).toBeGreaterThan(0)
-    expect(screen.getByRole('timer')).toHaveTextContent('20:00')
+    expect(screen.getAllByText('LEVEL 6').length).toBeGreaterThan(0)
+    expect(screen.getByRole('timer')).toHaveTextContent('15:00')
   })
 
   it('refreshes the time draft when moving to an entry with another duration', async () => {
@@ -65,14 +65,14 @@ describe('DirectorOverlay', () => {
     render(<App />)
     await openDirector(user)
 
-    expect(screen.getByLabelText('Minutes remaining')).toHaveValue(20)
-    await user.selectOptions(screen.getByLabelText('Choose level or break'), '4')
+    expect(screen.getByLabelText('Minutes remaining')).toHaveValue(12)
+    await user.selectOptions(screen.getByLabelText('Choose level or break'), '5')
 
-    expect(screen.getByLabelText('Minutes remaining')).toHaveValue(15)
+    expect(screen.getByLabelText('Minutes remaining')).toHaveValue(10)
     await user.click(screen.getByRole('button', { name: 'Subtract one minute' }))
-    expect(screen.getByLabelText('Minutes remaining')).toHaveValue(14)
+    expect(screen.getByLabelText('Minutes remaining')).toHaveValue(9)
     await user.click(screen.getByRole('button', { name: 'Apply time' }))
-    expect(screen.getByRole('timer')).toHaveTextContent('14:00')
+    expect(screen.getByRole('timer')).toHaveTextContent('09:00')
   })
 
   it('requires explicit confirmation before resetting the current level', async () => {
@@ -81,12 +81,12 @@ describe('DirectorOverlay', () => {
     await openDirector(user)
 
     await user.click(screen.getByRole('button', { name: 'Subtract one minute' }))
-    expect(screen.getByRole('timer')).toHaveTextContent('19:00')
+    expect(screen.getByRole('timer')).toHaveTextContent('11:00')
     await user.click(screen.getByRole('button', { name: 'Reset current level' }))
 
     expect(screen.getByRole('alertdialog', { name: 'Reset current level?' })).toBeVisible()
     await user.click(screen.getByRole('button', { name: 'Confirm level reset' }))
-    expect(screen.getByRole('timer')).toHaveTextContent('20:00')
+    expect(screen.getByRole('timer')).toHaveTextContent('12:00')
   })
 
   it('requires stronger confirmation before resetting the tournament', async () => {

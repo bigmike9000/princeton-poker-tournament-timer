@@ -1,4 +1,5 @@
 import { resolveTimer } from '../domain/timer'
+import { entryDurationMs } from '../domain/structure'
 import type {
   StructureEntry,
   TournamentConfiguration,
@@ -70,7 +71,7 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
       }
     }
     case 'RESET_CURRENT': {
-      const duration = state.structure[state.runtime.currentEntryIndex].durationSeconds * 1_000
+      const duration = entryDurationMs(state.structure[state.runtime.currentEntryIndex]) ?? 0
       const running = state.runtime.status === 'running'
       return {
         ...state,
@@ -90,7 +91,7 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
         runtime: {
           currentEntryIndex: 0,
           status: 'idle',
-          remainingMs: state.structure[0].durationSeconds * 1_000,
+          remainingMs: entryDurationMs(state.structure[0]) ?? 0,
           baselineAt: null,
           playersRemaining: state.configuration.startingPlayers,
           alertedThresholds: [],
@@ -111,7 +112,7 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
         runtime: {
           ...state.runtime,
           currentEntryIndex: index,
-          remainingMs: state.structure[index].durationSeconds * 1_000,
+          remainingMs: entryDurationMs(state.structure[index]) ?? 0,
           baselineAt: running ? action.now : null,
           status: running ? 'running' : state.runtime.status === 'idle' ? 'idle' : 'paused',
           alertedThresholds: [],
@@ -175,7 +176,7 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
           currentEntryIndex: index,
           remainingMs: Math.min(
             resolved.runtime.remainingMs,
-            action.structure[index].durationSeconds * 1_000,
+            entryDurationMs(action.structure[index]) ?? 0,
           ),
           baselineAt: running ? action.now : null,
           alertedThresholds: [],

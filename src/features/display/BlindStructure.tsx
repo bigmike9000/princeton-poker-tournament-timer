@@ -1,12 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { formatChips } from '../../domain/calculations'
-import type { StructureEntry, TournamentState } from '../../domain/types'
+import { durationLabel } from '../../domain/structure'
+import type { TournamentState } from '../../domain/types'
 import { selectPokerLevelNumber } from '../../state/selectors'
 import { anteLabel } from './format'
-
-function durationLabel(entry: StructureEntry): string {
-  return `${Math.round(entry.durationSeconds / 60)} min`
-}
 
 export function BlindStructure({ state }: { state: TournamentState }) {
   const currentRef = useRef<HTMLLIElement>(null)

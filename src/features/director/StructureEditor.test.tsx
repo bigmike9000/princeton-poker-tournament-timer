@@ -24,7 +24,7 @@ describe('StructureEditor', () => {
     await user.click(within(newBreak).getByRole('button', { name: 'Move up' }))
     await user.click(screen.getByRole('button', { name: 'Apply structure' }))
 
-    expect(screen.getByRole('listitem', { name: 'BREAK — 10 MIN' })).toBeVisible()
+    expect(screen.getAllByRole('listitem', { name: 'BREAK — 10 MIN' })).toHaveLength(3)
   })
 
   it('shows field validation and blocks malformed levels', async () => {

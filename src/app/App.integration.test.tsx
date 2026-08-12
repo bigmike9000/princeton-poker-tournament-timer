@@ -17,14 +17,14 @@ describe('representative tournament flow', () => {
     act(() => vi.advanceTimersByTime(5_000))
     fireEvent.click(screen.getByRole('button', { name: 'Pause tournament' }))
 
-    expect(screen.getByRole('timer')).toHaveTextContent('19:55')
+    expect(screen.getByRole('timer')).toHaveTextContent('11:55')
     fireEvent.click(screen.getByRole('button', { name: 'Eliminate player' }))
     expect(screen.getByText('79 / 80')).toBeVisible()
 
     first.unmount()
     render(<App />)
 
-    expect(screen.getByRole('timer')).toHaveTextContent('19:55')
+    expect(screen.getByRole('timer')).toHaveTextContent('11:55')
     expect(screen.getByText('79 / 80')).toBeVisible()
     expect(screen.getByRole('button', { name: 'Start tournament' })).toHaveTextContent('Resume')
   })

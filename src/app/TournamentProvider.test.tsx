@@ -30,7 +30,7 @@ describe('TournamentProvider', () => {
 
     act(() => vi.advanceTimersByTime(5_000))
 
-    expect(screen.getByLabelText('Remaining seconds')).toHaveTextContent('1195')
+    expect(screen.getByLabelText('Remaining seconds')).toHaveTextContent('715')
     expect(localStorage.getItem('ppc-tournament:v1')).not.toBeNull()
   })
 })

@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { TournamentProvider } from '../../app/TournamentProvider'
 import { createInitialState } from '../../domain/sampleStructure'
+import { entryDurationMs } from '../../domain/structure'
 import { saveSnapshot } from '../../persistence/snapshot'
 import { TournamentDisplay } from './TournamentDisplay'
 
@@ -28,33 +29,33 @@ describe('TournamentDisplay', () => {
   it('shows the dominant timer, current blinds, and player statistics', () => {
     renderDisplay()
 
-    expect(screen.getByRole('timer')).toHaveTextContent('20:00')
+    expect(screen.getByRole('timer')).toHaveTextContent('12:00')
     expect(screen.getByText('LEVEL 1')).toBeVisible()
-    expect(screen.getAllByText('100 / 200').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('BIG BLIND ANTE: 200').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('1 / 2').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('NO ANTE').length).toBeGreaterThan(0)
     expect(screen.getByText('80 / 80')).toBeVisible()
-    expect(screen.getByText('30,000')).toBeVisible()
-    expect(screen.getByText('2,400,000')).toBeVisible()
+    expect(screen.getByText('200')).toBeVisible()
+    expect(screen.getByText('16,000')).toBeVisible()
   })
 
   it('renders a break and previews the next poker level', () => {
     const state = createInitialState()
-    state.runtime.currentEntryIndex = 4
-    state.runtime.remainingMs = state.structure[4].durationSeconds * 1_000
+    state.runtime.currentEntryIndex = 5
+    state.runtime.remainingMs = entryDurationMs(state.structure[5]) ?? 0
     state.runtime.status = 'paused'
     saveSnapshot(localStorage, state, Date.now())
 
     renderDisplay()
 
     expect(screen.getAllByText('BREAK').length).toBeGreaterThan(0)
-    expect(screen.getByText(/Next: Level 5/)).toBeVisible()
-    expect(screen.getAllByText(/400 \/ 800/).length).toBeGreaterThan(0)
+    expect(screen.getByText(/Next: Level 6/)).toBeVisible()
+    expect(screen.getAllByText(/10 \/ 20/).length).toBeGreaterThan(0)
   })
 
   it('highlights the current structure row and lists completed levels', () => {
     const state = createInitialState()
     state.runtime.currentEntryIndex = 2
-    state.runtime.remainingMs = state.structure[2].durationSeconds * 1_000
+    state.runtime.remainingMs = entryDurationMs(state.structure[2]) ?? 0
     state.runtime.status = 'paused'
     saveSnapshot(localStorage, state, Date.now())
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTournament } from '../../app/useTournament'
 import { Dialog } from '../../components/Dialog'
+import { durationLabel } from '../../domain/structure'
 import { selectEntryLabel } from '../../state/selectors'
 import { TimeEditor } from './TimeEditor'
 
@@ -46,7 +47,7 @@ export function DirectorRun() {
             >
               {state.structure.map((entry, index) => (
                 <option key={entry.id} value={index}>
-                  {selectEntryLabel(state, index)} · {Math.round(entry.durationSeconds / 60)} min
+                  {selectEntryLabel(state, index)} · {durationLabel(entry)}
                 </option>
               ))}
             </select>

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createInitialState } from './sampleStructure'
+import { entryDurationMs } from './structure'
 import { resolveTimer } from './timer'
 
 describe('resolveTimer', () => {
@@ -17,7 +18,7 @@ describe('resolveTimer', () => {
     state.runtime.status = 'running'
     state.runtime.remainingMs = 1_000
     state.runtime.baselineAt = 10_000
-    const nextDuration = state.structure[1].durationSeconds * 1_000
+    const nextDuration = entryDurationMs(state.structure[1]) ?? 0
 
     const result = resolveTimer(state, 12_500)
 
@@ -29,7 +30,7 @@ describe('resolveTimer', () => {
 
   it('automatically enters a break and carries overflow', () => {
     const state = createInitialState()
-    state.runtime.currentEntryIndex = 3
+    state.runtime.currentEntryIndex = 4
     state.runtime.status = 'running'
     state.runtime.remainingMs = 1_000
     state.runtime.baselineAt = 20_000
@@ -37,7 +38,7 @@ describe('resolveTimer', () => {
     const result = resolveTimer(state, 22_500)
 
     expect(result.structure[result.runtime.currentEntryIndex].kind).toBe('break')
-    expect(result.runtime.remainingMs).toBe(898_500)
+    expect(result.runtime.remainingMs).toBe(598_500)
   })
 
   it('can advance across multiple entries after a delayed callback', () => {
@@ -45,8 +46,8 @@ describe('resolveTimer', () => {
     state.runtime.status = 'running'
     state.runtime.remainingMs = 1_000
     state.runtime.baselineAt = 1_000
-    const secondDuration = state.structure[1].durationSeconds * 1_000
-    const thirdDuration = state.structure[2].durationSeconds * 1_000
+    const secondDuration = entryDurationMs(state.structure[1]) ?? 0
+    const thirdDuration = entryDurationMs(state.structure[2]) ?? 0
 
     const result = resolveTimer(state, 1_000 + 1_000 + secondDuration + 5_000)
 

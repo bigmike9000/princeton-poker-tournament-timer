@@ -11,7 +11,7 @@ describe('tournamentReducer', () => {
     const paused = state.runtime.remainingMs
     state = tournamentReducer(state, { type: 'START', now: 20_000 })
 
-    expect(paused).toBe(1_194_750)
+    expect(paused).toBe(714_750)
     expect(state.runtime.remainingMs).toBe(paused)
     expect(state.runtime.baselineAt).toBe(20_000)
     expect(state.runtime.status).toBe('running')
@@ -25,7 +25,7 @@ describe('tournamentReducer', () => {
 
     const result = tournamentReducer(state, { type: 'RESET_CURRENT', now: 10_000 })
 
-    expect(result.runtime.remainingMs).toBe(1_200_000)
+    expect(result.runtime.remainingMs).toBe(720_000)
     expect(result.runtime.baselineAt).toBe(10_000)
     expect(result.runtime.status).toBe('running')
   })
@@ -35,10 +35,10 @@ describe('tournamentReducer', () => {
     state.runtime.status = 'running'
     state.runtime.baselineAt = 1_000
 
-    const result = tournamentReducer(state, { type: 'GO_TO_ENTRY', index: 5, now: 2_000 })
+    const result = tournamentReducer(state, { type: 'GO_TO_ENTRY', index: 6, now: 2_000 })
 
-    expect(result.runtime.currentEntryIndex).toBe(5)
-    expect(result.runtime.remainingMs).toBe(1_200_000)
+    expect(result.runtime.currentEntryIndex).toBe(6)
+    expect(result.runtime.remainingMs).toBe(900_000)
     expect(result.runtime.baselineAt).toBe(2_000)
     expect(result.runtime.transitionCause).toBe('manual')
   })
@@ -113,12 +113,12 @@ describe('tournamentReducer', () => {
 describe('selectors', () => {
   it('derives the current and next poker levels around a break', () => {
     const state = createInitialState()
-    state.runtime.currentEntryIndex = 4
+    state.runtime.currentEntryIndex = 5
 
     expect(selectCurrentEntry(state).kind).toBe('break')
-    expect(selectNextPokerLevel(state)?.id).toBe('level-5')
-    expect(selectEntryLabel(state, 4)).toBe('BREAK')
-    expect(selectEntryLabel(state, 5)).toBe('LEVEL 5')
+    expect(selectNextPokerLevel(state)?.id).toBe('level-6')
+    expect(selectEntryLabel(state, 5)).toBe('BREAK')
+    expect(selectEntryLabel(state, 6)).toBe('LEVEL 6')
   })
 
   it('derives remaining time between reducer ticks', () => {

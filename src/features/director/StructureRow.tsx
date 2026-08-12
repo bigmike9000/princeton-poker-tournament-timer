@@ -47,7 +47,7 @@ export function StructureRow({
         <div className="structure-fields structure-fields--level">
           <label>
             <span>Duration minutes</span>
-            <input aria-label="Duration minutes" type="number" min="1" step="1" value={entry.durationSeconds / 60} onChange={(event) => updateNumber('durationSeconds', String(Number(event.target.value) * 60))} />
+            <input aria-label="Duration minutes" type="number" min="1" step="1" value={entry.durationSeconds === null ? '' : entry.durationSeconds / 60} onChange={(event) => updateNumber('durationSeconds', String(Number(event.target.value) * 60))} />
             <FieldIssue field="durationSeconds" issues={issues} />
           </label>
           <label>

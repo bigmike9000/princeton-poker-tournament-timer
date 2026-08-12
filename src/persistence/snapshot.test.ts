@@ -46,7 +46,7 @@ describe('snapshot persistence', () => {
     const restored = loadSnapshot(localStorage, 3_500)
 
     expect(restored.state.runtime.currentEntryIndex).toBe(1)
-    expect(restored.state.runtime.remainingMs).toBe(1_198_500)
+    expect(restored.state.runtime.remainingMs).toBe(718_500)
   })
 
   it('returns safe defaults and a recovery warning for malformed storage', () => {
