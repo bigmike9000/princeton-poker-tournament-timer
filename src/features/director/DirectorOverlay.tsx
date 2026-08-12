@@ -18,9 +18,10 @@ const tabs = [
 interface DirectorOverlayProps {
   open: boolean
   onClose: () => void
+  onAfterClose: () => void
 }
 
-export function DirectorOverlay({ open, onClose }: DirectorOverlayProps) {
+export function DirectorOverlay({ open, onClose, onAfterClose }: DirectorOverlayProps) {
   const [tab, setTab] = useState<DirectorTab>('structure')
   const closeRef = useRef<HTMLButtonElement>(null)
   const overlayRef = useRef<HTMLElement>(null)
@@ -36,8 +37,9 @@ export function DirectorOverlay({ open, onClose }: DirectorOverlayProps) {
     return () => {
       document.body.style.overflow = previousOverflow
       background?.removeAttribute('inert')
+      onAfterClose()
     }
-  }, [open])
+  }, [onAfterClose, open])
 
   if (!open) return null
 

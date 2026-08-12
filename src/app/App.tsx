@@ -67,8 +67,11 @@ function AppContent() {
 
   const closeDirector = () => {
     setDirectorOpen(false)
-    directorTrigger.current?.focus()
   }
+
+  const restoreDirectorFocus = useCallback(() => {
+    directorTrigger.current?.focus()
+  }, [])
 
   return (
     <>
@@ -78,7 +81,13 @@ function AppContent() {
         fullscreenError={fullscreenError}
         onToggleFullscreen={handleFullscreen}
       />
-      <DirectorOverlay open={directorOpen} onClose={closeDirector} />
+      {directorOpen && (
+        <DirectorOverlay
+          open
+          onClose={closeDirector}
+          onAfterClose={restoreDirectorFocus}
+        />
+      )}
       <PwaUpdatePrompt />
     </>
   )

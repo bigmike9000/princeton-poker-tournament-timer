@@ -65,6 +65,17 @@ export function StructureEditor() {
     }])
   }
 
+  const applyStructure = () => {
+    const normalized = structuredClone(draft)
+    normalized.forEach((entry) => {
+      if (entry.kind === 'level' && entry.note !== undefined && entry.note.trim() === '') {
+        delete entry.note
+      }
+    })
+    setDraft(normalized)
+    dispatch({ type: 'SET_STRUCTURE', structure: normalized, now: Date.now() })
+  }
+
   return (
     <div className="director-section structure-editor">
       <div className="structure-live-tools">
@@ -121,7 +132,7 @@ export function StructureEditor() {
         <button
           className="primary-action"
           disabled={!validation.valid}
-          onClick={() => dispatch({ type: 'SET_STRUCTURE', structure: draft, now: Date.now() })}
+          onClick={applyStructure}
         >Apply structure</button>
       </div>
 

@@ -1,16 +1,34 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import { useReducer } from 'react'
 import { App } from '../../app/App'
 import { TournamentContext } from '../../app/useTournament'
 import { createInitialState } from '../../domain/sampleStructure'
 import { createPresetRepository } from '../../persistence/presets'
+import { tournamentReducer } from '../../state/reducer'
+import { StructureEditor } from './StructureEditor'
 import { StructureRow } from './StructureRow'
 import { TimeEditor } from './TimeEditor'
 
 async function openTab(user: ReturnType<typeof userEvent.setup>, name: 'Structure' | 'Presets') {
   await user.click(screen.getByRole('button', { name: 'Open Tournament Director' }))
   await user.click(screen.getByRole('button', { name }))
+}
+
+function StructureStateHarness() {
+  const [state, dispatch] = useReducer(tournamentReducer, undefined, createInitialState)
+  const first = state.structure[0]
+  const note = first.kind === 'level' && first.note !== undefined
+    ? JSON.stringify(first.note)
+    : 'absent'
+
+  return (
+    <TournamentContext.Provider value={{ state, now: 0, dispatch, persistenceError: null }}>
+      <StructureEditor />
+      <output aria-label="Applied first entry">{first.kind === 'level' ? `${first.bigBlind}:${note}` : 'unexpected'}</output>
+    </TournamentContext.Provider>
+  )
 }
 
 describe('StructureEditor', () => {
@@ -65,6 +83,21 @@ describe('StructureEditor', () => {
     fireEvent.change(note, { target: { value: '  Final table  ' } })
 
     expect(onChange).toHaveBeenLastCalledWith({ ...entry, note: '  Final table  ' })
+  })
+
+  it('removes a whitespace-only note when the draft is applied while preserving the typed draft', async () => {
+    const user = userEvent.setup()
+    render(<StructureStateHarness />)
+    const firstLevel = screen.getByRole('group', { name: 'Level 1' })
+    const note = within(firstLevel).getByRole('textbox', { name: 'Level note' })
+    fireEvent.change(note, { target: { value: '   ' } })
+    await user.clear(within(firstLevel).getByLabelText('Big blind'))
+    await user.type(within(firstLevel).getByLabelText('Big blind'), '3')
+
+    expect(note).toHaveValue('   ')
+    await user.click(screen.getByRole('button', { name: 'Apply structure' }))
+
+    expect(screen.getByLabelText('Applied first entry')).toHaveTextContent('3:absent')
   })
 
   it('inserts a break, reorders it, and applies the draft atomically', async () => {

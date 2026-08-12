@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react'
 import { useTournament } from '../../app/useTournament'
 import { Dialog } from '../../components/Dialog'
+import { isUntimedEntry } from '../../domain/structure'
 import { selectEntryLabel } from '../../state/selectors'
 
 export function ResetControls() {
@@ -23,6 +24,11 @@ export function ResetControls() {
   }
 
   const closeConfirmation = () => setConfirmation(null)
+  const currentEntry = state.structure[state.runtime.currentEntryIndex]
+  const currentLabel = selectEntryLabel(state, state.runtime.currentEntryIndex).toLowerCase()
+  const currentResetDescription = isUntimedEntry(currentEntry)
+    ? `The ${currentLabel} clock will remain untimed and ready to run until the tournament ends.`
+    : `The ${currentLabel} clock will return to its full configured duration.`
 
   return (
     <>
@@ -35,7 +41,7 @@ export function ResetControls() {
       {confirmation === 'current' && (
         <Dialog
           title="Reset current level?"
-          description={`The ${selectEntryLabel(state, state.runtime.currentEntryIndex).toLowerCase()} clock will return to its full configured duration.`}
+          description={currentResetDescription}
           confirmLabel="Confirm level reset"
           onCancel={closeConfirmation}
           onConfirm={() => { dispatch({ type: 'RESET_CURRENT', now: Date.now() }); closeConfirmation() }}

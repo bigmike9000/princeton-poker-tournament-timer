@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { App } from '../../app/App'
 
 async function openDirector(user: ReturnType<typeof userEvent.setup>) {
@@ -42,6 +42,20 @@ describe('DirectorOverlay', () => {
     expect(screen.queryByText('Field')).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Edit remaining time' })).toBeVisible()
     expect(screen.getByRole('button', { name: 'Reset current level' })).toBeVisible()
+  })
+
+  it('returns to Structure after another tab is selected and the Director is reopened', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await openDirector(user)
+    await user.click(screen.getByRole('button', { name: 'Tournament' }))
+    expect(screen.getByRole('button', { name: 'Tournament' })).toHaveAttribute('aria-pressed', 'true')
+
+    await user.click(screen.getByRole('button', { name: 'Close Tournament Director' }))
+    await openDirector(user)
+
+    expect(screen.getByRole('button', { name: 'Structure' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('heading', { name: 'Edit remaining time' })).toBeVisible()
   })
 
   it('edits remaining time from Structure', async () => {
@@ -112,14 +126,24 @@ describe('DirectorOverlay', () => {
     expect(screen.queryByText('Default allocation: 10 × 1 · 8 × 5 · 6 × 25 = 200')).not.toBeInTheDocument()
   })
 
-  it('returns focus to the director trigger when closed', async () => {
+  it('returns focus only after the director background is no longer inert', async () => {
+    const nativeFocus = HTMLElement.prototype.focus
+    const focus = vi.spyOn(HTMLElement.prototype, 'focus').mockImplementation(function (this: HTMLElement) {
+      if (this.closest('[inert]')) return
+      nativeFocus.call(this)
+    })
     const user = userEvent.setup()
-    render(<App />)
-    const trigger = screen.getByRole('button', { name: 'Open Tournament Director' })
-    await user.click(trigger)
-    await user.click(screen.getByRole('button', { name: 'Close Tournament Director' }))
+    try {
+      render(<App />)
+      const trigger = screen.getByRole('button', { name: 'Open Tournament Director' })
+      await user.click(trigger)
+      await user.click(screen.getByRole('button', { name: 'Close Tournament Director' }))
 
-    expect(trigger).toHaveFocus()
+      expect(document.querySelector('.tournament-shell')).not.toHaveAttribute('inert')
+      expect(trigger).toHaveFocus()
+    } finally {
+      focus.mockRestore()
+    }
   })
 
   it('contains keyboard focus inside the modal overlay', async () => {

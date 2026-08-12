@@ -17,6 +17,7 @@ function ResetHarness({ Controls }: { Controls: ComponentType }) {
       <output aria-label="Players remaining">{state.runtime.playersRemaining}</output>
       <button onClick={() => dispatch({ type: 'SET_TIME', remainingMs: 60_000, now: Date.now() })}>Shorten clock</button>
       <button onClick={() => dispatch({ type: 'GO_TO_ENTRY', index: 1, now: Date.now() })}>Advance entry</button>
+      <button onClick={() => dispatch({ type: 'GO_TO_ENTRY', index: state.structure.length - 1, now: Date.now() })}>Final level</button>
       <button onClick={() => dispatch({ type: 'SET_PLAYERS', players: 40 })}>Reduce field</button>
     </>
   )
@@ -51,6 +52,17 @@ describe('ResetControls', () => {
     await user.click(screen.getByRole('button', { name: 'Cancel' }))
 
     expect(resetCurrent).toHaveFocus()
+  })
+
+  it('describes an untimed current-level reset without promising a duration', async () => {
+    const user = userEvent.setup()
+    renderControls()
+    await user.click(screen.getByRole('button', { name: 'Final level' }))
+    await user.click(screen.getByRole('button', { name: 'Reset current level' }))
+
+    const confirmation = screen.getByRole('alertdialog', { name: 'Reset current level?' })
+    expect(confirmation).toHaveTextContent(/remain untimed/i)
+    expect(confirmation).not.toHaveTextContent(/full configured duration/i)
   })
 
   it('uses stronger confirmation before resetting all tournament progress', async () => {
