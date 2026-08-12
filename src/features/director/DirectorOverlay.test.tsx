@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { App } from '../../app/App'
@@ -37,6 +37,21 @@ describe('DirectorOverlay', () => {
 
     expect(screen.getAllByText('LEVEL 5').length).toBeGreaterThan(0)
     expect(screen.getByRole('timer')).toHaveTextContent('20:00')
+  })
+
+  it('refreshes the time draft when moving to an entry with another duration', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await openDirector(user)
+
+    expect(screen.getByLabelText('Minutes remaining')).toHaveValue(20)
+    await user.selectOptions(screen.getByLabelText('Choose level or break'), '4')
+
+    expect(screen.getByLabelText('Minutes remaining')).toHaveValue(15)
+    await user.click(screen.getByRole('button', { name: 'Subtract one minute' }))
+    expect(screen.getByLabelText('Minutes remaining')).toHaveValue(14)
+    await user.click(screen.getByRole('button', { name: 'Apply time' }))
+    expect(screen.getByRole('timer')).toHaveTextContent('14:00')
   })
 
   it('requires explicit confirmation before resetting the current level', async () => {
@@ -95,5 +110,20 @@ describe('DirectorOverlay', () => {
     await user.click(screen.getByRole('button', { name: 'Close Tournament Director' }))
 
     expect(trigger).toHaveFocus()
+  })
+
+  it('contains keyboard focus inside the modal overlay', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await openDirector(user)
+    const close = screen.getByRole('button', { name: 'Close Tournament Director' })
+
+    expect(document.querySelector('.tournament-shell')).toHaveAttribute('inert')
+    expect(close).toHaveFocus()
+    const last = screen.getByRole('button', { name: 'Reset tournament' })
+    fireEvent.keyDown(close, { key: 'Tab', shiftKey: true })
+    expect(last).toHaveFocus()
+    fireEvent.keyDown(last, { key: 'Tab' })
+    expect(close).toHaveFocus()
   })
 })

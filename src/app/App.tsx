@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { DirectorOverlay } from '../features/director/DirectorOverlay'
 import { TournamentDisplay } from '../features/display/TournamentDisplay'
@@ -6,12 +6,31 @@ import { audioAlerts } from '../services/audio'
 import { toggleFullscreen } from '../services/fullscreen'
 import { shortcutForEvent } from '../services/shortcuts'
 import { TournamentProvider } from './TournamentProvider'
+import { PwaUpdatePrompt } from './PwaUpdatePrompt'
 import { useTournament } from './useTournament'
 
 function AppContent() {
   const [directorOpen, setDirectorOpen] = useState(false)
+  const [fullscreen, setFullscreen] = useState(Boolean(document.fullscreenElement))
+  const [fullscreenError, setFullscreenError] = useState<string | null>(null)
   const directorTrigger = useRef<HTMLElement | null>(null)
   const { state, dispatch } = useTournament()
+
+  const handleFullscreen = useCallback(async () => {
+    try {
+      await toggleFullscreen(document)
+      setFullscreen(Boolean(document.fullscreenElement))
+      setFullscreenError(null)
+    } catch {
+      setFullscreenError('Fullscreen is unavailable in this browser.')
+    }
+  }, [])
+
+  useEffect(() => {
+    const updateFullscreen = () => setFullscreen(Boolean(document.fullscreenElement))
+    document.addEventListener('fullscreenchange', updateFullscreen)
+    return () => document.removeEventListener('fullscreenchange', updateFullscreen)
+  }, [])
 
   useEffect(() => {
     const runShortcut = (event: KeyboardEvent) => {
@@ -31,13 +50,13 @@ function AppContent() {
         audioAlerts.unlock()
         dispatch({ type: 'SET_SETTINGS', settings: { ...state.settings, muted: !state.settings.muted } })
       } else {
-        void toggleFullscreen(document)
+        void handleFullscreen()
       }
     }
 
     window.addEventListener('keydown', runShortcut)
     return () => window.removeEventListener('keydown', runShortcut)
-  }, [dispatch, state])
+  }, [dispatch, handleFullscreen, state])
 
   const openDirector = () => {
     directorTrigger.current = document.activeElement instanceof HTMLElement
@@ -53,8 +72,14 @@ function AppContent() {
 
   return (
     <>
-      <TournamentDisplay onOpenDirector={openDirector} />
+      <TournamentDisplay
+        onOpenDirector={openDirector}
+        fullscreen={fullscreen}
+        fullscreenError={fullscreenError}
+        onToggleFullscreen={handleFullscreen}
+      />
       <DirectorOverlay open={directorOpen} onClose={closeDirector} />
+      <PwaUpdatePrompt />
     </>
   )
 }

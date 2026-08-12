@@ -23,19 +23,26 @@ interface DirectorOverlayProps {
 export function DirectorOverlay({ open, onClose }: DirectorOverlayProps) {
   const [tab, setTab] = useState<DirectorTab>('run')
   const closeRef = useRef<HTMLButtonElement>(null)
+  const overlayRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     if (!open) return
     closeRef.current?.focus()
     const previousOverflow = document.body.style.overflow
+    const background = document.querySelector<HTMLElement>('.tournament-shell')
     document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = previousOverflow }
+    background?.setAttribute('inert', '')
+    return () => {
+      document.body.style.overflow = previousOverflow
+      background?.removeAttribute('inert')
+    }
   }, [open])
 
   if (!open) return null
 
   return (
     <section
+      ref={overlayRef}
       role="dialog"
       aria-modal="true"
       aria-labelledby="director-title"
@@ -44,6 +51,22 @@ export function DirectorOverlay({ open, onClose }: DirectorOverlayProps) {
         if (event.key === 'Escape') {
           event.preventDefault()
           onClose()
+          return
+        }
+        if (event.key !== 'Tab') return
+        const focusable = Array.from(overlayRef.current?.querySelectorAll<HTMLElement>('*') ?? [])
+          .filter((element) => element.matches(
+            'button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), a[href], [tabindex]:not([tabindex="-1"])',
+          ))
+        if (focusable.length === 0) return
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault()
+          last.focus()
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault()
+          first.focus()
         }
       }}
     >

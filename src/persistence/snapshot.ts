@@ -1,6 +1,7 @@
 import { createInitialState } from '../domain/sampleStructure'
 import { resolveTimer } from '../domain/timer'
 import type { StructureEntry, TournamentState } from '../domain/types'
+import { validateStructure } from '../domain/validation'
 
 export const SNAPSHOT_KEY = 'ppc-tournament:v1'
 const SNAPSHOT_VERSION = 1
@@ -58,14 +59,15 @@ function parseSnapshot(value: unknown): Snapshot {
 
   if (typeof configuration.organizationName !== 'string' ||
       typeof configuration.tournamentName !== 'string' ||
-      !isFiniteNonnegative(configuration.startingPlayers) || configuration.startingPlayers < 1 ||
-      !isFiniteNonnegative(configuration.startingStack) || configuration.startingStack < 1 ||
+      !Number.isInteger(configuration.startingPlayers) || Number(configuration.startingPlayers) < 1 ||
+      !Number.isInteger(configuration.startingStack) || Number(configuration.startingStack) < 1 ||
       !Array.isArray(configuration.sponsorLabels) ||
       !configuration.sponsorLabels.every((label) => typeof label === 'string')) {
     throw new Error('Saved tournament configuration is invalid.')
   }
 
-  if (!Array.isArray(structure) || structure.length === 0 || !structure.every(isStructureEntry)) {
+  if (!Array.isArray(structure) || structure.length === 0 || !structure.every(isStructureEntry) ||
+      !validateStructure(structure).valid) {
     throw new Error('Saved tournament structure is invalid.')
   }
 
@@ -74,7 +76,8 @@ function parseSnapshot(value: unknown): Snapshot {
       !['idle', 'running', 'paused', 'complete'].includes(String(runtime.status)) ||
       !isFiniteNonnegative(runtime.remainingMs) ||
       !(runtime.baselineAt === null || isFiniteNonnegative(runtime.baselineAt)) ||
-      !isFiniteNonnegative(runtime.playersRemaining) || Number(runtime.playersRemaining) < 1 ||
+      !Number.isInteger(runtime.playersRemaining) || Number(runtime.playersRemaining) < 1 ||
+      Number(runtime.playersRemaining) > Number(configuration.startingPlayers) ||
       !Array.isArray(runtime.alertedThresholds) ||
       !runtime.alertedThresholds.every(isFiniteNonnegative) ||
       !(runtime.transitionCause === undefined || runtime.transitionCause === null ||
@@ -86,7 +89,7 @@ function parseSnapshot(value: unknown): Snapshot {
     isRecord(entry) &&
     typeof entry.id === 'string' &&
     ['initial', 'reentry', 'addon'].includes(String(entry.kind)) &&
-    isFiniteNonnegative(entry.chips))) {
+    Number.isInteger(entry.chips) && Number(entry.chips) >= 0)) {
     throw new Error('Saved tournament chip ledger is invalid.')
   }
 

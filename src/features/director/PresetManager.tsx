@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useTournament } from '../../app/useTournament'
 import { Dialog } from '../../components/Dialog'
-import { createPresetRepository, type StructurePreset } from '../../persistence/presets'
+import { createPresetRepository, type PresetRepository, type StructurePreset } from '../../persistence/presets'
 
 interface PresetRowProps {
   preset: StructurePreset
@@ -35,19 +35,36 @@ function PresetRow({ preset, onLoad, onDuplicate, onRename, onDelete }: PresetRo
 
 export function PresetManager() {
   const { state, dispatch } = useTournament()
-  const repository = useMemo(() => createPresetRepository(localStorage), [])
-  const [presets, setPresets] = useState(() => repository.list())
+  const [initialRepository] = useState<{
+    repository: PresetRepository | null
+    presets: StructurePreset[]
+    error: string | null
+  }>(() => {
+    try {
+      const repository = createPresetRepository(localStorage)
+      return { repository, presets: repository.list(), error: null }
+    } catch {
+      return {
+        repository: null,
+        presets: [],
+        error: 'Presets are unavailable because this browser cannot access local storage.',
+      }
+    }
+  })
+  const repository = initialRepository.repository
+  const [presets, setPresets] = useState(initialRepository.presets)
   const [newName, setNewName] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(initialRepository.error)
   const [pendingLoad, setPendingLoad] = useState<StructurePreset | null>(null)
   const [pendingDelete, setPendingDelete] = useState<StructurePreset | null>(null)
 
-  const refresh = () => setPresets(repository.list())
-  const run = (operation: () => void) => {
+  const refresh = (activeRepository: PresetRepository) => setPresets(activeRepository.list())
+  const run = (operation: (activeRepository: PresetRepository) => void) => {
+    if (repository === null) return
     try {
-      operation()
+      operation(repository)
       setError(null)
-      refresh()
+      refresh(repository)
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Preset operation failed.')
     }
@@ -84,8 +101,8 @@ export function PresetManager() {
 
       <section className="save-preset-card">
         <div><span>Current structure</span><strong>{state.structure.filter((entry) => entry.kind === 'level').length} levels · {state.structure.filter((entry) => entry.kind === 'break').length} breaks</strong></div>
-        <label><span>New preset name</span><input value={newName} maxLength={60} placeholder="e.g. Turbo Tournament" onChange={(event) => setNewName(event.target.value)} /></label>
-        <button className="primary-action" onClick={() => run(() => { repository.save(newName, state.structure); setNewName('') })}>Save current structure</button>
+        <label><span>New preset name</span><input disabled={repository === null} value={newName} maxLength={60} placeholder="e.g. Turbo Tournament" onChange={(event) => setNewName(event.target.value)} /></label>
+        <button disabled={repository === null} className="primary-action" onClick={() => run((activeRepository) => { activeRepository.save(newName, state.structure); setNewName('') })}>Save current structure</button>
       </section>
 
       {error && <p role="alert" className="validation-banner">{error}</p>}
@@ -96,8 +113,8 @@ export function PresetManager() {
             key={preset.id}
             preset={preset}
             onLoad={() => loadPreset(preset, Date.now())}
-            onDuplicate={() => run(() => { repository.duplicate(preset.id, duplicateName(preset.name)) })}
-            onRename={(name) => run(() => { repository.rename(preset.id, name) })}
+            onDuplicate={() => run((activeRepository) => { activeRepository.duplicate(preset.id, duplicateName(preset.name)) })}
+            onRename={(name) => run((activeRepository) => { activeRepository.rename(preset.id, name) })}
             onDelete={() => setPendingDelete(preset)}
           />
         ))}
@@ -111,7 +128,7 @@ export function PresetManager() {
           confirmLabel="Confirm preset deletion"
           destructive
           onCancel={() => setPendingDelete(null)}
-          onConfirm={() => run(() => { repository.remove(pendingDelete.id); setPendingDelete(null) })}
+          onConfirm={() => run((activeRepository) => { activeRepository.remove(pendingDelete.id); setPendingDelete(null) })}
         />
       )}
       {pendingLoad && (

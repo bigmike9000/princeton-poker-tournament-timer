@@ -2,6 +2,8 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { App } from '../../app/App'
+import { createInitialState } from '../../domain/sampleStructure'
+import { createPresetRepository } from '../../persistence/presets'
 
 async function openTab(user: ReturnType<typeof userEvent.setup>, name: 'Structure' | 'Presets') {
   await user.click(screen.getByRole('button', { name: 'Open Tournament Director' }))
@@ -42,6 +44,22 @@ describe('StructureEditor', () => {
 })
 
 describe('PresetManager', () => {
+  it('keeps the tournament operational when preset storage is unavailable', async () => {
+    const originalSetItem = localStorage.setItem
+    localStorage.setItem = () => { throw new Error('quota unavailable') }
+    const user = userEvent.setup()
+    try {
+      render(<App />)
+      await openTab(user, 'Presets')
+
+      expect(screen.getByText(/presets are unavailable/i)).toHaveAttribute('role', 'alert')
+      expect(screen.getByRole('timer')).toBeVisible()
+      expect(screen.getByRole('button', { name: 'Save current structure' })).toBeDisabled()
+    } finally {
+      localStorage.setItem = originalSetItem
+    }
+  })
+
   it('saves, duplicates, renames, and deletes a structure preset', async () => {
     const user = userEvent.setup()
     render(<App />)
@@ -61,6 +79,20 @@ describe('PresetManager', () => {
     await user.click(within(renamed).getByRole('button', { name: 'Delete' }))
     await user.click(screen.getByRole('button', { name: 'Confirm preset deletion' }))
     expect(screen.queryByRole('group', { name: 'Preset Championship' })).not.toBeInTheDocument()
+  })
+
+  it('loads a preset using its own opening-entry duration', async () => {
+    const structure = createInitialState().structure
+    structure[0].durationSeconds = 600
+    createPresetRepository(localStorage).save('Ten Minute Opener', structure)
+    const user = userEvent.setup()
+
+    render(<App />)
+    await openTab(user, 'Presets')
+    const preset = screen.getByRole('group', { name: 'Preset Ten Minute Opener' })
+    await user.click(within(preset).getByRole('button', { name: 'Load' }))
+
+    expect(screen.getByRole('timer')).toHaveTextContent('10:00')
   })
 
   it('confirms replacing a progressed tournament with a preset', async () => {

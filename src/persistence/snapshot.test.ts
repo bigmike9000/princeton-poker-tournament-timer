@@ -65,4 +65,23 @@ describe('snapshot persistence', () => {
     expect(restored.recovered).toBe(false)
     expect(restored.state.configuration.tournamentName).toBe('Princeton Poker Club Standard')
   })
+
+  it('rejects semantically invalid progress and structure data', () => {
+    const state = createInitialState()
+    state.runtime.playersRemaining = 2.5
+    saveSnapshot(localStorage, state, 10_000)
+
+    const restored = loadSnapshot(localStorage, 10_000)
+
+    expect(restored.recovered).toBe(true)
+    expect(restored.error).toMatch(/saved tournament/i)
+
+    const malformedStructure = createInitialState()
+    malformedStructure.structure[1].id = malformedStructure.structure[0].id
+    saveSnapshot(localStorage, malformedStructure, 10_000)
+    const structureResult = loadSnapshot(localStorage, 10_000)
+
+    expect(structureResult.recovered).toBe(true)
+    expect(structureResult.state.structure[0].id).toBe('level-1')
+  })
 })

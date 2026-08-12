@@ -48,6 +48,8 @@ For watch mode while developing, run `npm test`.
 
 The installed production app precaches its HTML, JavaScript, CSS, manifest, and local icons. It does not depend on remote fonts, images, analytics, ads, accounts, or APIs.
 
+When a new production version is available, the app shows an update notice. A running tournament must be paused before installation, and activation requires explicit confirmation so an update cannot unexpectedly reload the live clock.
+
 Keep the production server or installed app available on the tournament laptop. Opening the raw `index.html` file directly is not supported because browser service workers require a secure origin such as HTTPS or `localhost`.
 
 ## Tournament operation

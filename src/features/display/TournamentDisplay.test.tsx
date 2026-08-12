@@ -8,7 +8,12 @@ import { TournamentDisplay } from './TournamentDisplay'
 function renderDisplay(onOpenDirector = vi.fn()) {
   return render(
     <TournamentProvider>
-      <TournamentDisplay onOpenDirector={onOpenDirector} />
+      <TournamentDisplay
+        onOpenDirector={onOpenDirector}
+        fullscreen={false}
+        fullscreenError={null}
+        onToggleFullscreen={vi.fn().mockResolvedValue(undefined)}
+      />
     </TournamentProvider>,
   )
 }

@@ -1,36 +1,27 @@
-import { useEffect, useState, type Dispatch } from 'react'
+import type { Dispatch } from 'react'
 import type { TournamentState } from '../../domain/types'
 import { audioAlerts } from '../../services/audio'
-import { toggleFullscreen } from '../../services/fullscreen'
 import type { TournamentAction } from '../../state/reducer'
 
 interface DisplayControlsProps {
   state: TournamentState
   dispatch: Dispatch<TournamentAction>
   onOpenDirector: () => void
+  fullscreen: boolean
+  fullscreenError: string | null
+  onToggleFullscreen: () => Promise<void>
 }
 
-export function DisplayControls({ state, dispatch, onOpenDirector }: DisplayControlsProps) {
+export function DisplayControls({
+  state,
+  dispatch,
+  onOpenDirector,
+  fullscreen,
+  fullscreenError,
+  onToggleFullscreen,
+}: DisplayControlsProps) {
   const running = state.runtime.status === 'running'
-  const [fullscreen, setFullscreen] = useState(Boolean(document.fullscreenElement))
-  const [fullscreenError, setFullscreenError] = useState<string | null>(null)
   const now = () => Date.now()
-
-  useEffect(() => {
-    const updateFullscreen = () => setFullscreen(Boolean(document.fullscreenElement))
-    document.addEventListener('fullscreenchange', updateFullscreen)
-    return () => document.removeEventListener('fullscreenchange', updateFullscreen)
-  }, [])
-
-  const handleFullscreen = async () => {
-    try {
-      await toggleFullscreen(document)
-      setFullscreen(Boolean(document.fullscreenElement))
-      setFullscreenError(null)
-    } catch {
-      setFullscreenError('Fullscreen is unavailable in this browser.')
-    }
-  }
 
   return (
     <nav className="control-rail" aria-label="Tournament controls">
@@ -86,7 +77,7 @@ export function DisplayControls({ state, dispatch, onOpenDirector }: DisplayCont
         <button
           className="icon-button"
           aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-          onClick={() => void handleFullscreen()}
+          onClick={() => void onToggleFullscreen()}
         >{fullscreen ? 'Exit screen' : 'Full screen'}</button>
         <button
           className="icon-button"

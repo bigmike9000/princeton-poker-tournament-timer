@@ -59,7 +59,7 @@ export function DirectorRun() {
         </div>
       </section>
 
-      <TimeEditor />
+      <TimeEditor key={state.structure[state.runtime.currentEntryIndex].id} />
 
       <section className="director-card player-editor">
         <div className="director-card-heading"><div><span>Field</span><h3>Players remaining</h3></div><strong>{state.runtime.playersRemaining} / {state.configuration.startingPlayers}</strong></div>

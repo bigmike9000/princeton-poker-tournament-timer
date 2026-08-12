@@ -1,4 +1,3 @@
-import { createInitialState } from '../domain/sampleStructure'
 import { resolveTimer } from '../domain/timer'
 import type {
   StructureEntry,
@@ -86,12 +85,16 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
       }
     }
     case 'RESET_TOURNAMENT': {
-      const initial = createInitialState()
       return {
         ...state,
         runtime: {
-          ...initial.runtime,
+          currentEntryIndex: 0,
+          status: 'idle',
+          remainingMs: state.structure[0].durationSeconds * 1_000,
+          baselineAt: null,
           playersRemaining: state.configuration.startingPlayers,
+          alertedThresholds: [],
+          transitionCause: null,
         },
         chipLedger: [{
           id: 'initial-chips',

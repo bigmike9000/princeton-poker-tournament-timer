@@ -49,4 +49,14 @@ describe('DirectorSettings', () => {
     await user.click(screen.getByRole('button', { name: 'Enter fullscreen' }))
     expect(requestFullscreen).toHaveBeenCalledOnce()
   })
+
+  it('shows a nonblocking error when the fullscreen keyboard shortcut is unavailable', async () => {
+    Object.defineProperty(document.documentElement, 'requestFullscreen', { configurable: true, value: undefined })
+    render(<App />)
+
+    fireEvent.keyDown(window, { key: 'f' })
+
+    expect(await screen.findByRole('status')).toHaveTextContent(/fullscreen is unavailable/i)
+    expect(screen.getByRole('timer')).toBeVisible()
+  })
 })

@@ -8,9 +8,17 @@ import { PlayerStats } from './PlayerStats'
 
 export interface TournamentDisplayProps {
   onOpenDirector: () => void
+  fullscreen: boolean
+  fullscreenError: string | null
+  onToggleFullscreen: () => Promise<void>
 }
 
-export function TournamentDisplay({ onOpenDirector }: TournamentDisplayProps) {
+export function TournamentDisplay({
+  onOpenDirector,
+  fullscreen,
+  fullscreenError,
+  onToggleFullscreen,
+}: TournamentDisplayProps) {
   const { state, now, dispatch, persistenceError } = useTournament()
   const remainingMs = selectRemainingMs(state, now)
   const running = state.runtime.status === 'running'
@@ -48,7 +56,14 @@ export function TournamentDisplay({ onOpenDirector }: TournamentDisplayProps) {
 
         <BlindStructure state={state} />
       </main>
-      <DisplayControls state={state} dispatch={dispatch} onOpenDirector={onOpenDirector} />
+      <DisplayControls
+        state={state}
+        dispatch={dispatch}
+        onOpenDirector={onOpenDirector}
+        fullscreen={fullscreen}
+        fullscreenError={fullscreenError}
+        onToggleFullscreen={onToggleFullscreen}
+      />
     </div>
   )
 }

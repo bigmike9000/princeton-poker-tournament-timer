@@ -90,6 +90,24 @@ describe('tournamentReducer', () => {
     expect(result.runtime.playersRemaining).toBe(result.configuration.startingPlayers)
     expect(result.runtime.status).toBe('idle')
   })
+
+  it('resets to the first entry duration from the active structure', () => {
+    const state = createInitialState()
+    state.structure[0] = {
+      id: 'opening-break',
+      kind: 'break',
+      durationSeconds: 600,
+      label: 'Opening break',
+    }
+    state.runtime.currentEntryIndex = 3
+    state.runtime.remainingMs = 12_000
+
+    const result = tournamentReducer(state, { type: 'RESET_TOURNAMENT', now: 30_000 })
+
+    expect(result.structure[0].id).toBe('opening-break')
+    expect(result.runtime.currentEntryIndex).toBe(0)
+    expect(result.runtime.remainingMs).toBe(600_000)
+  })
 })
 
 describe('selectors', () => {
