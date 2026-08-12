@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { ErrorBoundary } from '../components/ErrorBoundary'
 import { DirectorOverlay } from '../features/director/DirectorOverlay'
 import { TournamentDisplay } from '../features/display/TournamentDisplay'
 import { audioAlerts } from '../services/audio'
@@ -59,5 +60,9 @@ function AppContent() {
 }
 
 export function App() {
-  return <TournamentProvider><AppContent /></TournamentProvider>
+  return (
+    <ErrorBoundary>
+      <TournamentProvider><AppContent /></TournamentProvider>
+    </ErrorBoundary>
+  )
 }

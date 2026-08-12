@@ -1,12 +1,7 @@
 import { formatChips } from '../../domain/calculations'
 import type { TournamentState } from '../../domain/types'
 import { selectCurrentEntry, selectNextPokerLevel, selectPokerLevelNumber } from '../../state/selectors'
-
-function anteLabel(anteType: 'none' | 'traditional' | 'big-blind', ante: number): string {
-  if (anteType === 'none') return 'NO ANTE'
-  if (anteType === 'traditional') return `ANTE: ${formatChips(ante)}`
-  return `BIG BLIND ANTE: ${formatChips(ante)}`
-}
+import { anteLabel } from './format'
 
 export function CurrentLevel({ state }: { state: TournamentState }) {
   const entry = selectCurrentEntry(state)
@@ -48,5 +43,3 @@ export function CurrentLevel({ state }: { state: TournamentState }) {
     </section>
   )
 }
-
-export { anteLabel }

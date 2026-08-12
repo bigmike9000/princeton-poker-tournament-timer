@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { formatChips } from '../../domain/calculations'
 import type { StructureEntry, TournamentState } from '../../domain/types'
 import { selectPokerLevelNumber } from '../../state/selectors'
-import { anteLabel } from './CurrentLevel'
+import { anteLabel } from './format'
 
 function durationLabel(entry: StructureEntry): string {
   return `${Math.round(entry.durationSeconds / 60)} min`
