@@ -8,13 +8,13 @@ import { saveSnapshot } from '../../persistence/snapshot'
 import displayCss from '../../styles/display.css?raw'
 import { TournamentDisplay } from './TournamentDisplay'
 
-function renderDisplay(onOpenDirector = vi.fn(), onOpenInfo = vi.fn()) {
+function renderDisplay(onOpenDirector = vi.fn(), onOpenInfo = vi.fn(), fullscreen = false) {
   return render(
     <TournamentProvider>
       <TournamentDisplay
         onOpenDirector={onOpenDirector}
         onOpenInfo={onOpenInfo}
-        fullscreen={false}
+        fullscreen={fullscreen}
         fullscreenError={null}
         onToggleFullscreen={vi.fn().mockResolvedValue(undefined)}
       />
@@ -208,6 +208,47 @@ describe('TournamentDisplay', () => {
     fireEvent.click(info)
     expect(onOpenInfo).toHaveBeenCalledOnce()
     expect(onOpenInfo).toHaveBeenCalledWith(info)
+  })
+
+  it('uses icon-only public utility controls without changing their accessible actions', () => {
+    const { container } = renderDisplay()
+    const utility = container.querySelector('.control-group--utility')
+
+    expect(utility).not.toBeNull()
+    const controls = within(utility as HTMLElement)
+    expect(controls.getAllByRole('button')).toHaveLength(4)
+    expect(controls.queryAllByText(/Info|Full screen|Exit screen|Sound on|Sound off|TD Controls/)).toHaveLength(0)
+    expect(controls.getByRole('button', { name: 'Open tournament information' }).querySelector('.control-icon--info')).not.toBeNull()
+    expect(controls.getByRole('button', { name: 'Enter fullscreen' }).querySelector('.control-icon--fullscreen-enter')).not.toBeNull()
+    expect(controls.getByRole('button', { name: 'Mute alerts' }).querySelector('.control-icon--sound-on')).not.toBeNull()
+    expect(controls.getByRole('button', { name: 'Open Tournament Director' }).querySelector('.control-icon--settings')).not.toBeNull()
+  })
+
+  it('changes the fullscreen and sound glyphs with their real control states', () => {
+    const { unmount } = renderDisplay(vi.fn(), vi.fn(), true)
+    const exitFullscreen = screen.getByRole('button', { name: 'Exit fullscreen' })
+
+    expect(exitFullscreen.querySelector('.control-icon--fullscreen-exit')).not.toBeNull()
+    unmount()
+
+    renderDisplay()
+    const mute = screen.getByRole('button', { name: 'Mute alerts' })
+    fireEvent.click(mute)
+
+    const unmute = screen.getByRole('button', { name: 'Unmute alerts' })
+    expect(unmute).toHaveAttribute('aria-pressed', 'true')
+    expect(unmute.querySelector('.control-icon--sound-off')).not.toBeNull()
+  })
+
+  it('keeps public utility glyph controls square and projector-safe', () => {
+    const buttonRule = cssRule(displayCss, '.utility-icon-button')
+    const iconRule = cssRule(displayCss, '.control-icon')
+
+    expect(buttonRule).toMatch(/width:\s*3\.4rem/)
+    expect(buttonRule).toMatch(/height:\s*3\.4rem/)
+    expect(buttonRule).toMatch(/padding:\s*0/)
+    expect(iconRule).toMatch(/width:\s*1\.35rem/)
+    expect(iconRule).toMatch(/height:\s*1\.35rem/)
   })
 
   it('updates player statistics from the editable player count', async () => {

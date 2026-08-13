@@ -737,6 +737,32 @@ select:focus-visible {
   cursor: not-allowed;
 }
 
+.utility-icon-button {
+  display: grid;
+  width: 3.4rem;
+  height: 3.4rem;
+  flex: 0 0 auto;
+  place-items: center;
+  padding: 0;
+}
+
+.control-icon {
+  display: block;
+  width: 1.35rem;
+  height: 1.35rem;
+  fill: none;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.utility-icon-button--active {
+  border-color: rgb(217 121 43 / 62%);
+  color: var(--orange-400);
+  background: rgb(217 121 43 / 9%);
+}
+
 .control-button--start,
 .control-button--pause {
   min-width: 7.3rem;

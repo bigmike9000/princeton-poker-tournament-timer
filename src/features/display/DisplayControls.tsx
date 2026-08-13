@@ -2,6 +2,7 @@ import type { Dispatch } from 'react'
 import type { TournamentState } from '../../domain/types'
 import { audioAlerts } from '../../services/audio'
 import type { TournamentAction } from '../../state/reducer'
+import { ControlIcon } from './ControlIcon'
 import { PlayerCountControl } from './PlayerCountControl'
 
 interface DisplayControlsProps {
@@ -68,26 +69,28 @@ export function DisplayControls({
       <div className="control-group control-group--utility">
         {fullscreenError && <span role="status" className="control-status">{fullscreenError}</span>}
         <button
-          className="icon-button info-button"
+          className="icon-button utility-icon-button info-button"
           aria-label="Open tournament information"
           onClick={(event) => onOpenInfo(event.currentTarget)}
-        >Info</button>
+        ><ControlIcon name="info" /></button>
         <button
-          className="icon-button"
+          className="icon-button utility-icon-button"
           aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
           onClick={() => void onToggleFullscreen()}
-        >{fullscreen ? 'Exit screen' : 'Full screen'}</button>
+        ><ControlIcon name={fullscreen ? 'fullscreen-exit' : 'fullscreen-enter'} /></button>
         <button
-          className="icon-button"
+          className={state.settings.muted
+            ? 'icon-button utility-icon-button utility-icon-button--active'
+            : 'icon-button utility-icon-button'}
           aria-pressed={state.settings.muted}
           aria-label={state.settings.muted ? 'Unmute alerts' : 'Mute alerts'}
           onClick={() => {
             audioAlerts.unlock()
             dispatch({ type: 'SET_SETTINGS', settings: { ...state.settings, muted: !state.settings.muted } })
           }}
-        >{state.settings.muted ? 'Sound off' : 'Sound on'}</button>
-        <button className="director-button" onClick={onOpenDirector} aria-label="Open Tournament Director">
-          TD Controls <span aria-hidden="true">↗</span>
+        ><ControlIcon name={state.settings.muted ? 'sound-off' : 'sound-on'} /></button>
+        <button className="icon-button utility-icon-button" onClick={onOpenDirector} aria-label="Open Tournament Director">
+          <ControlIcon name="settings" />
         </button>
       </div>
     </nav>
