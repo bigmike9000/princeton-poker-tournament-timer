@@ -68,40 +68,36 @@ export function StructureRow({
               )}
               <FieldIssue entryId={entry.id} field="durationSeconds" issues={issues} />
             </div>
-            <div className="structure-field-group structure-blinds-group">
-              <label className="structure-compact-field">
-                <span aria-hidden="true">SB</span>
-                <input {...fieldErrorProps(entry.id, 'smallBlind', issues)} aria-label="Small blind" type="number" min="0" step="1" value={entry.smallBlind} onChange={(event) => updateNumber('smallBlind', event.target.value)} />
-                <FieldIssue entryId={entry.id} field="smallBlind" issues={issues} />
-              </label>
-              <label className="structure-compact-field">
-                <span aria-hidden="true">BB</span>
-                <input {...fieldErrorProps(entry.id, 'bigBlind', issues)} aria-label="Big blind" type="number" min="1" step="1" value={entry.bigBlind} onChange={(event) => updateNumber('bigBlind', event.target.value)} />
-                <FieldIssue entryId={entry.id} field="bigBlind" issues={issues} />
-              </label>
-            </div>
-            <div className="structure-field-group structure-ante-group">
-              <label className="structure-compact-field">
-                <span aria-hidden="true">Type</span>
-                <select
-                  aria-label="Ante type"
-                  value={entry.anteType}
-                  onChange={(event) => {
-                    const anteType = event.target.value as typeof entry.anteType
-                    onChange({ ...entry, anteType, ante: anteType === 'none' ? 0 : Math.max(entry.ante, entry.bigBlind) })
-                  }}
-                >
-                  <option value="none">None</option>
-                  <option value="traditional">Traditional ante</option>
-                  <option value="big-blind">Big Blind Ante</option>
-                </select>
-              </label>
-              <label className="structure-compact-field">
-                <span aria-hidden="true">Amount</span>
-                <input {...fieldErrorProps(entry.id, 'ante', issues)} aria-label="Ante" type="number" min="0" step="1" value={entry.ante} onChange={(event) => updateNumber('ante', event.target.value)} />
-                <FieldIssue entryId={entry.id} field="ante" issues={issues} />
-              </label>
-            </div>
+            <label className="structure-compact-field structure-small-blind-field">
+              <span aria-hidden="true">SB</span>
+              <input {...fieldErrorProps(entry.id, 'smallBlind', issues)} aria-label="Small blind" type="number" min="0" step="1" value={entry.smallBlind} onChange={(event) => updateNumber('smallBlind', event.target.value)} />
+              <FieldIssue entryId={entry.id} field="smallBlind" issues={issues} />
+            </label>
+            <label className="structure-compact-field structure-big-blind-field">
+              <span aria-hidden="true">BB</span>
+              <input {...fieldErrorProps(entry.id, 'bigBlind', issues)} aria-label="Big blind" type="number" min="1" step="1" value={entry.bigBlind} onChange={(event) => updateNumber('bigBlind', event.target.value)} />
+              <FieldIssue entryId={entry.id} field="bigBlind" issues={issues} />
+            </label>
+            <label className="structure-compact-field structure-ante-type-field">
+              <span aria-hidden="true">Ante type</span>
+              <select
+                aria-label="Ante type"
+                value={entry.anteType}
+                onChange={(event) => {
+                  const anteType = event.target.value as typeof entry.anteType
+                  onChange({ ...entry, anteType, ante: anteType === 'none' ? 0 : Math.max(entry.ante, entry.bigBlind) })
+                }}
+              >
+                <option value="none">None</option>
+                <option value="traditional">Traditional ante</option>
+                <option value="big-blind">Big Blind Ante</option>
+              </select>
+            </label>
+            <label className="structure-compact-field structure-ante-field">
+              <span aria-hidden="true">Ante</span>
+              <input {...fieldErrorProps(entry.id, 'ante', issues)} aria-label="Ante" type="number" min="0" step="1" value={entry.ante} onChange={(event) => updateNumber('ante', event.target.value)} />
+              <FieldIssue entryId={entry.id} field="ante" issues={issues} />
+            </label>
           </>
         ) : (
           <>

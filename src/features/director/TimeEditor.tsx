@@ -48,20 +48,10 @@ function TimedEditor() {
     setError(null)
   }
 
-  const adjustTime = (deltaMs: number) => {
-    dispatch({ type: 'ADJUST_TIME', deltaMs, now: Date.now() })
-    setDraft(null)
-    setError(null)
-  }
-
   return (
     <section className="director-card time-editor" aria-labelledby="time-editor-title">
       <div className="director-card-heading">
         <div><span>Clock</span><h3 id="time-editor-title">Edit remaining time</h3></div>
-        <div className="quick-time-actions">
-          <button onClick={() => adjustTime(-60_000)} aria-label="Subtract one minute">− 1 min</button>
-          <button onClick={() => adjustTime(60_000)} aria-label="Add one minute">+ 1 min</button>
-        </div>
       </div>
       <div className="time-input-row">
         <label>

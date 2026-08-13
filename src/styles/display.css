@@ -226,8 +226,8 @@ select:focus-visible {
   font-family: var(--font-numeric);
   font-size: clamp(2.5rem, 4.4vw, 5rem);
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  letter-spacing: -.045em;
+  font-weight: 500;
+  letter-spacing: -.015em;
   line-height: .95;
 }
 
@@ -283,8 +283,8 @@ select:focus-visible {
   font-size: clamp(7.5rem, 14.2vw, 16rem);
   font-stretch: condensed;
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  letter-spacing: -.075em;
+  font-weight: 400;
+  letter-spacing: 0;
   line-height: .74;
   text-align: center;
   text-shadow: 0 12px 52px rgb(0 0 0 / 58%);
@@ -369,8 +369,8 @@ select:focus-visible {
   font-family: var(--font-numeric);
   font-size: clamp(1.35rem, 2.2vw, 2.45rem);
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  letter-spacing: -.035em;
+  font-weight: 500;
+  letter-spacing: -.015em;
   text-overflow: ellipsis;
 }
 
@@ -399,13 +399,13 @@ select:focus-visible {
 
 .sponsor-strip {
   display: flex;
-  height: 2rem;
+  height: 3rem;
   flex: 0 0 auto;
   align-items: center;
-  gap: .75rem;
+  gap: 1rem;
   margin-top: .8rem;
   color: var(--slate-500);
-  font-size: .58rem;
+  font-size: .72rem;
   font-weight: 500;
   letter-spacing: .15em;
   text-transform: uppercase;
@@ -427,8 +427,8 @@ select:focus-visible {
 }
 
 .sponsor-marks--display .sponsor-logo-card {
-  width: 8.5rem;
-  height: 2.25rem;
+  width: 12rem;
+  height: 3rem;
 }
 
 .sponsor-logo-card--jane-street {
@@ -959,9 +959,9 @@ select:focus-visible {
   .club-logo { width: 3.2rem; height: 3.2rem; }
   .stage-content { padding-top: .75rem; }
   .clock { margin: .7rem 0 1rem; padding-bottom: .65rem; font-size: clamp(6.5rem, 12.2vw, 12rem); }
-  .sponsor-strip { height: 1.85rem; gap: .5rem; margin-top: .5rem; font-size: .5rem; }
+  .sponsor-strip { height: 2.7rem; gap: .85rem; margin-top: .5rem; font-size: .64rem; }
   .sponsor-logo-card { width: 5.5rem; height: 1.5rem; }
-  .sponsor-marks--display .sponsor-logo-card { width: 7.25rem; height: 1.85rem; }
+  .sponsor-marks--display .sponsor-logo-card { width: 10.5rem; height: 2.7rem; }
   .sponsor-logo-card--jane-street { padding: .14rem .28rem; }
   .structure-header { min-height: 5.6rem; }
   .structure-row { min-height: 3.25rem; }
@@ -1297,8 +1297,8 @@ select:focus-visible {
 }
 
 .sponsor-marks--info .sponsor-logo-card {
-  width: clamp(7.5rem, 11vw, 10rem);
-  height: clamp(2.1rem, 3.2vw, 2.8rem);
+  width: clamp(9rem, 14vw, 12.5rem);
+  height: clamp(2.4rem, 4vw, 3.3rem);
 }
 
 .sponsor-marks--info .sponsor-logo-card--jane-street {
@@ -1457,11 +1457,12 @@ select:focus-visible {
 
 .info-prize-list li {
   display: grid;
-  min-height: clamp(1.9rem, 4.2vh, 2.65rem);
+  min-height: clamp(2.5rem, 5.2vh, 3.25rem);
   grid-template-columns: minmax(2.75rem, .3fr) minmax(0, 1fr);
   align-items: center;
   border-top: 1px solid rgb(184 154 97 / 16%);
   padding: .18rem .25rem;
+  font-size: clamp(1.05rem, 1.35vw, 1.35rem);
 }
 
 .info-prize-list li:first-child {
@@ -1471,14 +1472,14 @@ select:focus-visible {
 .info-prize-rank {
   color: var(--orange-400);
   font-family: var(--font-numeric);
-  font-weight: 600;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
 
 .info-prize-value {
   color: var(--ivory-50);
   font-family: var(--font-numeric);
-  font-weight: 600;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
   text-align: right;
 }

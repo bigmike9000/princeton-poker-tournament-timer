@@ -112,7 +112,9 @@ export function StructureEditor() {
         <div className="structure-editor-columns" aria-hidden="true">
           <span>Level</span>
           <span>Minutes</span>
-          <span>Blinds</span>
+          <span>SB</span>
+          <span>BB</span>
+          <span>Ante type</span>
           <span>Ante</span>
           <span>Actions</span>
         </div>

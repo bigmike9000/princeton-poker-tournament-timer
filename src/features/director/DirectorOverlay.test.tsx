@@ -33,17 +33,14 @@ describe('DirectorOverlay', () => {
     expect(within(lockup as HTMLElement).getByRole('heading', { level: 1 })).toHaveTextContent('Tournament Director')
   })
 
-  it('shows the configured organization name in the director header', async () => {
+  it('keeps the club identity fixed and out of tournament editing', async () => {
     const user = userEvent.setup()
     render(<App />)
     await openDirector(user)
     await user.click(screen.getByRole('button', { name: 'Tournament' }))
 
-    await user.clear(screen.getByLabelText('Organization name'))
-    await user.type(screen.getByLabelText('Organization name'), 'Garden State Poker Society')
-    await user.click(screen.getByRole('button', { name: 'Apply tournament details' }))
-
-    expect(within(screen.getByRole('dialog')).getByText('Garden State Poker Society')).toBeVisible()
+    expect(screen.queryByLabelText('Organization name')).not.toBeInTheDocument()
+    expect(within(screen.getByRole('dialog')).getByText('PRINCETON POKER CLUB')).toBeVisible()
   })
 
   it('opens on Structure with integrated clock and reset controls', async () => {
@@ -108,7 +105,9 @@ describe('DirectorOverlay', () => {
     render(<App />)
     await openDirector(user)
 
-    await user.click(screen.getByRole('button', { name: 'Subtract one minute' }))
+    await user.clear(screen.getByLabelText('Minutes remaining'))
+    await user.type(screen.getByLabelText('Minutes remaining'), '11')
+    await user.click(screen.getByRole('button', { name: 'Apply time' }))
     expect(screen.getByRole('timer')).toHaveTextContent('11:00')
     await user.click(screen.getByRole('button', { name: 'Reset current level' }))
 
@@ -121,7 +120,9 @@ describe('DirectorOverlay', () => {
     const user = userEvent.setup()
     render(<App />)
     await openDirector(user)
-    await user.click(screen.getByRole('button', { name: 'Subtract one minute' }))
+    await user.clear(screen.getByLabelText('Minutes remaining'))
+    await user.type(screen.getByLabelText('Minutes remaining'), '11')
+    await user.click(screen.getByRole('button', { name: 'Apply time' }))
     await user.click(screen.getByRole('button', { name: 'Reset tournament' }))
 
     const confirmation = screen.getByRole('alertdialog', { name: 'Reset the entire tournament?' })
@@ -139,8 +140,11 @@ describe('DirectorOverlay', () => {
     await openDirector(user)
     await user.click(screen.getByRole('button', { name: 'Tournament' }))
 
-    expect(screen.getByText('Starting chips in play: 16,000')).toBeVisible()
-    expect(screen.getByText('Default allocation: 10 × 1 · 8 × 5 · 6 × 25 = 200')).toBeVisible()
+    expect(screen.queryByText('Starting chips in play: 16,000')).not.toBeInTheDocument()
+    expect(screen.queryByText('Default allocation: 10 × 1 · 8 × 5 · 6 × 25 = 200')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Organization name')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Chip denominations and starting stack')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('House notes')).not.toBeInTheDocument()
 
     await user.clear(screen.getByLabelText('Tournament name'))
     await user.type(screen.getByLabelText('Tournament name'), 'Fall Championship')
@@ -148,12 +152,16 @@ describe('DirectorOverlay', () => {
     await user.type(screen.getByLabelText('Starting player count'), '100')
     await user.clear(screen.getByLabelText('Starting chip stack'))
     await user.type(screen.getByLabelText('Starting chip stack'), '50000')
+    await user.clear(screen.getByLabelText('Prize structure'))
+    await user.type(screen.getByLabelText('Prize structure'), '1: 500\n2: 300\n3: 200')
     await user.click(screen.getByRole('button', { name: 'Apply tournament details' }))
 
     expect(screen.getByText('Fall Championship')).toBeVisible()
     expect(screen.getByText('80 / 100')).toBeVisible()
-    expect(screen.getByText('Starting chips in play: 5,000,000')).toBeVisible()
-    expect(screen.queryByText('Default allocation: 10 × 1 · 8 × 5 · 6 × 25 = 200')).not.toBeInTheDocument()
+    expect(screen.queryByText('Starting chips in play: 5,000,000')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Close Tournament Director' }))
+    await user.click(screen.getByRole('button', { name: 'Open tournament information' }))
+    expect(screen.getByRole('listitem', { name: '1 place prize, 500' })).toBeVisible()
   })
 
   it('returns focus only after the director background is no longer inert', async () => {
