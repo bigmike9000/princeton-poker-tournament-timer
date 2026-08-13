@@ -1,5 +1,5 @@
 import { useTournament } from '../../app/useTournament'
-import { ClubLogo } from '../../components/ClubLogo'
+import { ClubBrandLockup } from '../../components/ClubBrandLockup'
 import { isUntimedEntry } from '../../domain/structure'
 import { selectCurrentEntry, selectRemainingMs } from '../../state/selectors'
 import { BlindStructure } from './BlindStructure'
@@ -35,13 +35,13 @@ export function TournamentDisplay({
       <main className="display-grid">
         <section className="tournament-stage">
           <header className="brand-header">
-            <div className="club-mark">
-              <ClubLogo className="club-logo" size={64} />
-            </div>
-            <div className="brand-copy">
-              <p className="brand-organization">{state.configuration.organizationName}</p>
-              <h1>{state.configuration.tournamentName}</h1>
-            </div>
+            <ClubBrandLockup
+              className="brand-lockup--display"
+              logoClassName="club-logo"
+              logoSize={64}
+              organizationName={state.configuration.organizationName}
+              title={state.configuration.tournamentName}
+            />
             <div className={running ? 'status-pill status-pill--live' : 'status-pill'}>
               <i aria-hidden="true" />
               {running ? 'Clock running' : state.runtime.status === 'complete' ? 'Tournament complete' : 'Clock paused'}

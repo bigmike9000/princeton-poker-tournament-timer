@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTournament } from '../../app/useTournament'
-import { ClubLogo } from '../../components/ClubLogo'
+import { ClubBrandLockup } from '../../components/ClubBrandLockup'
 import {
   selectTournamentInformation,
   validateProjectorInformation,
@@ -89,14 +89,13 @@ export function InfoOverlay({ open, onClose, onAfterClose }: InfoOverlayProps) {
     >
       <article className="info-panel" onClick={(event) => event.stopPropagation()}>
         <header className="info-header">
-          <div className="info-brand">
-            <ClubLogo className="info-logo" size={52} />
-            <div>
-              <p>{state.configuration.organizationName}</p>
-              <h1 id="info-title">Tournament information</h1>
-              <h2>{state.configuration.tournamentName}</h2>
-            </div>
-          </div>
+          <ClubBrandLockup
+            className="info-brand"
+            logoClassName="info-logo"
+            organizationName={state.configuration.organizationName}
+            title="Tournament Info"
+            titleId="info-title"
+          />
           <button
             ref={closeRef}
             className="info-close"

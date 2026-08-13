@@ -4,6 +4,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { StrictMode } from 'react'
 import { App } from '../../app/App'
 import { TournamentProvider } from '../../app/TournamentProvider'
+import { createInitialState } from '../../domain/sampleStructure'
+import { saveSnapshot } from '../../persistence/snapshot'
 import { DirectorOverlay } from './DirectorOverlay'
 
 async function openDirector(user: ReturnType<typeof userEvent.setup>) {
@@ -12,12 +14,23 @@ async function openDirector(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('DirectorOverlay', () => {
-  it('shows the Princeton Poker Club logo when open', async () => {
+  it('renders the Director header as a shared semantic lockup', async () => {
+    const state = createInitialState()
+    state.configuration.organizationName = 'Princeton Poker Club'
+    saveSnapshot(localStorage, state, Date.now())
+
     const user = userEvent.setup()
     render(<App />)
     await openDirector(user)
 
-    expect(within(screen.getByRole('dialog')).getByRole('img', { name: 'Princeton Poker Club logo' })).toBeVisible()
+    const dialog = screen.getByRole('dialog')
+    const lockup = dialog.querySelector('.club-brand-lockup')
+
+    expect(lockup).not.toBeNull()
+    expect(lockup?.firstElementChild).toHaveAttribute('alt', 'Princeton Poker Club logo')
+    expect(within(lockup as HTMLElement).getByText('Princeton Poker Club')).toHaveClass('club-brand-organization')
+    expect(within(lockup as HTMLElement).getAllByRole('heading', { level: 1 })).toHaveLength(1)
+    expect(within(lockup as HTMLElement).getByRole('heading', { level: 1 })).toHaveTextContent('Tournament Director')
   })
 
   it('shows the configured organization name in the director header', async () => {

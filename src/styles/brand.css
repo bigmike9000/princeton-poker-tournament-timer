@@ -1,0 +1,84 @@
+.club-brand-lockup {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: .9rem;
+}
+
+.club-brand-lockup > img {
+  display: block;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.club-brand-lockup > div {
+  min-width: 0;
+}
+
+.club-brand-lockup .club-brand-organization,
+.club-brand-lockup h1 {
+  margin: 0;
+}
+
+.club-brand-lockup .club-brand-organization {
+  color: var(--brass-400);
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+
+.club-brand-lockup h1 {
+  margin-top: .16rem;
+  color: var(--ivory-50);
+  font-family: var(--font-heritage);
+  font-weight: 600;
+  letter-spacing: .025em;
+}
+
+.club-brand-lockup.brand-lockup--display .club-brand-organization {
+  color: var(--ivory-50);
+  font-family: var(--font-heritage);
+  font-size: clamp(1.05rem, 1.4vw, 1.48rem);
+  font-weight: 700;
+  letter-spacing: .025em;
+}
+
+.club-brand-lockup.brand-lockup--display h1 {
+  overflow: hidden;
+  color: var(--slate-300);
+  font-size: clamp(.72rem, .86vw, .9rem);
+  font-weight: 650;
+  letter-spacing: .12em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.club-brand-lockup.info-brand {
+  gap: .95rem;
+}
+
+.club-brand-lockup.info-brand .club-brand-organization {
+  color: var(--orange-400);
+  font-weight: 850;
+  letter-spacing: .16em;
+}
+
+.club-brand-lockup.info-brand h1 {
+  margin-top: .12rem;
+  font-size: clamp(1.2rem, 2vw, 1.65rem);
+  letter-spacing: -.015em;
+}
+
+.club-brand-lockup.director-brand h1 {
+  font-size: 1.15rem;
+}
+
+@media (max-width: 640px) {
+  .club-brand-lockup.brand-lockup--display .club-brand-organization { font-size: 1rem; }
+  .club-brand-lockup.brand-lockup--display h1 { font-size: .66rem; }
+  .club-brand-lockup.info-brand { gap: .45rem; }
+  .club-brand-lockup.info-brand .club-brand-organization { font-size: .54rem; }
+  .club-brand-lockup.info-brand h1 { font-size: .92rem; }
+}

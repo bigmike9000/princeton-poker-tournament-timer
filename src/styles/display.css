@@ -121,59 +121,14 @@ select:focus-visible {
   content: '';
 }
 
-.club-mark {
-  display: grid;
-  width: 4.7rem;
-  height: 4.7rem;
-  flex: 0 0 auto;
-  place-items: center;
-  border: 1px solid rgb(184 154 97 / 58%);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle, rgb(217 121 43 / 12%), transparent 66%),
-    var(--ink-950);
-  box-shadow:
-    0 0 0 3px rgb(7 7 5 / 78%),
-    0 0 0 4px rgb(184 154 97 / 17%),
-    inset 0 0 1.4rem rgb(217 121 43 / 12%);
-}
-
 .club-logo {
-  display: block;
   width: 4rem;
   height: 4rem;
-  object-fit: contain;
 }
 
-.brand-copy {
-  min-width: 0;
-}
-
-.brand-copy p,
-.brand-copy h1,
 .eyebrow,
 .structure-header h2 {
   margin: 0;
-}
-
-.brand-copy .brand-organization {
-  color: var(--ivory-50);
-  font-family: var(--font-heritage);
-  font-size: clamp(1.05rem, 1.4vw, 1.48rem);
-  font-weight: 700;
-  letter-spacing: .025em;
-}
-
-.brand-copy h1 {
-  margin-top: .22rem;
-  overflow: hidden;
-  color: var(--slate-300);
-  font-size: clamp(.72rem, .86vw, .9rem);
-  font-weight: 650;
-  letter-spacing: .12em;
-  text-overflow: ellipsis;
-  text-transform: uppercase;
-  white-space: nowrap;
 }
 
 .status-pill {
@@ -899,7 +854,6 @@ select:focus-visible {
   .tournament-stage { padding-top: 1rem; }
   .tournament-stage::after { opacity: .34; }
   .brand-header { min-height: 4.35rem; padding-bottom: .8rem; }
-  .club-mark { width: 3.7rem; height: 3.7rem; }
   .club-logo { width: 3.2rem; height: 3.2rem; }
   .stage-content { padding-top: .75rem; }
   .clock { margin: .7rem 0 1rem; padding-bottom: .65rem; font-size: clamp(6.5rem, 12.2vw, 12rem); }
@@ -913,7 +867,6 @@ select:focus-visible {
 @media (max-width: 1100px) {
   .display-grid { grid-template-columns: minmax(0, 1.45fr) minmax(19rem, .7fr); }
   .tournament-stage { padding-right: 1.6rem; padding-left: 1.6rem; }
-  .club-mark { width: 4.2rem; height: 4.2rem; }
   .club-logo { width: 3.6rem; height: 3.6rem; }
   .control-rail { gap: .55rem; }
   .control-button,
@@ -941,10 +894,7 @@ select:focus-visible {
     min-height: 0;
     gap: .8rem;
   }
-  .club-mark { width: 3.75rem; height: 3.75rem; }
   .club-logo { width: 3.25rem; height: 3.25rem; }
-  .brand-copy .brand-organization { font-size: 1rem; }
-  .brand-copy h1 { font-size: .66rem; }
   .status-pill { grid-column: 1 / -1; justify-self: start; margin-left: 4.55rem; white-space: normal; }
   .current-level,
   .current-level--break { grid-template-columns: 1fr; }
@@ -1016,25 +966,12 @@ select:focus-visible {
   box-shadow: 0 10px 30px rgb(0 0 0 / 20%);
 }
 
-.info-brand {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-  gap: .95rem;
-}
-
 .info-logo {
-  display: block;
   width: 3.25rem;
   height: 3.25rem;
-  flex: 0 0 auto;
-  object-fit: contain;
   filter: drop-shadow(0 6px 14px rgb(0 0 0 / 46%));
 }
 
-.info-brand p,
-.info-brand h1,
-.info-brand h2,
 .info-card h2,
 .info-card h3,
 .info-kicker,
@@ -1042,34 +979,12 @@ select:focus-visible {
   margin: 0;
 }
 
-.info-brand p,
 .info-kicker {
   color: var(--orange-400);
   font-size: .62rem;
   font-weight: 850;
   letter-spacing: .16em;
   text-transform: uppercase;
-}
-
-.info-brand h1 {
-  margin-top: .12rem;
-  color: var(--ivory-50);
-  font-family: var(--font-heritage);
-  font-size: clamp(1.2rem, 2vw, 1.65rem);
-  font-weight: 600;
-  letter-spacing: -.015em;
-}
-
-.info-brand h2 {
-  margin-top: .12rem;
-  overflow: hidden;
-  color: var(--slate-400);
-  font-size: .67rem;
-  font-weight: 750;
-  letter-spacing: .08em;
-  text-overflow: ellipsis;
-  text-transform: uppercase;
-  white-space: nowrap;
 }
 
 .info-close {
@@ -1603,11 +1518,7 @@ select:focus-visible {
   .info-overlay { padding: 0; }
   .info-panel { width: 100%; height: 100dvh; border: 0; border-top: 2px solid var(--orange-500); }
   .info-header { gap: .3rem .55rem; padding: .4rem .5rem .3rem; }
-  .info-brand { gap: .45rem; }
   .info-logo { width: 2.1rem; height: 2.1rem; }
-  .info-brand p { font-size: .54rem; }
-  .info-brand h1 { font-size: .92rem; }
-  .info-brand h2 { max-width: 11rem; font-size: .5rem; }
   .info-close { min-width: 4.5rem; min-height: 2.75rem; padding-right: .45rem; padding-left: .55rem; }
   .info-close span { margin-left: .25rem; }
   .info-navigation { gap: .4rem; }

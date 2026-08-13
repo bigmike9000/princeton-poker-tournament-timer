@@ -29,7 +29,7 @@ function openInfo() {
   const trigger = screen.getByRole('button', { name: 'Open tournament information' })
   fireEvent.click(trigger)
   return {
-    dialog: screen.getByRole('dialog', { name: 'Tournament information' }),
+    dialog: screen.getByRole('dialog', { name: 'Tournament Info' }),
     trigger,
   }
 }
@@ -65,6 +65,24 @@ describe('InfoOverlay', () => {
     } else {
       Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', originalScrollIntoView)
     }
+  })
+
+  it('renders the Info header as a shared semantic lockup without the tournament name', () => {
+    const state = createInitialState()
+    state.configuration.organizationName = 'Princeton Poker Club'
+    state.configuration.tournamentName = 'Test 1'
+    saveSnapshot(localStorage, state, Date.now())
+
+    render(<App />)
+    const { dialog } = openInfo()
+    const lockup = dialog.querySelector('.club-brand-lockup')
+
+    expect(lockup).not.toBeNull()
+    expect(lockup?.firstElementChild).toHaveAttribute('alt', 'Princeton Poker Club logo')
+    expect(within(lockup as HTMLElement).getByText('Princeton Poker Club')).toHaveClass('club-brand-organization')
+    expect(within(lockup as HTMLElement).getAllByRole('heading', { level: 1 })).toHaveLength(1)
+    expect(within(lockup as HTMLElement).getByRole('heading', { level: 1 })).toHaveTextContent('Tournament Info')
+    expect(within(lockup as HTMLElement).queryByText('Test 1')).not.toBeInTheDocument()
   })
 
   it('keeps essential projector information fluid and above readable desktop floors', () => {
@@ -134,7 +152,7 @@ describe('InfoOverlay', () => {
     const overlay = within(dialog)
 
     expect(overlay.getByRole('img', { name: 'Princeton Poker Club logo' })).toBeVisible()
-    expect(overlay.getByRole('heading', { name: 'Princeton Poker Club Standard' })).toBeVisible()
+    expect(overlay.getByRole('heading', { name: 'Tournament Info' })).toBeVisible()
     expect(overlay.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true')
     expect(overlay.getByText('Page 1 of 2')).toBeVisible()
     expect(overlay.getByRole('heading', { name: 'Chip denominations' })).toBeVisible()
@@ -377,7 +395,7 @@ describe('InfoOverlay', () => {
       render(<App />)
       const trigger = screen.getByRole('button', { name: 'Open tournament information' })
       await user.click(trigger)
-      const dialog = screen.getByRole('dialog', { name: 'Tournament information' })
+      const dialog = screen.getByRole('dialog', { name: 'Tournament Info' })
       const close = within(dialog).getByRole('button', { name: 'Close tournament information' })
       const structureTab = within(dialog).getByRole('tab', { name: 'Blind structure' })
 
@@ -391,7 +409,7 @@ describe('InfoOverlay', () => {
       expect(close).toHaveFocus()
       fireEvent.keyDown(close, { key: 'Escape' })
 
-      expect(screen.queryByRole('dialog', { name: 'Tournament information' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('dialog', { name: 'Tournament Info' })).not.toBeInTheDocument()
       expect(document.querySelector('.app-background')).not.toHaveAttribute('inert')
       expect(trigger).toHaveFocus()
     } finally {
@@ -419,9 +437,9 @@ describe('InfoOverlay', () => {
     expect(panel).not.toBeNull()
 
     fireEvent.click(panel as HTMLElement)
-    expect(screen.getByRole('dialog', { name: 'Tournament information' })).toBeVisible()
+    expect(screen.getByRole('dialog', { name: 'Tournament Info' })).toBeVisible()
     fireEvent.click(dialog)
-    expect(screen.queryByRole('dialog', { name: 'Tournament information' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('dialog', { name: 'Tournament Info' })).not.toBeInTheDocument()
   })
 
   it('blocks clock shortcuts and prevents Info and Director from coexisting', () => {
@@ -430,7 +448,7 @@ describe('InfoOverlay', () => {
     const directorTrigger = screen.getByRole('button', { name: 'Open Tournament Director' })
 
     fireEvent.click(infoTrigger)
-    const infoDialog = screen.getByRole('dialog', { name: 'Tournament information' })
+    const infoDialog = screen.getByRole('dialog', { name: 'Tournament Info' })
     fireEvent.click(within(infoDialog).getByRole('tab', { name: 'Blind structure' }))
     const structure = within(infoDialog).getByRole('list', { name: 'Tournament blind structure' })
     const firstEntry = within(structure).getAllByRole('listitem')[0]
@@ -447,7 +465,7 @@ describe('InfoOverlay', () => {
     fireEvent.click(directorTrigger)
     fireEvent.click(infoTrigger)
     expect(screen.getByRole('dialog', { name: 'Tournament Director' })).toBeVisible()
-    expect(screen.queryByRole('dialog', { name: 'Tournament information' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('dialog', { name: 'Tournament Info' })).not.toBeInTheDocument()
   })
 
   it('does not report a close during StrictMode effect rehearsal', () => {

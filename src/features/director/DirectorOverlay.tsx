@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTournament } from '../../app/useTournament'
-import { ClubLogo } from '../../components/ClubLogo'
+import { ClubBrandLockup } from '../../components/ClubBrandLockup'
 import { DirectorSettings } from './DirectorSettings'
 import { PresetManager } from './PresetManager'
 import { StructureEditor } from './StructureEditor'
@@ -80,7 +80,14 @@ export function DirectorOverlay({ open, onClose, onAfterClose }: DirectorOverlay
       }}
     >
       <header className="director-header">
-        <div className="director-brand"><ClubLogo className="director-logo" size={46} /><div><p>{state.configuration.organizationName}</p><h1 id="director-title">Tournament Director</h1></div></div>
+        <ClubBrandLockup
+          className="director-brand"
+          logoClassName="director-logo"
+          logoSize={46}
+          organizationName={state.configuration.organizationName}
+          title="Tournament Director"
+          titleId="director-title"
+        />
         <div className="director-header-note"><i aria-hidden="true" />Changes update the live display</div>
         <button ref={closeRef} className="director-close" onClick={requestClose} aria-label="Close Tournament Director">Close <span aria-hidden="true">×</span></button>
       </header>

@@ -28,6 +28,22 @@ describe('TournamentDisplay', () => {
     expect(screen.getByRole('img', { name: 'Princeton Poker Club logo' })).toBeVisible()
   })
 
+  it('renders the main brand as a shared semantic lockup', () => {
+    const state = createInitialState()
+    state.configuration.organizationName = 'Princeton Poker Club'
+    state.configuration.tournamentName = 'Test 1'
+    saveSnapshot(localStorage, state, Date.now())
+
+    const { container } = renderDisplay()
+    const lockup = container.querySelector('.club-brand-lockup')
+
+    expect(lockup).not.toBeNull()
+    expect(lockup?.firstElementChild).toHaveAttribute('alt', 'Princeton Poker Club logo')
+    expect(within(lockup as HTMLElement).getByText('Princeton Poker Club')).toHaveClass('club-brand-organization')
+    expect(within(lockup as HTMLElement).getAllByRole('heading', { level: 1 })).toHaveLength(1)
+    expect(within(lockup as HTMLElement).getByRole('heading', { level: 1 })).toHaveTextContent('Test 1')
+  })
+
   it('renders the default sponsor marks in the public footer', () => {
     renderDisplay()
 
