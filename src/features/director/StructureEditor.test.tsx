@@ -405,7 +405,19 @@ describe('Structure editor responsive CSS', () => {
     expect(collapseStart).toBeLessThan(mediumStart)
     expect(cssRule(collapseCss, '.director-layout')).toMatch(/grid-template-columns:\s*1fr/)
     expect(cssRule(collapseCss, '.director-nav')).toMatch(/flex-direction:\s*row/)
-    expect(cssRule(collapseCss, '.director-nav')).toMatch(/overflow-x:\s*auto/)
+  })
+
+  it('fits all four Director tabs at 390px without horizontal navigation clipping', () => {
+    const collapseStart = directorCss.indexOf('@media (max-width: 864px)')
+    const collapseCss = collapseStart < 0
+      ? ''
+      : directorCss.slice(collapseStart, directorCss.indexOf('.structure-editor {', collapseStart))
+    const navRule = cssRule(collapseCss, '.director-nav')
+    const tabRule = cssRule(collapseCss, '.director-tab')
+
+    expect(navRule).toMatch(/overflow-x:\s*hidden/)
+    expect(tabRule).toMatch(/flex:\s*1 1 0/)
+    expect(tabRule).toMatch(/min-width:\s*0/)
   })
 
   it('reduces the five-column groups before they can overflow the Director content column', () => {
