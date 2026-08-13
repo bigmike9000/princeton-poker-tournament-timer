@@ -5,6 +5,7 @@ import { TournamentProvider } from '../../app/TournamentProvider'
 import { createInitialState } from '../../domain/sampleStructure'
 import { entryDurationMs } from '../../domain/structure'
 import { saveSnapshot } from '../../persistence/snapshot'
+import displayCss from '../../styles/display.css?raw'
 import { TournamentDisplay } from './TournamentDisplay'
 
 function renderDisplay(onOpenDirector = vi.fn(), onOpenInfo = vi.fn()) {
@@ -19,6 +20,11 @@ function renderDisplay(onOpenDirector = vi.fn(), onOpenInfo = vi.fn()) {
       />
     </TournamentProvider>,
   )
+}
+
+function cssRule(css: string, selector: string) {
+  const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return css.match(new RegExp(`${escapedSelector}\\s*\\{([^}]*)\\}`))?.[1] ?? ''
 }
 
 describe('TournamentDisplay', () => {
@@ -139,6 +145,14 @@ describe('TournamentDisplay', () => {
     expect(screen.getByRole('region', { name: 'Current poker level' })).toHaveTextContent('LEVEL 17')
     expect(screen.getByRole('region', { name: 'Current poker level' })).not.toHaveTextContent('Final level')
     expect(screen.getByRole('timer')).toHaveTextContent('UNTIL END')
+  })
+
+  it('keeps the public blind schedule compact without shrinking its buttons below their row height', () => {
+    expect(cssRule(displayCss, '.structure-header')).toMatch(/min-height:\s*5\.6rem/)
+    expect(cssRule(displayCss, '.structure-row')).toMatch(/min-height:\s*3\.25rem/)
+    expect(cssRule(displayCss, '.structure-row--break')).toMatch(/min-height:\s*2\.75rem/)
+    expect(cssRule(displayCss, '.structure-row-button')).toMatch(/min-height:\s*inherit/)
+    expect(cssRule(displayCss, '.structure-row-button')).toMatch(/padding:\s*\.4rem\s+\.75rem/)
   })
 
   it('runs safe main-display controls and opens the director overlay', () => {
