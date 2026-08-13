@@ -76,6 +76,9 @@ describe('TournamentDisplay', () => {
 
   it('renders a break and previews the next poker level', () => {
     const state = createInitialState()
+    const savedBreak = state.structure[5]
+    if (savedBreak?.kind !== 'break') throw new Error('Missing first break')
+    savedBreak.label = 'Chip up to 5s'
     state.runtime.currentEntryIndex = 5
     state.runtime.remainingMs = entryDurationMs(state.structure[5]) ?? 0
     state.runtime.status = 'paused'
@@ -83,10 +86,31 @@ describe('TournamentDisplay', () => {
 
     renderDisplay()
 
-    expect(screen.getAllByText('BREAK · 10 MIN').length).toBeGreaterThan(0)
-    expect(screen.getByRole('region', { name: 'Current break' })).toHaveTextContent('Chip up to 5s')
+    const currentBreak = within(screen.getByRole('region', { name: 'Current break' }))
+    expect(currentBreak.getByRole('heading', { name: 'BREAK' })).toBeVisible()
+    expect(currentBreak.queryByText('BREAK · 10 MIN')).not.toBeInTheDocument()
+    expect(currentBreak.getByText('Count and stack white chips in stacks of 10')).toBeVisible()
+    const schedule = within(screen.getByRole('complementary', { name: 'Blind Structure' }))
+    const scheduledBreak = schedule.getByRole('button', {
+      name: 'Break, 10 min, Count and stack white chips in stacks of 10',
+    })
+    expect(within(scheduledBreak).getByText('BREAK · 10 MIN')).toBeVisible()
     expect(screen.getByText(/Next: Level 6/)).toBeVisible()
     expect(screen.getAllByText(/10 \/ 20/).length).toBeGreaterThan(0)
+  })
+
+  it('shows the red-chip instruction during the second bundled break', () => {
+    const state = createInitialState()
+    state.runtime.currentEntryIndex = 11
+    state.runtime.remainingMs = entryDurationMs(state.structure[11]) ?? 0
+    state.runtime.status = 'paused'
+    saveSnapshot(localStorage, state, Date.now())
+
+    renderDisplay()
+
+    const currentBreak = within(screen.getByRole('region', { name: 'Current break' }))
+    expect(currentBreak.getByRole('heading', { name: 'BREAK' })).toBeVisible()
+    expect(currentBreak.getByText('Count and stack red chips')).toBeVisible()
   })
 
   it('renders a generic break label once and opts its current schedule row into shortcuts', () => {
@@ -100,8 +124,8 @@ describe('TournamentDisplay', () => {
     renderDisplay()
 
     const currentBreak = within(screen.getByRole('region', { name: 'Current break' }))
-    expect(currentBreak.getAllByText('BREAK · 10 MIN')).toHaveLength(1)
-    expect(currentBreak.queryByText('Break', { exact: true })).not.toBeInTheDocument()
+    expect(currentBreak.getByRole('heading', { name: 'BREAK' })).toBeVisible()
+    expect(currentBreak.queryByText('BREAK · 10 MIN')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Break, 10 min' })).toHaveAttribute('data-tournament-shortcuts', 'true')
   })
 
@@ -138,11 +162,13 @@ describe('TournamentDisplay', () => {
     renderDisplay()
     const schedule = screen.getByRole('complementary', { name: 'Blind Structure' })
 
-    expect(within(schedule).getByText(/Chip up to 5s/)).toBeVisible()
-    expect(within(schedule).getByText(/Chip up to 25s and 100s/)).toBeVisible()
+    expect(within(schedule).getByText(/Count and stack white chips in stacks of 10/)).toBeVisible()
+    expect(within(schedule).getByText(/Count and stack red chips/)).toBeVisible()
     expect(within(schedule).queryByText('Director-only final table setup')).not.toBeInTheDocument()
     expect(within(schedule).queryByRole('button', { name: /Director-only final table setup/ })).not.toBeInTheDocument()
-    expect(within(schedule).getByRole('button', { name: 'Break, 10 min, Chip up to 5s' })).toBeVisible()
+    expect(within(schedule).getByRole('button', {
+      name: 'Break, 10 min, Count and stack white chips in stacks of 10',
+    })).toBeVisible()
     expect(within(schedule).getByRole('button', {
       name: 'Level 13 100 / 200, BIG BLIND ANTE: 200, 15 min',
     })).toBeVisible()

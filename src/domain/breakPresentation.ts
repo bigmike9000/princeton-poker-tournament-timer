@@ -7,6 +7,11 @@ export interface BreakPresentation {
   accessibleLabel: string
 }
 
+const formerBundledMessages: Readonly<Record<string, string>> = {
+  'Chip up to 5s': 'Count and stack white chips in stacks of 10',
+  'Chip up to 25s and 100s': 'Count and stack red chips',
+}
+
 function normalized(value: string): string {
   return value.trim().toLocaleLowerCase().replace(/[—–-]/g, ' ').replace(/[·,:]/g, ' ').replace(/\s+/g, ' ')
 }
@@ -14,7 +19,8 @@ function normalized(value: string): string {
 export function breakPresentation(entry: BreakLevel): BreakPresentation {
   const duration = durationLabel(entry)
   const heading = `BREAK · ${duration.toLocaleUpperCase()}`
-  const candidate = entry.label.trim()
+  const savedLabel = entry.label.trim()
+  const candidate = formerBundledMessages[savedLabel] ?? savedLabel
   const generic = normalized(candidate)
   const repetitions = new Set([
     '',

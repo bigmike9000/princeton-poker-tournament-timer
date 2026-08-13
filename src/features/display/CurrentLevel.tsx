@@ -18,7 +18,7 @@ export function CurrentLevel({ state }: { state: TournamentState }) {
     return (
       <section className="current-level current-level--break" aria-label="Current break">
         <p className="eyebrow eyebrow--accent">Tournament break</p>
-        <h2 className="level-heading">{presentation.heading}</h2>
+        <h2 className="level-heading">BREAK</h2>
         {presentation.subtitle && <p className="current-level-note current-level-note--break">{presentation.subtitle}</p>}
         {nextLevel && nextNumber !== null ? (
           <div className="next-level-card">

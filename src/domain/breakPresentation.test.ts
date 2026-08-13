@@ -11,11 +11,22 @@ describe('breakPresentation', () => {
     }),
   )
 
-  it('retains operational chip-up copy once', () => {
-    expect(breakPresentation({ id: 'break', kind: 'break', durationSeconds: 600, label: 'Chip up to 5s' })).toEqual({
+  it.each([
+    ['Chip up to 5s', 'Count and stack white chips in stacks of 10'],
+    ['Chip up to 25s and 100s', 'Count and stack red chips'],
+  ])('updates former bundled instruction %j for saved tournaments', (label, subtitle) => {
+    expect(breakPresentation({ id: 'break', kind: 'break', durationSeconds: 600, label })).toEqual({
       heading: 'BREAK · 10 MIN',
-      subtitle: 'Chip up to 5s',
-      accessibleLabel: 'Break, 10 min, Chip up to 5s',
+      subtitle,
+      accessibleLabel: `Break, 10 min, ${subtitle}`,
+    })
+  })
+
+  it('retains customized operational copy once', () => {
+    expect(breakPresentation({ id: 'break', kind: 'break', durationSeconds: 600, label: 'Color up blue chips' })).toEqual({
+      heading: 'BREAK · 10 MIN',
+      subtitle: 'Color up blue chips',
+      accessibleLabel: 'Break, 10 min, Color up blue chips',
     })
   })
 })
