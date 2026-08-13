@@ -186,7 +186,7 @@ describe('preset repository', () => {
     expect(presets.slice(1)).toEqual([custom])
   })
 
-  it('strips obsolete bundled notes when an existing preset is read or loaded', () => {
+  it('preserves every saved level note exactly when a custom preset is listed, loaded, or duplicated', () => {
     const structure = structuredClone(sampleStructure)
     setStructureNote(structure, 'level-6', 'BB ante begins')
     setStructureNote(structure, 'level-13', 'Final table target · chip up to 100s and 500s')
@@ -200,16 +200,18 @@ describe('preset repository', () => {
     })
     localStorage.setItem(PRESETS_KEY, JSON.stringify([persisted]))
 
-    const repository = createPresetRepository(localStorage)
+    const repository = createPresetRepository(localStorage, () => Date.parse('2026-08-12T12:00:00.000Z'), () => 'saved-with-old-notes-copy')
     const listed = repository.list().find((preset) => preset.id === persisted.id)!
     const loaded = repository.load(persisted.id)
+    const duplicated = repository.duplicate(persisted.id, 'Saved notes copy')
 
-    for (const migrated of [listed.structure, loaded.structure]) {
-      expect(structureNote(migrated, 'level-6')).toBeUndefined()
-      expect(structureNote(migrated, 'level-13')).toBeUndefined()
-      expect(structureNote(migrated, 'level-15')).toBeUndefined()
-      expect(structureNote(migrated, 'level-17')).toBeUndefined()
-      expect(structureNote(migrated, 'level-7')).toBe('Custom note to preserve')
+    for (const preserved of [listed.structure, loaded.structure, duplicated.structure]) {
+      expect(preserved).toEqual(structure)
+      expect(structureNote(preserved, 'level-6')).toBe('BB ante begins')
+      expect(structureNote(preserved, 'level-13')).toBe('Final table target · chip up to 100s and 500s')
+      expect(structureNote(preserved, 'level-15')).toBe('Expected finish')
+      expect(structureNote(preserved, 'level-17')).toBe('Final level')
+      expect(structureNote(preserved, 'level-7')).toBe('Custom note to preserve')
     }
   })
 

@@ -54,7 +54,6 @@ export function InfoStructure({ state }: InfoStructureProps) {
           blinds,
           ante,
           duration,
-          entry.note,
         ].filter(Boolean).join(', ')
 
         return (
@@ -74,7 +73,6 @@ export function InfoStructure({ state }: InfoStructureProps) {
             <strong>{blinds}</strong>
             <span className="info-entry-ante">{ante}</span>
             <span className="info-entry-duration">{duration}</span>
-            {entry.note && <small>{entry.note}</small>}
           </li>
         )
       })}

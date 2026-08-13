@@ -217,6 +217,41 @@ describe('InfoOverlay', () => {
     expect(overlay.queryByText('Hidden house note 1')).not.toBeInTheDocument()
   })
 
+  it('keeps the fixed projector layout when only hidden chip lines exceed the raw editor budget', () => {
+    const state = createInitialState()
+    state.configuration.startingStack = 50_000
+    state.information = {
+      chipLines: [
+        `Starting stack: ${'9'.repeat(140)}`,
+        '10 × 1-value chips',
+        '8 × 5-value chips',
+        '6 × 25-value chips',
+        'Starting stack: 200 chips',
+        '10 × 1-value chips',
+        '20 × 100-value chips',
+      ],
+      prizeLines: ['1: 300'],
+      houseNotes: ['Director-only note'],
+    }
+    saveSnapshot(localStorage, state, Date.now())
+
+    render(<App />)
+    const { dialog } = openInfo()
+    const overlay = within(dialog)
+    const overview = overlay.getByRole('tabpanel')
+    const chips = overlay.getByRole('heading', { name: 'Chip denominations' }).closest('section')
+
+    expect(overview).toHaveClass('info-page--projector-safe')
+    expect(overview).not.toHaveClass('info-page--legacy-oversize')
+    expect(overlay.queryByText('Legacy information exceeds projector layout')).not.toBeInTheDocument()
+    expect(chips).not.toBeNull()
+    expect(within(chips as HTMLElement).getByRole('group', { name: '10 white 1-value chips' })).toBeVisible()
+    expect(within(chips as HTMLElement).getByText('20 × 100-value chips')).toBeVisible()
+    expect(within(chips as HTMLElement).getByText('50,000')).toBeVisible()
+    expect(within(chips as HTMLElement).queryByText(/^Starting stack:/)).not.toBeInTheDocument()
+    expect(within(chips as HTMLElement).queryByText('10 × 1-value chips')).not.toBeInTheDocument()
+  })
+
   it('warns about oversize public chips and keeps every legacy chip line reachable', () => {
     const state = createInitialState()
     state.information = {
@@ -373,6 +408,11 @@ describe('InfoOverlay', () => {
 
   it('shows all structure entries in two ordered columns with concise shared break copy', async () => {
     const user = userEvent.setup()
+    const state = createInitialState()
+    const notedLevel = state.structure.find((entry) => entry.id === 'level-13')
+    if (notedLevel?.kind !== 'level') throw new Error('Missing test level')
+    notedLevel.note = 'Director-only final table setup'
+    saveSnapshot(localStorage, state, Date.now())
 
     render(<App />)
     const { dialog } = openInfo()
@@ -416,10 +456,8 @@ describe('InfoOverlay', () => {
     expect(entries[18]).toHaveTextContent('500 / 1,000')
     expect(entries[18]).toHaveTextContent('BBA 1,000')
     expect(entries[18]).toHaveTextContent('Until end')
-    expect(structure).not.toHaveTextContent('BB ante begins')
-    expect(structure).not.toHaveTextContent('Final table target')
-    expect(structure).not.toHaveTextContent('Expected finish')
-    expect(structure).not.toHaveTextContent('Final level')
+    expect(structure).not.toHaveTextContent('Director-only final table setup')
+    expect(entries[14]).not.toHaveAccessibleName(/Director-only final table setup/)
     expect(scrollIntoView).not.toHaveBeenCalled()
   })
 

@@ -1,5 +1,6 @@
 import { formatChips } from '../../domain/calculations'
 import type { TournamentState } from '../../domain/types'
+import { selectSupplementalChipLines } from './selectSupplementalChipLines'
 
 const CHIPS = [
   { value: 1, color: 'White', quantity: 10, className: 'chip--white' },
@@ -7,23 +8,13 @@ const CHIPS = [
   { value: 25, color: 'Green', quantity: 6, className: 'chip--green' },
 ] as const
 
-const CANONICAL_LINE_PATTERNS = [
-  /^starting stack\s*:/i,
-  /^10\s*×\s*1-value(?:\s+chips)?\s*$/i,
-  /^8\s*×\s*5-value(?:\s+chips)?\s*$/i,
-  /^6\s*×\s*25-value(?:\s+chips)?\s*$/i,
-]
-
 interface ChipDenominationsProps {
   state: TournamentState
   chipLines: readonly string[]
 }
 
 export function ChipDenominations({ state, chipLines }: ChipDenominationsProps) {
-  const supplementalLines = chipLines.filter((line) => {
-    const trimmed = line.trim()
-    return !CANONICAL_LINE_PATTERNS.some((pattern) => pattern.test(trimmed))
-  })
+  const supplementalLines = selectSupplementalChipLines(chipLines)
   const { startingPlayers, startingStack } = state.configuration
 
   return (

@@ -135,7 +135,7 @@ describe('snapshot persistence', () => {
     expect(restored.state.structure.at(-1)?.durationSeconds).toBeNull()
   })
 
-  it('removes obsolete bundled level notes from an existing saved tournament', () => {
+  it('preserves every saved level note exactly when loading an existing tournament', () => {
     const state = createInitialState()
     setLevelNote(state, 'level-6', 'BB ante begins')
     setLevelNote(state, 'level-13', 'Final table target · chip up to 100s and 500s')
@@ -147,10 +147,11 @@ describe('snapshot persistence', () => {
     const restored = loadSnapshot(localStorage, 1_000)
 
     expect(restored.recovered).toBe(false)
-    expect(noteFor(restored.state, 'level-6')).toBeUndefined()
-    expect(noteFor(restored.state, 'level-13')).toBeUndefined()
-    expect(noteFor(restored.state, 'level-15')).toBeUndefined()
-    expect(noteFor(restored.state, 'level-17')).toBeUndefined()
+    expect(restored.state.structure).toEqual(state.structure)
+    expect(noteFor(restored.state, 'level-6')).toBe('BB ante begins')
+    expect(noteFor(restored.state, 'level-13')).toBe('Final table target · chip up to 100s and 500s')
+    expect(noteFor(restored.state, 'level-15')).toBe('Expected finish')
+    expect(noteFor(restored.state, 'level-17')).toBe('Final level')
     expect(noteFor(restored.state, 'level-7')).toBe('Custom note to preserve')
   })
 

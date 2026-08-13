@@ -7,6 +7,7 @@ import {
 } from '../../domain/tournamentInformation'
 import { InfoOverview } from './InfoOverview'
 import { InfoStructure } from './InfoStructure'
+import { selectSupplementalChipLines } from './selectSupplementalChipLines'
 
 interface InfoOverlayProps {
   open: boolean
@@ -23,9 +24,12 @@ export function InfoOverlay({ open, onClose, onAfterClose }: InfoOverlayProps) {
   const overlayRef = useRef<HTMLElement>(null)
   const { state } = useTournament()
   const information = selectTournamentInformation(state)
-  const validation = validateProjectorInformation(information)
-  const projectorSafeInformation = validation.fields.chipLines.error === null &&
-    validation.fields.prizeLines.error === null
+  const publicValidation = validateProjectorInformation({
+    ...information,
+    chipLines: selectSupplementalChipLines(information.chipLines),
+  })
+  const projectorSafeInformation = publicValidation.fields.chipLines.error === null &&
+    publicValidation.fields.prizeLines.error === null
 
   useEffect(() => {
     // The overlay persists while closed, so each open cycle deliberately starts on page one.

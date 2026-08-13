@@ -1,6 +1,5 @@
 import { createInitialState } from '../domain/sampleStructure'
 import { isUntimedEntry } from '../domain/structure'
-import { removeObsoleteBundledNotes } from '../domain/structureMigrations'
 import { resolveTimer } from '../domain/timer'
 import type { TournamentState } from '../domain/types'
 import { validateStructure } from '../domain/validation'
@@ -161,10 +160,7 @@ export function loadSnapshot(storage: Storage, now: number): LoadResult {
     if (isUntouchedFormerDefault(snapshot.state)) {
       return { state: createInitialState(), recovered: false }
     }
-    const state = canonicalizeUntimedRuntime({
-      ...snapshot.state,
-      structure: removeObsoleteBundledNotes(snapshot.state.structure),
-    })
+    const state = canonicalizeUntimedRuntime(snapshot.state)
     if (state.settings.closeBehavior === 'continue') {
       return {
         state: resolveTimer(state, now),

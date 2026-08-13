@@ -125,22 +125,26 @@ describe('TournamentDisplay', () => {
     expect(screen.getByRole('timer')).toHaveTextContent('12:00')
   })
 
-  it('keeps break actions but omits bundled level commentary from the untimed schedule', async () => {
+  it('keeps break descriptions but hides saved organizer level notes from the public schedule', async () => {
     const user = userEvent.setup()
+    const state = createInitialState()
+    const notedLevel = state.structure.find((entry) => entry.id === 'level-13')
+    if (notedLevel?.kind !== 'level') throw new Error('Missing test level')
+    notedLevel.note = 'Director-only final table setup'
+    saveSnapshot(localStorage, state, Date.now())
     renderDisplay()
+    const schedule = screen.getByRole('complementary', { name: 'Blind Structure' })
 
-    expect(screen.getByText(/Chip up to 5s/)).toBeVisible()
-    expect(screen.getByText(/Chip up to 25s and 100s/)).toBeVisible()
-    expect(screen.queryByText(/Final table target/)).not.toBeInTheDocument()
-    expect(screen.queryByText(/Expected finish/)).not.toBeInTheDocument()
-    expect(screen.queryByText(/^BB ante begins$/)).not.toBeInTheDocument()
-    expect(screen.queryByText(/^Final level$/)).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Break, 10 min, Chip up to 5s' })).toBeVisible()
-    expect(screen.getByRole('button', {
+    expect(within(schedule).getByText(/Chip up to 5s/)).toBeVisible()
+    expect(within(schedule).getByText(/Chip up to 25s and 100s/)).toBeVisible()
+    expect(within(schedule).queryByText('Director-only final table setup')).not.toBeInTheDocument()
+    expect(within(schedule).queryByRole('button', { name: /Director-only final table setup/ })).not.toBeInTheDocument()
+    expect(within(schedule).getByRole('button', { name: 'Break, 10 min, Chip up to 5s' })).toBeVisible()
+    expect(within(schedule).getByRole('button', {
       name: 'Level 13 100 / 200, BIG BLIND ANTE: 200, 15 min',
     })).toBeVisible()
 
-    await user.click(screen.getByRole('button', { name: /^Level 17 500 \/ 1,000/ }))
+    await user.click(within(schedule).getByRole('button', { name: /^Level 17 500 \/ 1,000/ }))
 
     expect(screen.getByRole('region', { name: 'Current poker level' })).toHaveTextContent('LEVEL 17')
     expect(screen.getByRole('region', { name: 'Current poker level' })).not.toHaveTextContent('Final level')

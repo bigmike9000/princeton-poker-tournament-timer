@@ -1,5 +1,4 @@
 import { sampleStructure } from '../domain/sampleStructure'
-import { removeObsoleteBundledNotes } from '../domain/structureMigrations'
 import type { StructureEntry } from '../domain/types'
 import { validatePresetName, validateStructure } from '../domain/validation'
 import { isFormerBundledStructure } from './legacyDefaults'
@@ -78,10 +77,7 @@ export function createPresetRepository(
 
     const formerBundledIndex = parsed.findIndex((preset) =>
       preset.name === BUILT_IN_PRESET_NAME && isFormerBundledStructure(preset.structure))
-    const persisted = parsed.map((preset, index) =>
-      index === formerBundledIndex || preset.name === BUILT_IN_PRESET_NAME
-        ? preset
-        : { ...preset, structure: removeObsoleteBundledNotes(preset.structure) })
+    const persisted = parsed
     const stablePresets = persisted.filter((preset) => isBuiltInPreset(preset))
     const replacedPresets = stablePresets.concat(formerBundledIndex >= 0 ? [persisted[formerBundledIndex]] : [])
     const createdAt = replacedPresets

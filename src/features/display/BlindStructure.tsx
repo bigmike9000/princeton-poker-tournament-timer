@@ -68,7 +68,6 @@ export function BlindStructure({ state, onSelectEntry }: BlindStructureProps) {
             `Level ${levelNumber} ${formatChips(entry.smallBlind)} / ${formatChips(entry.bigBlind)}`,
             anteLabel(entry.anteType, entry.ante),
             durationLabel(entry),
-            entry.note,
           ].filter(Boolean).join(', ')
           return (
             <li
@@ -90,7 +89,6 @@ export function BlindStructure({ state, onSelectEntry }: BlindStructureProps) {
                 <span className="structure-blinds">
                   <strong>{formatChips(entry.smallBlind)} / {formatChips(entry.bigBlind)}</strong>
                   <small>{anteLabel(entry.anteType, entry.ante)}</small>
-                  {entry.note && <small className="structure-note">{entry.note}</small>}
                 </span>
                 <span className="level-duration">{durationLabel(entry)}</span>
                 {current && <span className="live-marker">LIVE</span>}
