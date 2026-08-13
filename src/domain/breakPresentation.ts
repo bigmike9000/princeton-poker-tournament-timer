@@ -18,7 +18,7 @@ function normalized(value: string): string {
 
 export function breakPresentation(entry: BreakLevel): BreakPresentation {
   const duration = durationLabel(entry)
-  const heading = `BREAK · ${duration.toLocaleUpperCase()}`
+  const heading = `BREAK — ${duration.toLocaleUpperCase()}`
   const savedLabel = entry.label.trim()
   const candidate = formerBundledMessages[savedLabel] ?? savedLabel
   const generic = normalized(candidate)
@@ -33,6 +33,6 @@ export function breakPresentation(entry: BreakLevel): BreakPresentation {
   return {
     heading,
     subtitle,
-    accessibleLabel: ['Break', duration, subtitle].filter(Boolean).join(', '),
+    accessibleLabel: ['Break', duration].join(', '),
   }
 }

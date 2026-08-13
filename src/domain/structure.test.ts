@@ -18,7 +18,8 @@ describe('PPC default structure', () => {
       [40, 80, 80, 'big-blind', 900],
       ['break', 600, 'Count and stack red chips'],
       [50, 100, 100, 'big-blind', 900], [75, 150, 150, 'big-blind', 900],
-      [100, 200, 200, 'big-blind', 900], [200, 400, 400, 'big-blind', 900],
+      [100, 200, 200, 'big-blind', 900], [150, 300, 300, 'big-blind', 900],
+      [200, 400, 400, 'big-blind', 900],
       [300, 600, 600, 'big-blind', 900], [400, 800, 800, 'big-blind', 900],
       [500, 1000, 1000, 'big-blind', null],
     ])
@@ -34,10 +35,23 @@ describe('PPC default structure', () => {
     expect(state.chipLedger[0].chips).toBe(16_000)
   })
 
-  it('contains 17 levels and two ten-minute breaks', () => {
-    expect(sampleStructure.filter((entry) => entry.kind === 'level')).toHaveLength(17)
+  it('contains 18 levels and two ten-minute breaks', () => {
+    expect(sampleStructure.filter((entry) => entry.kind === 'level')).toHaveLength(18)
     expect(sampleStructure.filter((entry) => entry.kind === 'break')).toHaveLength(2)
+    expect(sampleStructure).toHaveLength(20)
     expect(sampleStructure.filter((entry) => entry.kind === 'break').every((entry) => entry.durationSeconds === 600)).toBe(true)
+  })
+
+  it('keeps the inserted 150/300 level addressable by its stable ID', () => {
+    expect(sampleStructure).toContainEqual(expect.objectContaining({
+      id: 'level-150-300',
+      kind: 'level',
+      durationSeconds: 900,
+      smallBlind: 150,
+      bigBlind: 300,
+      ante: 300,
+      anteType: 'big-blind',
+    }))
   })
 
   it('keeps bundled poker levels free of organizer-only notes', () => {

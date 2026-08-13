@@ -20,6 +20,7 @@ export const sampleStructure: StructureEntry[] = [
   { id: 'level-11', kind: 'level', durationSeconds: 900, smallBlind: 50, bigBlind: 100, ante: 100, anteType: 'big-blind' },
   { id: 'level-12', kind: 'level', durationSeconds: 900, smallBlind: 75, bigBlind: 150, ante: 150, anteType: 'big-blind' },
   { id: 'level-13', kind: 'level', durationSeconds: 900, smallBlind: 100, bigBlind: 200, ante: 200, anteType: 'big-blind' },
+  { id: 'level-150-300', kind: 'level', durationSeconds: 900, smallBlind: 150, bigBlind: 300, ante: 300, anteType: 'big-blind' },
   { id: 'level-14', kind: 'level', durationSeconds: 900, smallBlind: 200, bigBlind: 400, ante: 400, anteType: 'big-blind' },
   { id: 'level-15', kind: 'level', durationSeconds: 900, smallBlind: 300, bigBlind: 600, ante: 600, anteType: 'big-blind' },
   { id: 'level-16', kind: 'level', durationSeconds: 900, smallBlind: 400, bigBlind: 800, ante: 800, anteType: 'big-blind' },
