@@ -51,6 +51,17 @@ describe('validateStructure', () => {
     expect(validateStructure(structuredClone(sampleStructure)).valid).toBe(true)
   })
 
+  it('allows a break without an active-screen message', () => {
+    const structure = structuredClone(sampleStructure)
+    const breakEntry = structure.find((entry) => entry.kind === 'break')
+    if (!breakEntry || breakEntry.kind !== 'break') throw new Error('Expected a break fixture')
+    breakEntry.label = ''
+
+    expect(validateStructure(structure).issues).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({ entryId: breakEntry.id, field: 'label' }),
+    ]))
+  })
+
   it('rejects an untimed non-final level', () => {
     const structure = structuredClone(sampleStructure)
     const first = structure[0]

@@ -226,7 +226,7 @@ select:focus-visible {
   font-family: var(--font-numeric);
   font-size: clamp(2.5rem, 4.4vw, 5rem);
   font-variant-numeric: tabular-nums;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: -.015em;
   line-height: .95;
 }
@@ -283,8 +283,8 @@ select:focus-visible {
   font-size: clamp(7.5rem, 14.2vw, 16rem);
   font-stretch: condensed;
   font-variant-numeric: tabular-nums;
-  font-weight: 500;
-  letter-spacing: 0;
+  font-weight: 600;
+  letter-spacing: .012em;
   line-height: .74;
   text-align: center;
   text-shadow: 0 12px 52px rgb(0 0 0 / 58%);
@@ -369,7 +369,7 @@ select:focus-visible {
   font-family: var(--font-numeric);
   font-size: clamp(1.35rem, 2.2vw, 2.45rem);
   font-variant-numeric: tabular-nums;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: -.015em;
   text-overflow: ellipsis;
 }
@@ -1475,14 +1475,14 @@ select:focus-visible {
 .info-prize-rank {
   color: var(--orange-400);
   font-family: var(--font-numeric);
-  font-weight: 500;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
 .info-prize-value {
   color: var(--ivory-50);
   font-family: var(--font-numeric);
-  font-weight: 500;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   text-align: right;
 }

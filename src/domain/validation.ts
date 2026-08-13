@@ -50,9 +50,6 @@ export function validateStructure(entries: StructureEntry[]): ValidationResult {
     }
 
     if (entry.kind === 'break') {
-      if (!entry.label.trim()) {
-        issues.push({ entryId: entry.id, field: 'label', message: 'Break label is required.' })
-      }
       continue
     }
 

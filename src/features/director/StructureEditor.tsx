@@ -68,7 +68,7 @@ export function StructureEditor() {
         id: newId('break'),
         kind: 'break',
         durationSeconds: 600,
-        label: 'Break',
+        label: '',
       }
       const untimedIndex = current.findIndex((entry) => entry.kind === 'level' && entry.durationSeconds === null)
       return untimedIndex === -1

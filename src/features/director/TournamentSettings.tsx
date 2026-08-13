@@ -61,21 +61,26 @@ export function TournamentSettings() {
           <label className="field-wide"><span>Tournament name</span><input value={tournamentName} maxLength={80} onChange={(event) => setTournamentName(event.target.value)} /></label>
           <label><span>Starting player count</span><input type="number" min="1" value={startingPlayers} onChange={(event) => setStartingPlayers(event.target.value)} /></label>
           <label><span>Starting chip stack</span><input type="number" min="1" value={startingStack} onChange={(event) => setStartingStack(event.target.value)} /></label>
-          <label className="field-wide tournament-prize-field">
-            <span>Prize structure</span>
-            <textarea
-              rows={5}
-              value={prizeLines}
-              aria-label="Prize structure"
-              aria-invalid={informationValidation.fields.prizeLines.error ? true : undefined}
-              onChange={(event) => setPrizeLines(event.target.value)}
-            />
-            <small className="information-field-budget">
-              {informationValidation.fields.prizeLines.lineCount} of {PROJECTOR_INFORMATION_BUDGETS.prizeLines.maxLines} lines ·{' '}
-              {informationValidation.fields.prizeLines.characterCount} of {PROJECTOR_INFORMATION_BUDGETS.prizeLines.maxCharacters} characters
-            </small>
+          <section className="field-wide tournament-prize-editor" aria-label="Prize editor">
+            <header>
+              <div><span>Prize structure</span><strong>Shown in Tournament Info</strong></div>
+              <small className="information-field-budget">
+                {informationValidation.fields.prizeLines.lineCount}/{PROJECTOR_INFORMATION_BUDGETS.prizeLines.maxLines} lines ·{' '}
+                {informationValidation.fields.prizeLines.characterCount}/{PROJECTOR_INFORMATION_BUDGETS.prizeLines.maxCharacters} characters
+              </small>
+            </header>
+            <div>
+              <textarea
+                rows={8}
+                value={prizeLines}
+                aria-label="Prize structure"
+                aria-invalid={informationValidation.fields.prizeLines.error ? true : undefined}
+                placeholder={'1: 300\n2: 200\n3: 140'}
+                onChange={(event) => setPrizeLines(event.target.value)}
+              />
+            </div>
             {informationValidation.fields.prizeLines.error && <small className="field-error" role="alert">{informationValidation.fields.prizeLines.error}</small>}
-          </label>
+          </section>
         </section>
         <section className="director-card form-grid">
           <div className="field-wide director-card-heading"><div><span>Branding</span><h3>Sponsors</h3></div></div>

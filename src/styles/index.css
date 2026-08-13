@@ -117,6 +117,7 @@
   color: var(--ivory-100);
   background: var(--ink-900);
   font-family: var(--font-interface);
+  font-weight: 500;
   font-synthesis: none;
 }
 

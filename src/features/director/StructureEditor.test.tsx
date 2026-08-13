@@ -121,14 +121,31 @@ describe('StructureEditor', () => {
     render(<StructureStateHarness />)
     const breakRow = screen.getByRole('group', { name: 'Break 1' })
 
-    await user.clear(within(breakRow).getByRole('textbox', { name: 'Break label' }))
-    await user.type(within(breakRow).getByRole('textbox', { name: 'Break label' }), 'Dinner')
+    await user.clear(within(breakRow).getByRole('textbox', { name: 'Active break message' }))
+    await user.type(within(breakRow).getByRole('textbox', { name: 'Active break message' }), 'Dinner')
     await user.clear(within(breakRow).getByRole('spinbutton', { name: 'Duration minutes' }))
     await user.type(within(breakRow).getByRole('spinbutton', { name: 'Duration minutes' }), '20')
     await user.click(screen.getByRole('button', { name: 'Apply structure' }))
 
     expect(screen.getByLabelText('Applied structure')).toHaveTextContent(
       '"id":"break-1","kind":"break","durationSeconds":1200,"label":"Dinner"',
+    )
+  })
+
+  it('shows the exact active-screen break message and allows clearing it', async () => {
+    const user = userEvent.setup()
+    render(<StructureStateHarness />)
+    const breakRow = screen.getByRole('group', { name: 'Break 1' })
+    const message = within(breakRow).getByRole('textbox', { name: 'Active break message' })
+
+    expect(message).toHaveValue('Count and stack white chips in stacks of 10')
+    expect(message).toHaveAttribute('maxlength', '80')
+    expect(message).toHaveAttribute('placeholder', 'No message shown')
+    await user.clear(message)
+    expect(screen.getByRole('button', { name: 'Apply structure' })).toBeEnabled()
+    await user.click(screen.getByRole('button', { name: 'Apply structure' }))
+    expect(screen.getByLabelText('Applied structure')).toHaveTextContent(
+      '"id":"break-1","kind":"break","durationSeconds":600,"label":""',
     )
   })
 
@@ -145,7 +162,7 @@ describe('StructureEditor', () => {
     expect(within(level).getByRole('button', { name: 'Move up' })).toBeVisible()
     expect(within(level).getByRole('button', { name: 'Move down' })).toBeVisible()
     expect(within(level).getByRole('button', { name: 'Delete' })).toBeVisible()
-    expect(within(breakRow).getByRole('textbox', { name: 'Break label' })).toBeVisible()
+    expect(within(breakRow).getByRole('textbox', { name: 'Active break message' })).toBeVisible()
     expect(within(breakRow).getByRole('spinbutton', { name: 'Duration minutes' })).toBeVisible()
   })
 
@@ -171,7 +188,7 @@ describe('StructureEditor', () => {
     const breakRow = screen.getByRole('group', { name: 'Break 1' })
 
     expect(breakRow.querySelector('.structure-break-label')).toContainElement(
-      within(breakRow).getByRole('textbox', { name: 'Break label' }),
+      within(breakRow).getByRole('textbox', { name: 'Active break message' }),
     )
     expect(within(breakRow).getByRole('spinbutton', { name: 'Duration minutes' })).toBeVisible()
     expect(within(breakRow).getByRole('button', { name: 'Delete' })).toBeVisible()
@@ -241,7 +258,7 @@ describe('StructureEditor', () => {
     )
 
     const duration = screen.getByRole('spinbutton', { name: 'Duration minutes' })
-    const label = screen.getByRole('textbox', { name: 'Break label' })
+    const label = screen.getByRole('textbox', { name: 'Active break message' })
     expect(duration).toHaveAttribute('aria-invalid', 'true')
     expect(duration).toHaveAttribute('aria-describedby', `structure-${breakEntry.id}-durationSeconds-error`)
     expect(document.getElementById(`structure-${breakEntry.id}-durationSeconds-error`)).toHaveTextContent('Duration error')
@@ -282,7 +299,7 @@ describe('StructureEditor', () => {
     expect.soft(breakGroup.querySelector('legend')).toHaveTextContent(/^Break 1$/)
     expect(breakGroup.querySelector('.structure-row-identity')).toHaveTextContent(/^Break 01$/)
     expect(breakGroup.querySelector('.structure-row-identity')).not.toHaveTextContent('BreakBreak 1')
-    expect(within(breakGroup).getByRole('textbox', { name: 'Break label' })).toBeEnabled()
+    expect(within(breakGroup).getByRole('textbox', { name: 'Active break message' })).toBeEnabled()
     expect(within(breakGroup).getByRole('spinbutton', { name: 'Duration minutes' })).toBeEnabled()
     expect(within(breakGroup).queryByRole('spinbutton', { name: 'Small blind' })).not.toBeInTheDocument()
     expect(within(breakGroup).queryByRole('spinbutton', { name: 'Big blind' })).not.toBeInTheDocument()
@@ -455,6 +472,7 @@ describe('Structure editor responsive CSS', () => {
     expect(collapseStart).toBeLessThan(mediumStart)
     expect(directorCss).not.toContain('@media (max-width: 960px)')
     expect(cssRule(collapseCss, '.director-layout')).toMatch(/grid-template-columns:\s*1fr/)
+    expect(cssRule(collapseCss, '.director-layout')).toMatch(/grid-template-rows:\s*auto minmax\(0, 1fr\)/)
     expect(cssRule(collapseCss, '.director-nav')).toMatch(/flex-direction:\s*row/)
   })
 

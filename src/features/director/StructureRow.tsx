@@ -1,5 +1,6 @@
 import type { StructureEntry } from '../../domain/types'
 import type { ValidationIssue } from '../../domain/validation'
+import { breakPresentation } from '../../domain/breakPresentation'
 
 interface StructureRowProps {
   entry: StructureEntry
@@ -107,8 +108,15 @@ export function StructureRow({
               <FieldIssue entryId={entry.id} field="durationSeconds" issues={issues} />
             </div>
             <label className="structure-cell structure-break-label">
-              <span className="structure-cell-label">Break label</span>
-              <input {...fieldErrorProps(entry.id, 'label', issues)} aria-label="Break label" value={entry.label} maxLength={30} onChange={(event) => onChange({ ...entry, label: event.target.value })} />
+              <span className="structure-cell-label">Active message</span>
+              <input
+                {...fieldErrorProps(entry.id, 'label', issues)}
+                aria-label="Active break message"
+                value={breakPresentation(entry).subtitle ?? ''}
+                maxLength={80}
+                placeholder="No message shown"
+                onChange={(event) => onChange({ ...entry, label: event.target.value })}
+              />
               <FieldIssue entryId={entry.id} field="label" issues={issues} />
             </label>
           </>

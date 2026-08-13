@@ -19,10 +19,12 @@ function PresetRow({ preset, onLoad, onDuplicate, onRename, onDelete }: PresetRo
 
   return (
     <article className="preset-row" role="group" aria-label={`Preset ${preset.name}`}>
-      <div className="preset-symbol" aria-hidden="true">{String(levels).padStart(2, '0')}</div>
+      <div className="preset-symbol" aria-hidden="true"><strong>{String(levels).padStart(2, '0')}</strong><span>Levels</span></div>
       <div className="preset-details">
-        <label><span>Preset name</span><input value={name} maxLength={60} readOnly={builtIn} onChange={(event) => setName(event.target.value)} /></label>
-        {builtIn && <span className="preset-built-in">Built-in</span>}
+        <div className="preset-name-row">
+          <label><span>Preset name</span><input value={name} maxLength={60} readOnly={builtIn} onChange={(event) => setName(event.target.value)} /></label>
+          {builtIn && <span className="preset-built-in">Built-in</span>}
+        </div>
         <p>{levels} levels · {breaks} breaks · Updated {new Date(preset.updatedAt).toLocaleDateString()}</p>
       </div>
       <div className="preset-actions">
@@ -102,7 +104,7 @@ export function PresetManager() {
       </div>
 
       <section className="save-preset-card">
-        <div><span>Current structure</span><strong>{state.structure.filter((entry) => entry.kind === 'level').length} levels · {state.structure.filter((entry) => entry.kind === 'break').length} breaks</strong></div>
+        <div className="current-structure-summary"><span>Current structure</span><strong>{state.structure.filter((entry) => entry.kind === 'level').length} levels · {state.structure.filter((entry) => entry.kind === 'break').length} breaks</strong></div>
         <label><span>New preset name</span><input disabled={repository === null} value={newName} maxLength={60} placeholder="e.g. Turbo Tournament" onChange={(event) => setNewName(event.target.value)} /></label>
         <button disabled={repository === null} className="primary-action" onClick={() => run((activeRepository) => { activeRepository.save(newName, state.structure); setNewName('') })}>Save current structure</button>
       </section>
