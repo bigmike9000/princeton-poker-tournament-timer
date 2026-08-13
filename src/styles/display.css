@@ -374,41 +374,13 @@ select:focus-visible {
 }
 
 .break-procedure {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: .7rem;
-  margin-top: .55rem;
-  border: 1px solid rgb(184 154 97 / 18%);
-  border-left: 3px solid var(--orange-500);
-  border-radius: var(--radius-card);
-  padding: .62rem .85rem;
-  background: linear-gradient(90deg, rgb(217 121 43 / 11%), rgb(13 13 11 / 72%));
-  box-shadow:
-    inset 0 1px rgb(255 249 232 / 3%),
-    0 12px 32px rgb(0 0 0 / 20%);
-}
-
-.break-procedure span {
-  color: var(--orange-400);
-  font-size: .62rem;
-  font-weight: 800;
-  letter-spacing: .13em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.break-procedure strong {
-  min-width: 0;
-  overflow: hidden;
+  margin: .55rem 0 0;
   color: var(--ivory-100);
   font-size: clamp(.74rem, .9vw, .88rem);
   font-weight: 700;
   letter-spacing: .02em;
   line-height: 1.35;
   overflow-wrap: anywhere;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .break-procedure--empty {
@@ -520,7 +492,7 @@ select:focus-visible {
 .structure-header h2 {
   margin-top: .28rem;
   color: var(--ivory-100);
-  font-family: var(--font-heritage);
+  font-family: var(--font-interface);
   font-size: clamp(1.45rem, 1.9vw, 2rem);
   font-weight: 600;
   letter-spacing: -.025em;
@@ -1000,8 +972,6 @@ select:focus-visible {
   .clock { font-size: 24vw; }
   .clock.clock--untimed { font-size: 15vw; }
   .stats-grid { grid-template-columns: 1fr; }
-  .break-procedure { grid-template-columns: 1fr; gap: .18rem; }
-  .break-procedure strong { overflow: visible; text-overflow: clip; white-space: normal; }
   .sponsor-strip { height: 1.5rem; gap: .5rem; overflow: hidden; white-space: nowrap; }
   .sponsor-logo-card { width: 5.5rem; height: 1.5rem; }
   .sponsor-marks--display .sponsor-logo-card { width: 5.5rem; height: 1.5rem; }

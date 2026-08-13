@@ -22,6 +22,7 @@
   --radius-compact: .25rem;
   --radius-control: .375rem;
   --radius-card: .5rem;
-  --font-heritage: Georgia, "Times New Roman", Times, serif;
-  --font-numeric: "Arial Narrow", "Aptos Narrow", "Roboto Condensed", ui-sans-serif, system-ui, sans-serif;
+  --font-interface: "Avenir Next", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --font-heritage: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-numeric: "DIN Alternate", "Arial Narrow", "Aptos Narrow", "Roboto Condensed", ui-sans-serif, system-ui, sans-serif;
 }

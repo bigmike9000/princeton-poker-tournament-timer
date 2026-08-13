@@ -9,12 +9,7 @@ export function BreakProcedure({ entry }: { entry: StructureEntry }) {
       role="status"
       aria-atomic="true"
     >
-      {subtitle && (
-        <>
-          <span aria-hidden="true">Break procedure</span>
-          <strong>{subtitle}</strong>
-        </>
-      )}
+      {subtitle}
     </aside>
   )
 }

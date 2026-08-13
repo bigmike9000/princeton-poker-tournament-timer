@@ -5,7 +5,9 @@ import { TournamentProvider } from '../../app/TournamentProvider'
 import { createInitialState } from '../../domain/sampleStructure'
 import { entryDurationMs } from '../../domain/structure'
 import { saveSnapshot } from '../../persistence/snapshot'
+import brandCss from '../../styles/brand.css?raw'
 import displayCss from '../../styles/display.css?raw'
+import indexCss from '../../styles/index.css?raw'
 import tokensCss from '../../styles/tokens.css?raw'
 import { TournamentDisplay } from './TournamentDisplay'
 
@@ -26,13 +28,6 @@ function renderDisplay(onOpenDirector = vi.fn(), onOpenInfo = vi.fn(), fullscree
 function cssRule(css: string, selector: string) {
   const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   return css.match(new RegExp(`${escapedSelector}\\s*\\{([^}]*)\\}`))?.[1] ?? ''
-}
-
-function cssRuleWithinMedia(css: string, mediaQuery: string, selector: string) {
-  const mediaStart = css.indexOf(`@media (${mediaQuery})`)
-  if (mediaStart < 0) return ''
-  const nextMediaStart = css.indexOf('@media', mediaStart + 1)
-  return cssRule(css.slice(mediaStart, nextMediaStart < 0 ? undefined : nextMediaStart), selector)
 }
 
 describe('TournamentDisplay', () => {
@@ -100,8 +95,8 @@ describe('TournamentDisplay', () => {
     const procedure = screen.getByRole('status')
     expect(procedure).toHaveAttribute('aria-atomic', 'true')
     expect(procedure).not.toHaveAttribute('aria-label')
-    expect(within(procedure).getByText('Break procedure')).toHaveAttribute('aria-hidden', 'true')
     expect(procedure).toHaveTextContent('Count and stack white chips in stacks of 10')
+    expect(procedure).not.toHaveTextContent('Break procedure')
     expect(
       procedure.compareDocumentPosition(screen.getByLabelText('Tournament statistics')) & Node.DOCUMENT_POSITION_PRECEDING,
     ).toBeTruthy()
@@ -134,8 +129,8 @@ describe('TournamentDisplay', () => {
     expect(within(currentBreak).getByRole('heading', { name: 'BREAK' })).toBeVisible()
     expect(currentBreak).not.toHaveTextContent('Count and stack red chips')
     const procedure = screen.getByRole('status')
-    expect(within(procedure).getByText('Break procedure')).toHaveAttribute('aria-hidden', 'true')
     expect(procedure).toHaveTextContent('Count and stack red chips')
+    expect(procedure).not.toHaveTextContent('Break procedure')
   })
 
   it('announces a break procedure by updating the status node mounted during poker levels', async () => {
@@ -154,8 +149,8 @@ describe('TournamentDisplay', () => {
     expect(breakStatus).toBe(levelStatus)
     expect(breakStatus).not.toHaveClass('break-procedure--empty')
     expect(breakStatus).not.toHaveAttribute('aria-label')
-    expect(within(breakStatus).getByText('Break procedure')).toHaveAttribute('aria-hidden', 'true')
     expect(within(breakStatus).getByText('Count and stack white chips in stacks of 10')).toBeVisible()
+    expect(breakStatus).not.toHaveTextContent('Break procedure')
   })
 
   it('renders a generic break label once and opts its current schedule row into shortcuts', () => {
@@ -283,15 +278,25 @@ describe('TournamentDisplay', () => {
     expect(emptyProcedureRule).not.toMatch(/display:\s*none|visibility:\s*hidden/)
   })
 
-  it('stacks and wraps active break procedures at phone widths', () => {
-    const procedureRule = cssRuleWithinMedia(displayCss, 'max-width: 640px', '.break-procedure')
-    const messageRule = cssRuleWithinMedia(displayCss, 'max-width: 640px', '.break-procedure strong')
+  it('uses interface typography for operational surfaces while preserving heritage branding', () => {
+    const tokenRoot = cssRule(tokensCss, ':root')
 
-    expect(procedureRule).toMatch(/grid-template-columns:\s*1fr/)
-    expect(procedureRule).toMatch(/gap:\s*\.18rem/)
-    expect(messageRule).toMatch(/overflow:\s*visible/)
-    expect(messageRule).toMatch(/text-overflow:\s*clip/)
-    expect(messageRule).toMatch(/white-space:\s*normal/)
+    expect(tokenRoot).toMatch(/--font-interface:\s*"Avenir Next",\s*"Segoe UI",\s*ui-sans-serif,\s*system-ui,\s*sans-serif/)
+    expect(tokenRoot).toMatch(/--font-heritage:\s*"Iowan Old Style",\s*"Palatino Linotype",\s*Palatino,\s*Georgia,\s*serif/)
+    expect(tokenRoot).toMatch(/--font-numeric:\s*"DIN Alternate",\s*"Arial Narrow",\s*"Aptos Narrow",\s*"Roboto Condensed",\s*ui-sans-serif,\s*system-ui,\s*sans-serif/)
+    expect(cssRule(indexCss, ':root')).toMatch(/font-family:\s*var\(--font-interface\)/)
+    expect(displayCss).toMatch(/\.structure-header h2\s*\{[^}]*font-family:\s*var\(--font-interface\)/)
+    expect(cssRule(displayCss, '.level-heading')).toMatch(/font-family:\s*var\(--font-heritage\)/)
+    expect(brandCss).toMatch(/\.club-brand-lockup h1\s*\{[^}]*font-family:\s*var\(--font-heritage\)/)
+  })
+
+  it('renders active break instructions as a plain text line', () => {
+    const procedureRule = cssRule(displayCss, '.break-procedure')
+
+    expect(procedureRule).toMatch(/margin:\s*\.55rem\s+0\s+0/)
+    expect(procedureRule).toMatch(/font-size:\s*clamp\(\.74rem,\s*\.9vw,\s*\.88rem\)/)
+    expect(procedureRule).toMatch(/line-height:\s*1\.35/)
+    expect(procedureRule).not.toMatch(/border\s*:|background\s*:|box-shadow\s*:/)
   })
 
   it('uses restrained radii and clips grouped public surfaces', () => {
@@ -302,7 +307,6 @@ describe('TournamentDisplay', () => {
 
     expect(cssRule(displayCss, '.stats-grid')).toMatch(/border-radius:\s*var\(--radius-card\)/)
     expect(cssRule(displayCss, '.stats-grid')).toMatch(/overflow:\s*hidden/)
-    expect(cssRule(displayCss, '.break-procedure')).toMatch(/border-radius:\s*var\(--radius-card\)/)
     expect(cssRule(displayCss, '.player-stepper')).toMatch(/border-radius:\s*var\(--radius-control\)/)
     expect(cssRule(displayCss, '.player-stepper')).toMatch(/overflow:\s*hidden/)
     expect(cssRule(displayCss, '.player-stepper button:focus-visible')).toMatch(/outline-offset:\s*-3px/)

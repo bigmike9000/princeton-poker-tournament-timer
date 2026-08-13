@@ -116,7 +116,7 @@
 :root {
   color: var(--ivory-100);
   background: var(--ink-900);
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-interface);
   font-synthesis: none;
 }
 
