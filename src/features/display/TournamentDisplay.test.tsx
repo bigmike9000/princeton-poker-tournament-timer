@@ -41,7 +41,7 @@ describe('TournamentDisplay', () => {
     saveSnapshot(localStorage, state, Date.now())
 
     const { container } = renderDisplay()
-    const lockup = container.querySelector('.club-brand-lockup')
+    const lockup = container.querySelector('.club-brand-lockup.brand-lockup--display')
 
     expect(lockup).not.toBeNull()
     expect(lockup?.firstElementChild).toHaveAttribute('alt', 'Princeton Poker Club logo')
