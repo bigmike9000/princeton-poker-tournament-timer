@@ -21,7 +21,7 @@
 }
 
 .club-brand-lockup .club-brand-organization {
-  color: var(--brass-400);
+  color: var(--orange-400);
   font-size: .62rem;
   font-weight: 800;
   letter-spacing: .15em;
@@ -37,7 +37,6 @@
 }
 
 .club-brand-lockup.brand-lockup--display .club-brand-organization {
-  color: var(--ivory-50);
   font-family: var(--font-heritage);
   font-size: clamp(1.05rem, 1.4vw, 1.48rem);
   font-weight: 700;
@@ -60,7 +59,6 @@
 }
 
 .club-brand-lockup.info-brand .club-brand-organization {
-  color: var(--orange-400);
   font-weight: 850;
   letter-spacing: .16em;
 }
