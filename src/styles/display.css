@@ -438,11 +438,14 @@ select:focus-visible {
 }
 
 .sponsor-text-mark {
+  min-width: 0;
+  max-width: 100%;
   border-left: 1px solid var(--brass-500);
   padding: .22rem 0 .22rem .65rem;
   color: var(--slate-400);
   font-size: .59rem;
   letter-spacing: .17em;
+  overflow-wrap: anywhere;
 }
 
 .structure-panel {
@@ -1284,6 +1287,7 @@ select:focus-visible {
 }
 
 .chip--black {
+  border-color: var(--brass-400);
   color: #fff8e7;
   background: #171712;
 }

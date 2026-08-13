@@ -518,7 +518,7 @@
   margin-top: 1.5rem;
 }
 
-@media (max-width: 864px) {
+@media (max-width: 967px) {
   .director-overlay { grid-template-rows: auto minmax(0, 1fr); }
   .director-header { grid-template-columns: 1fr auto; padding: .8rem; }
   .director-header-note { display: none; }

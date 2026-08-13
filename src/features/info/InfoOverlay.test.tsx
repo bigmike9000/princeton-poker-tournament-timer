@@ -347,6 +347,15 @@ describe('InfoOverlay', () => {
     expect(within(totals as HTMLElement).getByText('16,000')).toBeVisible()
   })
 
+  it('gives the black chip a brass outer edge with ivory inner markings', () => {
+    const blackChipRule = cssRule(displayCss, '.chip--black')
+    const innerMarkRule = cssRule(displayCss, '.info-chip-disk::before')
+
+    expect(blackChipRule).toMatch(/color:\s*#fff8e7/)
+    expect(blackChipRule).toMatch(/border-color:\s*var\(--brass-400\)/)
+    expect(innerMarkRule).toMatch(/border:\s*\.14rem dashed currentcolor/)
+  })
+
   it('places the shared sponsor marks between prize structure and the chip reminder', () => {
     render(<App />)
     const { dialog } = openInfo()

@@ -92,7 +92,7 @@ export function PresetManager() {
       return
     }
     dispatch({ type: 'SET_STRUCTURE', structure: preset.structure, now })
-    dispatch({ type: 'RESET_TOURNAMENT', now })
+    dispatch({ type: 'RESET_PROGRESS', now })
   }
 
   return (
@@ -142,7 +142,7 @@ export function PresetManager() {
           onCancel={() => setPendingLoad(null)}
           onConfirm={() => {
             dispatch({ type: 'SET_STRUCTURE', structure: pendingLoad.structure, now: Date.now() })
-            dispatch({ type: 'RESET_TOURNAMENT', now: Date.now() })
+            dispatch({ type: 'RESET_PROGRESS', now: Date.now() })
             setPendingLoad(null)
           }}
         />

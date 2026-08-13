@@ -206,11 +206,53 @@ describe('StructureEditor', () => {
     )
 
     const smallBlindField = screen.getByRole('spinbutton', { name: 'Small blind' }).closest('label')
-    const bigBlindField = screen.getByRole('spinbutton', { name: 'Big blind' }).closest('label')
+    const smallBlindInput = screen.getByRole('spinbutton', { name: 'Small blind' })
+    const bigBlindInput = screen.getByRole('spinbutton', { name: 'Big blind' })
+    const bigBlindField = bigBlindInput.closest('label')
     const anteField = screen.getByRole('spinbutton', { name: 'Ante' }).closest('label')
+    const anteInput = screen.getByRole('spinbutton', { name: 'Ante' })
     expect(within(smallBlindField as HTMLElement).getByText('Small blind error')).toBeVisible()
     expect(within(bigBlindField as HTMLElement).queryByText('Small blind error')).not.toBeInTheDocument()
     expect(within(anteField as HTMLElement).getByText('Ante error')).toBeVisible()
+    expect(smallBlindInput).toHaveAttribute('aria-invalid', 'true')
+    expect(smallBlindInput).toHaveAttribute('aria-describedby', `structure-${level.id}-smallBlind-error`)
+    expect(document.getElementById(`structure-${level.id}-smallBlind-error`)).toHaveTextContent('Small blind error')
+    expect(anteInput).toHaveAttribute('aria-invalid', 'true')
+    expect(anteInput).toHaveAttribute('aria-describedby', `structure-${level.id}-ante-error`)
+    expect(document.getElementById(`structure-${level.id}-ante-error`)).toHaveTextContent('Ante error')
+    expect(bigBlindInput).not.toHaveAttribute('aria-invalid')
+    expect(bigBlindInput).not.toHaveAttribute('aria-describedby')
+  })
+
+  it('programmatically binds break validation errors to only their affected controls', () => {
+    const breakEntry = createInitialState().structure.find((entry) => entry.kind === 'break')
+    if (!breakEntry || breakEntry.kind !== 'break') throw new Error('Expected a break fixture')
+
+    render(
+      <StructureRow
+        entry={breakEntry}
+        label="Break 1"
+        tone="even"
+        index={0}
+        total={1}
+        issues={[
+          { entryId: breakEntry.id, field: 'durationSeconds', message: 'Duration error' },
+          { entryId: breakEntry.id, field: 'label', message: 'Label error' },
+        ]}
+        onChange={vi.fn()}
+        onMove={vi.fn()}
+        onDelete={vi.fn()}
+      />,
+    )
+
+    const duration = screen.getByRole('spinbutton', { name: 'Duration minutes' })
+    const label = screen.getByRole('textbox', { name: 'Break label' })
+    expect(duration).toHaveAttribute('aria-invalid', 'true')
+    expect(duration).toHaveAttribute('aria-describedby', `structure-${breakEntry.id}-durationSeconds-error`)
+    expect(document.getElementById(`structure-${breakEntry.id}-durationSeconds-error`)).toHaveTextContent('Duration error')
+    expect(label).toHaveAttribute('aria-invalid', 'true')
+    expect(label).toHaveAttribute('aria-describedby', `structure-${breakEntry.id}-label-error`)
+    expect(document.getElementById(`structure-${breakEntry.id}-label-error`)).toHaveTextContent('Label error')
   })
 
   it('shows the final untimed level as a non-editable duration marker', () => {
@@ -394,8 +436,8 @@ describe('Structure editor responsive CSS', () => {
     expect(breakRule).toMatch(/background:/)
   })
 
-  it('collapses Director navigation through the measured 821 to 863 overflow band', () => {
-    const collapseStart = directorCss.indexOf('@media (max-width: 864px)')
+  it('collapses Director navigation through the measured 967px overflow boundary', () => {
+    const collapseStart = directorCss.indexOf('@media (max-width: 967px)')
     const mediumStart = directorCss.indexOf('@media (max-width: 1180px)')
     const collapseCss = collapseStart < 0
       ? ''
@@ -403,12 +445,13 @@ describe('Structure editor responsive CSS', () => {
 
     expect(collapseStart).toBeGreaterThan(-1)
     expect(collapseStart).toBeLessThan(mediumStart)
+    expect(directorCss).not.toContain('@media (max-width: 960px)')
     expect(cssRule(collapseCss, '.director-layout')).toMatch(/grid-template-columns:\s*1fr/)
     expect(cssRule(collapseCss, '.director-nav')).toMatch(/flex-direction:\s*row/)
   })
 
   it('fits all four Director tabs at 390px without horizontal navigation clipping', () => {
-    const collapseStart = directorCss.indexOf('@media (max-width: 864px)')
+    const collapseStart = directorCss.indexOf('@media (max-width: 967px)')
     const collapseCss = collapseStart < 0
       ? ''
       : directorCss.slice(collapseStart, directorCss.indexOf('.structure-editor {', collapseStart))
@@ -531,7 +574,11 @@ describe('PresetManager', () => {
 
   it('loads a preset using its own opening-entry duration', async () => {
     const structure = createInitialState().structure
-    structure[0].durationSeconds = 600
+    const opener = structure[0]
+    if (opener.kind !== 'level') throw new Error('Expected opening poker level')
+    opener.durationSeconds = 600
+    opener.smallBlind = 3
+    opener.bigBlind = 6
     createPresetRepository(localStorage).save('Ten Minute Opener', structure)
     const user = userEvent.setup()
 
@@ -541,18 +588,36 @@ describe('PresetManager', () => {
     await user.click(within(preset).getByRole('button', { name: 'Load' }))
 
     expect(screen.getByRole('timer')).toHaveTextContent('10:00')
+    await user.click(screen.getByRole('button', { name: 'Structure' }))
+    const loadedOpener = screen.getByRole('group', { name: 'Level 1' })
+    expect(within(loadedOpener).getByRole('spinbutton', { name: 'Small blind' })).toHaveValue(3)
+    expect(within(loadedOpener).getByRole('spinbutton', { name: 'Big blind' })).toHaveValue(6)
   })
 
-  it('confirms replacing a progressed tournament with a preset', async () => {
+  it('confirms a progressed preset load while retaining the selected structure and resetting progress', async () => {
+    const structure = createInitialState().structure
+    const opener = structure[0]
+    if (opener.kind !== 'level') throw new Error('Expected opening poker level')
+    opener.durationSeconds = 600
+    opener.smallBlind = 3
+    opener.bigBlind = 6
+    createPresetRepository(localStorage).save('Ten Minute Opener', structure)
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByRole('button', { name: 'Next level' }))
+    await user.click(screen.getByRole('button', { name: 'Eliminate player' }))
     await openTab(user, 'Presets')
-    const sample = screen.getByRole('group', { name: 'Preset Princeton Poker Club Standard' })
-    await user.click(within(sample).getByRole('button', { name: 'Load' }))
+    const preset = screen.getByRole('group', { name: 'Preset Ten Minute Opener' })
+    await user.click(within(preset).getByRole('button', { name: 'Load' }))
 
     expect(screen.getByRole('alertdialog', { name: 'Load this preset?' })).toBeVisible()
     await user.click(screen.getByRole('button', { name: 'Confirm preset load' }))
     expect(screen.getAllByText('LEVEL 1').length).toBeGreaterThan(0)
+    expect(screen.getByRole('timer')).toHaveTextContent('10:00')
+    expect(screen.getAllByText('80 / 80').length).toBeGreaterThan(0)
+    await user.click(screen.getByRole('button', { name: 'Structure' }))
+    const loadedOpener = screen.getByRole('group', { name: 'Level 1' })
+    expect(within(loadedOpener).getByRole('spinbutton', { name: 'Small blind' })).toHaveValue(3)
+    expect(within(loadedOpener).getByRole('spinbutton', { name: 'Big blind' })).toHaveValue(6)
   })
 })

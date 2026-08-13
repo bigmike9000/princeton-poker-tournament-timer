@@ -15,10 +15,25 @@ function ResetHarness({ Controls }: { Controls: ComponentType }) {
       <output aria-label="Current entry">{state.runtime.currentEntryIndex + 1}</output>
       <output aria-label="Remaining time">{state.runtime.remainingMs}</output>
       <output aria-label="Players remaining">{state.runtime.playersRemaining}</output>
+      <output aria-label="Opening entry">{state.structure[0]?.id}</output>
+      <output aria-label="Structure length">{state.structure.length}</output>
       <button onClick={() => dispatch({ type: 'SET_TIME', remainingMs: 60_000, now: Date.now() })}>Shorten clock</button>
       <button onClick={() => dispatch({ type: 'GO_TO_ENTRY', index: 1, now: Date.now() })}>Advance entry</button>
       <button onClick={() => dispatch({ type: 'GO_TO_ENTRY', index: state.structure.length - 1, now: Date.now() })}>Final level</button>
       <button onClick={() => dispatch({ type: 'SET_PLAYERS', players: 40 })}>Reduce field</button>
+      <button onClick={() => dispatch({
+        type: 'SET_STRUCTURE',
+        now: Date.now(),
+        structure: [{
+          id: 'custom-opener',
+          kind: 'level',
+          durationSeconds: 600,
+          smallBlind: 3,
+          bigBlind: 6,
+          ante: 0,
+          anteType: 'none',
+        }],
+      })}>Use custom structure</button>
     </>
   )
 }
@@ -68,18 +83,23 @@ describe('ResetControls', () => {
   it('uses stronger confirmation before resetting all tournament progress', async () => {
     const user = userEvent.setup()
     renderControls()
-    await user.click(screen.getByRole('button', { name: 'Advance entry' }))
+    await user.click(screen.getByRole('button', { name: 'Use custom structure' }))
+    await user.click(screen.getByRole('button', { name: 'Shorten clock' }))
     await user.click(screen.getByRole('button', { name: 'Reduce field' }))
+    expect(screen.getByLabelText('Opening entry')).toHaveTextContent('custom-opener')
 
     const resetTournament = screen.getByRole('button', { name: 'Reset tournament' })
     await user.click(resetTournament)
     const confirmation = screen.getByRole('alertdialog', { name: 'Reset the entire tournament?' })
     expect(confirmation).toHaveTextContent('level, clock, and player progress')
+    expect(confirmation).toHaveTextContent('blind structure returns to Princeton Poker Club Standard')
     await user.click(screen.getByRole('button', { name: 'Confirm full reset' }))
 
     expect(screen.getByLabelText('Current entry')).toHaveTextContent('1')
     expect(screen.getByLabelText('Remaining time')).toHaveTextContent('720000')
     expect(screen.getByLabelText('Players remaining')).toHaveTextContent('80')
+    expect(screen.getByLabelText('Opening entry')).toHaveTextContent('level-1')
+    expect(screen.getByLabelText('Structure length')).toHaveTextContent('19')
     expect(resetTournament).toHaveFocus()
   })
 })

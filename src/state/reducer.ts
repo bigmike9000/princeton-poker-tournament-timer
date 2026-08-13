@@ -1,4 +1,5 @@
 import { resolveTimer } from '../domain/timer'
+import { sampleStructure } from '../domain/sampleStructure'
 import { entryDurationMs, isUntimedEntry } from '../domain/structure'
 import type {
   StructureEntry,
@@ -14,6 +15,7 @@ export type TournamentAction =
   | { type: 'PAUSE'; now: number }
   | { type: 'RESET_CURRENT'; now: number }
   | { type: 'RESET_TOURNAMENT'; now: number }
+  | { type: 'RESET_PROGRESS'; now: number }
   | { type: 'GO_TO_ENTRY'; index: number; now: number }
   | { type: 'ADJUST_TIME'; deltaMs: number; now: number }
   | { type: 'SET_TIME'; remainingMs: number; now: number }
@@ -48,6 +50,26 @@ function updateTime(state: TournamentState, remainingMs: number, now: number): T
       alertedThresholds: resolved.runtime.alertedThresholds.filter((threshold) => threshold > nextRemaining),
       transitionCause: null,
     },
+  }
+}
+
+function resetProgress(state: TournamentState): TournamentState {
+  return {
+    ...state,
+    runtime: {
+      currentEntryIndex: 0,
+      status: 'idle',
+      remainingMs: entryDurationMs(state.structure[0]) ?? 0,
+      baselineAt: null,
+      playersRemaining: state.configuration.startingPlayers,
+      alertedThresholds: [],
+      transitionCause: null,
+    },
+    chipLedger: [{
+      id: 'initial-chips',
+      kind: 'initial',
+      chips: state.configuration.startingPlayers * state.configuration.startingStack,
+    }],
   }
 }
 
@@ -93,24 +115,10 @@ export function tournamentReducer(state: TournamentState, action: TournamentActi
       }
     }
     case 'RESET_TOURNAMENT': {
-      return {
-        ...state,
-        runtime: {
-          currentEntryIndex: 0,
-          status: 'idle',
-          remainingMs: entryDurationMs(state.structure[0]) ?? 0,
-          baselineAt: null,
-          playersRemaining: state.configuration.startingPlayers,
-          alertedThresholds: [],
-          transitionCause: null,
-        },
-        chipLedger: [{
-          id: 'initial-chips',
-          kind: 'initial',
-          chips: state.configuration.startingPlayers * state.configuration.startingStack,
-        }],
-      }
+      return resetProgress({ ...state, structure: structuredClone(sampleStructure) })
     }
+    case 'RESET_PROGRESS':
+      return resetProgress(state)
     case 'GO_TO_ENTRY': {
       const index = clamp(Math.round(action.index), 0, state.structure.length - 1)
       if (index === state.runtime.currentEntryIndex) return state

@@ -13,9 +13,22 @@ interface StructureRowProps {
   onDelete: () => void
 }
 
-function FieldIssue({ field, issues }: { field: string; issues: ValidationIssue[] }) {
+function fieldErrorId(entryId: string, field: string): string {
+  return `structure-${encodeURIComponent(entryId)}-${field}-error`
+}
+
+function fieldErrorProps(entryId: string, field: string, issues: ValidationIssue[]) {
   const issue = issues.find((candidate) => candidate.field === field)
-  return issue ? <small className="structure-field-error">{issue.message}</small> : null
+  return issue
+    ? { 'aria-invalid': true as const, 'aria-describedby': fieldErrorId(entryId, field) }
+    : {}
+}
+
+function FieldIssue({ entryId, field, issues }: { entryId: string; field: string; issues: ValidationIssue[] }) {
+  const issue = issues.find((candidate) => candidate.field === field)
+  return issue
+    ? <small id={fieldErrorId(entryId, field)} className="structure-field-error">{issue.message}</small>
+    : null
 }
 
 export function StructureRow({
@@ -49,22 +62,22 @@ export function StructureRow({
             <div className="structure-cell structure-duration-field">
               <span className="structure-cell-label">Duration minutes</span>
               {entry.durationSeconds !== null ? (
-                <input aria-label="Duration minutes" type="number" min="1" step="1" value={entry.durationSeconds / 60} onChange={(event) => updateNumber('durationSeconds', String(Number(event.target.value) * 60))} />
+                <input {...fieldErrorProps(entry.id, 'durationSeconds', issues)} aria-label="Duration minutes" type="number" min="1" step="1" value={entry.durationSeconds / 60} onChange={(event) => updateNumber('durationSeconds', String(Number(event.target.value) * 60))} />
               ) : (
                 <span className="structure-untimed-duration" aria-label="Untimed level">—</span>
               )}
-              <FieldIssue field="durationSeconds" issues={issues} />
+              <FieldIssue entryId={entry.id} field="durationSeconds" issues={issues} />
             </div>
             <div className="structure-field-group structure-blinds-group">
               <label className="structure-compact-field">
                 <span aria-hidden="true">SB</span>
-                <input aria-label="Small blind" type="number" min="0" step="1" value={entry.smallBlind} onChange={(event) => updateNumber('smallBlind', event.target.value)} />
-                <FieldIssue field="smallBlind" issues={issues} />
+                <input {...fieldErrorProps(entry.id, 'smallBlind', issues)} aria-label="Small blind" type="number" min="0" step="1" value={entry.smallBlind} onChange={(event) => updateNumber('smallBlind', event.target.value)} />
+                <FieldIssue entryId={entry.id} field="smallBlind" issues={issues} />
               </label>
               <label className="structure-compact-field">
                 <span aria-hidden="true">BB</span>
-                <input aria-label="Big blind" type="number" min="1" step="1" value={entry.bigBlind} onChange={(event) => updateNumber('bigBlind', event.target.value)} />
-                <FieldIssue field="bigBlind" issues={issues} />
+                <input {...fieldErrorProps(entry.id, 'bigBlind', issues)} aria-label="Big blind" type="number" min="1" step="1" value={entry.bigBlind} onChange={(event) => updateNumber('bigBlind', event.target.value)} />
+                <FieldIssue entryId={entry.id} field="bigBlind" issues={issues} />
               </label>
             </div>
             <div className="structure-field-group structure-ante-group">
@@ -85,8 +98,8 @@ export function StructureRow({
               </label>
               <label className="structure-compact-field">
                 <span aria-hidden="true">Amount</span>
-                <input aria-label="Ante" type="number" min="0" step="1" value={entry.ante} onChange={(event) => updateNumber('ante', event.target.value)} />
-                <FieldIssue field="ante" issues={issues} />
+                <input {...fieldErrorProps(entry.id, 'ante', issues)} aria-label="Ante" type="number" min="0" step="1" value={entry.ante} onChange={(event) => updateNumber('ante', event.target.value)} />
+                <FieldIssue entryId={entry.id} field="ante" issues={issues} />
               </label>
             </div>
           </>
@@ -94,13 +107,13 @@ export function StructureRow({
           <>
             <div className="structure-cell structure-duration-field">
               <span className="structure-cell-label">Duration minutes</span>
-              <input aria-label="Duration minutes" type="number" min="1" step="1" value={entry.durationSeconds / 60} onChange={(event) => updateNumber('durationSeconds', String(Number(event.target.value) * 60))} />
-              <FieldIssue field="durationSeconds" issues={issues} />
+              <input {...fieldErrorProps(entry.id, 'durationSeconds', issues)} aria-label="Duration minutes" type="number" min="1" step="1" value={entry.durationSeconds / 60} onChange={(event) => updateNumber('durationSeconds', String(Number(event.target.value) * 60))} />
+              <FieldIssue entryId={entry.id} field="durationSeconds" issues={issues} />
             </div>
             <label className="structure-cell structure-break-label">
               <span className="structure-cell-label">Break label</span>
-              <input aria-label="Break label" value={entry.label} maxLength={30} onChange={(event) => onChange({ ...entry, label: event.target.value })} />
-              <FieldIssue field="label" issues={issues} />
+              <input {...fieldErrorProps(entry.id, 'label', issues)} aria-label="Break label" value={entry.label} maxLength={30} onChange={(event) => onChange({ ...entry, label: event.target.value })} />
+              <FieldIssue entryId={entry.id} field="label" issues={issues} />
             </label>
           </>
         )}

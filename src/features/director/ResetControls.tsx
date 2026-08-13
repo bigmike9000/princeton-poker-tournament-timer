@@ -50,7 +50,7 @@ export function ResetControls() {
       {confirmation === 'tournament' && (
         <Dialog
           title="Reset the entire tournament?"
-          description="This resets the level, clock, and player progress. Your blind structure and settings are retained."
+          description="This resets the level, clock, and player progress. The blind structure returns to Princeton Poker Club Standard; tournament details and settings are retained."
           confirmLabel="Confirm full reset"
           destructive
           onCancel={closeConfirmation}

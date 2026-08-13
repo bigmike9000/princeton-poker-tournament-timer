@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createInitialState } from '../domain/sampleStructure'
+import { createInitialState, sampleStructure } from '../domain/sampleStructure'
 import { tournamentReducer } from './reducer'
 import { selectCurrentEntry, selectEntryLabel, selectNextPokerLevel, selectRemainingMs } from './selectors'
 
@@ -298,22 +298,67 @@ describe('tournamentReducer', () => {
     expect(result.runtime.status).toBe('idle')
   })
 
-  it('resets to the first entry duration from the active structure', () => {
+  it('restores a cloned canonical structure while retaining tournament configuration', () => {
     const state = createInitialState()
-    state.structure[0] = {
+    state.configuration.tournamentName = 'Championship'
+    state.settings.muted = true
+    state.information = {
+      chipLines: ['Custom chip copy'],
+      prizeLines: ['1: Trophy'],
+      houseNotes: ['Custom director note'],
+    }
+    state.structure = [{
       id: 'opening-break',
       kind: 'break',
       durationSeconds: 600,
       label: 'Opening break',
-    }
-    state.runtime.currentEntryIndex = 3
+    }]
+    state.runtime.currentEntryIndex = 0
     state.runtime.remainingMs = 12_000
+    state.runtime.playersRemaining = 42
+    state.chipLedger.push({ id: 'addon', kind: 'addon', chips: 2_000 })
 
     const result = tournamentReducer(state, { type: 'RESET_TOURNAMENT', now: 30_000 })
 
-    expect(result.structure[0].id).toBe('opening-break')
+    expect(result.structure).toEqual(sampleStructure)
+    expect(result.structure).not.toBe(sampleStructure)
+    expect(result.structure).not.toBe(state.structure)
     expect(result.runtime.currentEntryIndex).toBe(0)
-    expect(result.runtime.remainingMs).toBe(600_000)
+    expect(result.runtime.remainingMs).toBe(720_000)
+    expect(result.runtime.playersRemaining).toBe(80)
+    expect(result.configuration.tournamentName).toBe('Championship')
+    expect(result.settings.muted).toBe(true)
+    expect(result.information).toEqual(state.information)
+    expect(result.chipLedger).toEqual([{ id: 'initial-chips', kind: 'initial', chips: 16_000 }])
+  })
+
+  it('resets progress without replacing the selected preset structure', () => {
+    const state = createInitialState()
+    state.structure = [{
+      id: 'custom-opener',
+      kind: 'level',
+      durationSeconds: 600,
+      smallBlind: 3,
+      bigBlind: 6,
+      ante: 0,
+      anteType: 'none',
+    }]
+    state.runtime.currentEntryIndex = 0
+    state.runtime.remainingMs = 12_000
+    state.runtime.status = 'paused'
+    state.runtime.playersRemaining = 42
+    state.chipLedger.push({ id: 'addon', kind: 'addon', chips: 2_000 })
+
+    const result = tournamentReducer(state, { type: 'RESET_PROGRESS', now: 30_000 })
+
+    expect(result.structure).toEqual(state.structure)
+    expect(result.runtime).toMatchObject({
+      currentEntryIndex: 0,
+      remainingMs: 600_000,
+      status: 'idle',
+      playersRemaining: 80,
+    })
+    expect(result.chipLedger).toEqual([{ id: 'initial-chips', kind: 'initial', chips: 16_000 }])
   })
 })
 
