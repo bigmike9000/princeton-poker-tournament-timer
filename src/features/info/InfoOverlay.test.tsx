@@ -151,9 +151,13 @@ describe('InfoOverlay', () => {
     )
 
     expect(prizeListRule).toMatch(/gap:\s*0/)
+    expect(prizeListRule).toMatch(/min-width:\s*0/)
+    expect(prizeListRule).toMatch(/overflow:\s*hidden/)
     expect(prizeListRule).toMatch(/margin:\s*\.42rem 0 0/)
     expect(prizeListRule).toMatch(/padding:\s*0/)
     expect(narrowPrizeListRule).toMatch(/margin:\s*\.2rem 0 0/)
+    expect(cssRule(displayCss, '.info-prize-line--custom')).toMatch(/max-width:\s*100%/)
+    expect(cssRule(displayCss, '.info-prize-line--custom')).toMatch(/overflow-wrap:\s*anywhere/)
   })
 
   it('opens on Overview, switches pages manually, and resets to Overview after closing', async () => {

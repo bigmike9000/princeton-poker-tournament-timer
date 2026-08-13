@@ -20,7 +20,7 @@ export function DirectorSettings() {
   return (
     <section className="director-section">
       <div className="section-intro">
-        <div><span className="section-kicker">Application</span><h2>Settings</h2><p>Choose how the clock, alerts, and keyboard controls behave on this device.</p></div>
+        <div><span className="section-kicker">Application</span><h2>Settings</h2></div>
       </div>
 
       <div className="settings-grid">

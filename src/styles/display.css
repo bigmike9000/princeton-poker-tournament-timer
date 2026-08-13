@@ -284,10 +284,15 @@ select:focus-visible {
   font-stretch: condensed;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
-  letter-spacing: .012em;
+  letter-spacing: .006em;
   line-height: .74;
   text-align: center;
   text-shadow: 0 12px 52px rgb(0 0 0 / 58%);
+}
+
+.current-level:not(.current-level--break) + .clock {
+  margin-top: clamp(1.2rem, 2.8vh, 2.75rem);
+  margin-bottom: clamp(1.35rem, 2.9vh, 2.75rem);
 }
 
 .clock::after {
@@ -962,6 +967,7 @@ select:focus-visible {
   .club-logo { width: 3.2rem; height: 3.2rem; }
   .stage-content { padding-top: .75rem; }
   .clock { margin: .7rem 0 1rem; padding-bottom: .65rem; font-size: clamp(6.5rem, 12.2vw, 12rem); }
+  .current-level:not(.current-level--break) + .clock { margin-top: 1rem; margin-bottom: 1.25rem; }
   .sponsor-strip { height: 2.7rem; gap: .85rem; margin-top: .5rem; font-size: .64rem; }
   .sponsor-logo-card { width: 5.5rem; height: 1.5rem; }
   .sponsor-marks--display .sponsor-logo-card { width: 10.5rem; height: 2.7rem; }
@@ -1452,14 +1458,17 @@ select:focus-visible {
 
 .info-card .info-prize-list {
   display: grid;
+  min-width: 0;
   gap: 0;
   margin: .42rem 0 0;
+  overflow: hidden;
   padding: 0;
   list-style: none;
 }
 
 .info-prize-list li {
   display: grid;
+  min-width: 0;
   min-height: clamp(2.5rem, 5.2vh, 3.25rem);
   grid-template-columns: minmax(2.75rem, .3fr) minmax(0, 1fr);
   align-items: center;
@@ -1473,6 +1482,7 @@ select:focus-visible {
 }
 
 .info-prize-rank {
+  min-width: 0;
   color: var(--orange-400);
   font-family: var(--font-numeric);
   font-weight: 600;
@@ -1480,15 +1490,20 @@ select:focus-visible {
 }
 
 .info-prize-value {
+  min-width: 0;
   color: var(--ivory-50);
   font-family: var(--font-numeric);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
   text-align: right;
 }
 
 .info-prize-line--custom {
+  min-width: 0;
+  max-width: 100%;
   grid-column: 1 / -1;
+  overflow-wrap: anywhere;
 }
 
 .info-chip-reminder {

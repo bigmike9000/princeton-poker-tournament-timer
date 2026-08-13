@@ -39,6 +39,7 @@ describe('DirectorOverlay', () => {
     await openDirector(user)
     await user.click(screen.getByRole('button', { name: 'Tournament' }))
 
+    expect(screen.queryByText('Changes appear on the public display immediately after they are applied.')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Organization name')).not.toBeInTheDocument()
     expect(within(screen.getByRole('dialog')).getByText('PRINCETON POKER CLUB')).toBeVisible()
   })

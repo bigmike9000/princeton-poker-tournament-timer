@@ -55,7 +55,6 @@ export function TournamentSettings() {
         <div className="section-intro">
           <span className="section-kicker">Tournament identity</span>
           <h2>Event details</h2>
-          <p>Changes appear on the public display immediately after they are applied.</p>
         </div>
         <section className="director-card form-grid">
           <label className="field-wide"><span>Tournament name</span><input value={tournamentName} maxLength={80} onChange={(event) => setTournamentName(event.target.value)} /></label>

@@ -289,7 +289,7 @@ describe('TournamentDisplay', () => {
     expect(cssRule(indexCss, ':root')).toMatch(/font-family:\s*var\(--font-interface\)/)
     expect(cssRule(indexCss, ':root')).toMatch(/font-weight:\s*500/)
     expect(cssRule(displayCss, '.clock')).toMatch(/font-weight:\s*600/)
-    expect(cssRule(displayCss, '.clock')).toMatch(/letter-spacing:\s*\.012em/)
+    expect(cssRule(displayCss, '.clock')).toMatch(/letter-spacing:\s*\.006em/)
     expect(displayCss).toMatch(/\.structure-header h2\s*\{[^}]*font-family:\s*var\(--font-interface\)/)
     expect(cssRule(displayCss, '.level-heading')).toMatch(/font-family:\s*var\(--font-heritage\)/)
     expect(brandCss).toMatch(/\.club-brand-lockup h1\s*\{[^}]*font-family:\s*var\(--font-heritage\)/)

@@ -14,6 +14,8 @@ describe('DirectorSettings', () => {
     render(<App />)
     await openSettings(user)
 
+    expect(screen.queryByText('Choose how the clock, alerts, and keyboard controls behave on this device.')).not.toBeInTheDocument()
+
     const autoAdvance = screen.getByRole('checkbox', { name: 'Automatically advance levels' })
     expect(autoAdvance).toBeChecked()
     await user.click(autoAdvance)
