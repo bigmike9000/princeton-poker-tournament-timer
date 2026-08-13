@@ -539,7 +539,7 @@
   display: grid;
   grid-template-columns: minmax(12rem, .32fr) minmax(0, 1fr);
   align-items: stretch;
-  gap: 1rem;
+  gap: .75rem;
 }
 
 .structure-live-heading {
@@ -573,7 +573,7 @@
   display: flex;
   align-items: end;
   justify-content: space-between;
-  gap: 1rem;
+  gap: .75rem;
 }
 
 .structure-editor-heading .section-intro {
@@ -582,13 +582,13 @@
 
 .structure-add-actions {
   display: flex;
-  gap: .55rem;
+  gap: .4rem;
 }
 
 .structure-add-actions button {
-  min-height: 2.85rem;
+  min-height: 2.75rem;
   border: 1px solid rgb(217 121 43 / 35%);
-  padding: 0 .9rem;
+  padding: 0 .75rem;
   color: var(--orange-400);
   background: rgb(217 121 43 / 7%);
   font-size: .71rem;
@@ -611,9 +611,18 @@
   font-size: .74rem;
 }
 
+.structure-editor-table {
+  min-width: 0;
+  overflow: clip;
+  border: 1px solid rgb(184 154 97 / 22%);
+  border-radius: .5rem;
+  background: rgb(11 11 9 / 92%);
+  box-shadow: 0 14px 30px rgb(0 0 0 / 18%);
+}
+
 .structure-editor-list {
   display: grid;
-  gap: .35rem;
+  gap: 0;
 }
 
 .structure-editor-columns {
@@ -621,14 +630,13 @@
   z-index: 4;
   top: 0;
   display: grid;
-  grid-template-columns: 5.25rem 5.75rem 4.75rem 4.75rem 4.75rem minmax(7.5rem, 1fr) 8.7rem;
-  gap: .4rem;
-  margin-bottom: -.7rem;
+  grid-template-columns: 5.25rem 5.75rem minmax(12rem, 1fr) minmax(13rem, 1.05fr) 8.7rem;
+  gap: .45rem;
   border-bottom: 1px solid rgb(184 154 97 / 22%);
-  padding: .45rem .55rem;
+  padding: .55rem .65rem;
   color: var(--slate-500);
   background: var(--ink-950);
-  box-shadow: 0 5px 12px rgb(0 0 0 / 20%);
+  box-shadow: 0 4px 10px rgb(0 0 0 / 18%);
   font-size: .56rem;
   font-weight: 850;
   letter-spacing: .11em;
@@ -640,24 +648,27 @@
   min-height: 3.75rem;
   min-width: 0;
   margin: 0;
-  border: 1px solid var(--line);
-  border-radius: .375rem;
-  padding: .45rem .55rem;
-  background: linear-gradient(145deg, rgb(27 25 20 / 88%), rgb(13 13 11 / 88%));
+  border: 0;
+  border-bottom: 1px solid rgb(184 154 97 / 14%);
+  padding: .55rem .65rem;
+  background: rgb(22 21 17 / 58%);
 }
 
 .structure-editor-row--level[data-row-tone='odd'] {
-  background: linear-gradient(145deg, rgb(27 25 20 / 94%), rgb(16 15 12 / 92%));
+  background: rgb(27 25 20 / 62%);
 }
 
 .structure-editor-row--level[data-row-tone='even'] {
-  background: linear-gradient(145deg, rgb(22 21 17 / 92%), rgb(11 11 9 / 92%));
+  background: rgb(18 17 14 / 68%);
 }
 
 .structure-editor-row--break {
-  border-color: rgb(217 121 43 / 24%);
   border-left: 3px solid var(--orange-500);
-  background: linear-gradient(90deg, rgb(217 121 43 / 16%), rgb(22 18 13 / 94%) 42%, rgb(13 13 11 / 92%));
+  background: linear-gradient(90deg, rgb(217 121 43 / 11%), rgb(24 20 14 / 74%) 46%, rgb(15 14 11 / 72%));
+}
+
+.structure-editor-list > .structure-editor-row:last-child {
+  border-bottom: 0;
 }
 
 .structure-row-legend {
@@ -672,10 +683,10 @@
 
 .structure-row-grid {
   display: grid;
-  grid-template-columns: 5.25rem 5.75rem 4.75rem 4.75rem 4.75rem minmax(7.5rem, 1fr) 8.7rem;
+  grid-template-columns: 5.25rem 5.75rem minmax(12rem, 1fr) minmax(13rem, 1.05fr) 8.7rem;
   min-width: 0;
   align-items: start;
-  gap: .4rem;
+  gap: .45rem;
 }
 
 .structure-row-identity {
@@ -757,6 +768,33 @@
   gap: .3rem;
 }
 
+.structure-field-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+  gap: .35rem;
+  border: 1px solid rgb(184 154 97 / 15%);
+  border-radius: .375rem;
+  padding: .3rem;
+  background: rgb(7 7 5 / 34%);
+}
+
+.structure-compact-field {
+  display: grid;
+  min-width: 0;
+  gap: .25rem;
+}
+
+.structure-compact-field > span {
+  display: block;
+  color: var(--slate-400);
+  font-size: .5rem;
+  font-weight: 820;
+  letter-spacing: .1em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
 .structure-cell-label {
   display: none;
   color: var(--slate-400);
@@ -795,7 +833,9 @@
 }
 
 .structure-cell:has(.structure-field-error) input,
-.structure-cell:has(.structure-field-error) select {
+.structure-cell:has(.structure-field-error) select,
+.structure-compact-field:has(.structure-field-error) input,
+.structure-compact-field:has(.structure-field-error) select {
   border-color: var(--danger-400);
   box-shadow: inset 0 0 0 1px rgb(238 129 117 / 18%);
 }
@@ -805,11 +845,11 @@
 }
 
 .structure-actions-cell {
-  grid-column: 7;
+  grid-column: 5;
 }
 
 .structure-editor-row--break .structure-break-label {
-  grid-column: 3 / 7;
+  grid-column: 3 / 5;
 }
 
 .structure-field-error {
@@ -827,9 +867,9 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: .6rem;
+  gap: .45rem;
   border-top: 1px solid var(--line);
-  padding: 1rem 0;
+  padding: .75rem 0;
   background: rgb(7 7 5 / 95%);
   backdrop-filter: blur(12px);
 }
@@ -1146,18 +1186,13 @@
 @media (max-width: 1180px) {
   .structure-editor-columns { display: none; }
   .structure-row-grid {
-    grid-template-columns: 5.25rem 5.75rem repeat(3, minmax(4.75rem, 1fr)) 8.7rem;
+    grid-template-columns: 4.75rem 5.25rem minmax(10rem, 1fr) minmax(11rem, 1.05fr) 8.7rem;
     row-gap: .6rem;
   }
   .structure-cell-label { display: block; margin-bottom: .25rem; }
-  .structure-editor-row--level .structure-row-identity { grid-row: 1 / 3; }
-  .structure-editor-row--level .structure-duration-field { grid-column: 2; }
-  .structure-editor-row--level .structure-small-blind { grid-column: 3; }
-  .structure-editor-row--level .structure-big-blind { grid-column: 4; }
-  .structure-editor-row--level .structure-ante { grid-column: 5; }
-  .structure-editor-row--level .structure-ante-type { grid-column: 2 / 6; }
-  .structure-actions-cell { grid-column: 6; grid-row: 1 / 3; }
-  .structure-editor-row--break .structure-break-label { grid-column: 3 / 6; }
+  .structure-compact-field > span { display: block; }
+  .structure-actions-cell { grid-column: 5; }
+  .structure-editor-row--break .structure-break-label { grid-column: 3 / 5; }
 }
 
 @media (max-width: 1000px) {
@@ -1176,19 +1211,11 @@
     gap: .65rem;
   }
   .structure-editor-row { padding: .65rem; }
-  .structure-editor-row--level .structure-row-identity,
-  .structure-editor-row--level .structure-duration-field,
-  .structure-editor-row--level .structure-small-blind,
-  .structure-editor-row--level .structure-big-blind,
-  .structure-editor-row--level .structure-ante,
-  .structure-editor-row--level .structure-ante-type,
-  .structure-editor-row--break .structure-break-label,
-  .structure-actions-cell {
-    grid-column: auto;
-    grid-row: auto;
-  }
   .structure-row-identity,
+  .structure-field-group,
   .structure-actions-cell { grid-column: 1 / -1; }
+  .structure-field-group { min-width: 0; }
+  .structure-editor-row--break .structure-break-label { grid-column: 1 / -1; }
   .row-order-actions { justify-content: end; }
   .alert-options, .shortcut-grid { grid-template-columns: 1fr; }
   .row-order-actions button { width: 2.75rem; height: 2.75rem; }

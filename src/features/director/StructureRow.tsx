@@ -55,36 +55,40 @@ export function StructureRow({
               )}
               <FieldIssue field="durationSeconds" issues={issues} />
             </div>
-            <label className="structure-cell structure-small-blind">
-              <span className="structure-cell-label">Small blind</span>
-              <input aria-label="Small blind" type="number" min="0" step="1" value={entry.smallBlind} onChange={(event) => updateNumber('smallBlind', event.target.value)} />
-              <FieldIssue field="smallBlind" issues={issues} />
-            </label>
-            <label className="structure-cell structure-big-blind">
-              <span className="structure-cell-label">Big blind</span>
-              <input aria-label="Big blind" type="number" min="1" step="1" value={entry.bigBlind} onChange={(event) => updateNumber('bigBlind', event.target.value)} />
-              <FieldIssue field="bigBlind" issues={issues} />
-            </label>
-            <label className="structure-cell structure-ante">
-              <span className="structure-cell-label">Ante</span>
-              <input aria-label="Ante" type="number" min="0" step="1" value={entry.ante} onChange={(event) => updateNumber('ante', event.target.value)} />
-              <FieldIssue field="ante" issues={issues} />
-            </label>
-            <label className="structure-cell structure-ante-type">
-              <span className="structure-cell-label">Ante type</span>
-              <select
-                aria-label="Ante type"
-                value={entry.anteType}
-                onChange={(event) => {
-                  const anteType = event.target.value as typeof entry.anteType
-                  onChange({ ...entry, anteType, ante: anteType === 'none' ? 0 : Math.max(entry.ante, entry.bigBlind) })
-                }}
-              >
-                <option value="none">None</option>
-                <option value="traditional">Traditional ante</option>
-                <option value="big-blind">Big Blind Ante</option>
-              </select>
-            </label>
+            <div className="structure-field-group structure-blinds-group">
+              <label className="structure-compact-field">
+                <span aria-hidden="true">SB</span>
+                <input aria-label="Small blind" type="number" min="0" step="1" value={entry.smallBlind} onChange={(event) => updateNumber('smallBlind', event.target.value)} />
+                <FieldIssue field="smallBlind" issues={issues} />
+              </label>
+              <label className="structure-compact-field">
+                <span aria-hidden="true">BB</span>
+                <input aria-label="Big blind" type="number" min="1" step="1" value={entry.bigBlind} onChange={(event) => updateNumber('bigBlind', event.target.value)} />
+                <FieldIssue field="bigBlind" issues={issues} />
+              </label>
+            </div>
+            <div className="structure-field-group structure-ante-group">
+              <label className="structure-compact-field">
+                <span aria-hidden="true">Type</span>
+                <select
+                  aria-label="Ante type"
+                  value={entry.anteType}
+                  onChange={(event) => {
+                    const anteType = event.target.value as typeof entry.anteType
+                    onChange({ ...entry, anteType, ante: anteType === 'none' ? 0 : Math.max(entry.ante, entry.bigBlind) })
+                  }}
+                >
+                  <option value="none">None</option>
+                  <option value="traditional">Traditional ante</option>
+                  <option value="big-blind">Big Blind Ante</option>
+                </select>
+              </label>
+              <label className="structure-compact-field">
+                <span aria-hidden="true">Amount</span>
+                <input aria-label="Ante" type="number" min="0" step="1" value={entry.ante} onChange={(event) => updateNumber('ante', event.target.value)} />
+                <FieldIssue field="ante" issues={issues} />
+              </label>
+            </div>
           </>
         ) : (
           <>

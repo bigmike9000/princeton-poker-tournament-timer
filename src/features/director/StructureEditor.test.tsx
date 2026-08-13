@@ -44,20 +44,18 @@ function cssRule(source: string, selector: string): string {
 }
 
 describe('StructureEditor', () => {
-  it('renders one shared desktop heading for every structure column', () => {
+  it('renders five grouped headings inside the shared structure table', () => {
     const { container } = render(<StructureStateHarness />)
-    const heading = container.querySelector('.structure-editor-columns')
+    const table = container.querySelector('.structure-editor-table')
+    const columns = table?.querySelector('.structure-editor-columns')
+    const list = table?.querySelector('.structure-editor-list')
 
-    expect(heading).toHaveAttribute('aria-hidden', 'true')
-    expect(Array.from(heading?.children ?? [], (column) => column.textContent)).toEqual([
-      'Level',
-      'Duration',
-      'Small',
-      'Big',
-      'Ante',
-      'Type',
-      'Actions',
+    expect(columns).toHaveAttribute('aria-hidden', 'true')
+    expect(within(columns as HTMLElement).getAllByText(/.+/).map((node) => node.textContent)).toEqual([
+      'Level', 'Minutes', 'Blinds', 'Ante', 'Actions',
     ])
+    expect(columns?.closest('.structure-editor-table')).toBe(table)
+    expect(list?.closest('.structure-editor-table')).toBe(table)
   })
 
   it('marks every structure row with its list-position tone', () => {
@@ -151,28 +149,68 @@ describe('StructureEditor', () => {
     expect(within(breakRow).getByRole('spinbutton', { name: 'Duration minutes' })).toBeVisible()
   })
 
-  it('renders responsive field-label hooks without note or until-end controls', () => {
+  it('groups poker controls with compact sublabels without note or until-end controls', () => {
     render(<StructureStateHarness />)
     const level = screen.getByRole('group', { name: 'Level 1' })
-    const breakRow = screen.getByRole('group', { name: 'Break 1' })
+    const blinds = level.querySelector('.structure-blinds-group')
+    const ante = level.querySelector('.structure-ante-group')
 
-    expect(Array.from(level.querySelectorAll('.structure-cell-label'), (label) => label.textContent)).toEqual([
-      'Duration minutes',
-      'Small blind',
-      'Big blind',
-      'Ante',
-      'Ante type',
-      'Actions',
-    ])
-    expect(Array.from(breakRow.querySelectorAll('.structure-cell-label'), (label) => label.textContent)).toEqual([
-      'Duration minutes',
-      'Break label',
-      'Actions',
-    ])
+    expect(blinds).not.toBeNull()
+    expect(within(blinds as HTMLElement).getByRole('spinbutton', { name: 'Small blind' })).toBeVisible()
+    expect(within(blinds as HTMLElement).getByRole('spinbutton', { name: 'Big blind' })).toBeVisible()
+    expect(within(blinds as HTMLElement).getByText('SB', { exact: true })).toBeVisible()
+    expect(within(blinds as HTMLElement).getByText('BB', { exact: true })).toBeVisible()
+    expect(ante).not.toBeNull()
+    expect(within(ante as HTMLElement).getByRole('combobox', { name: 'Ante type' })).toBeVisible()
+    expect(within(ante as HTMLElement).getByRole('spinbutton', { name: 'Ante' })).toBeVisible()
+    expect(within(ante as HTMLElement).getByText('Type', { exact: true })).toBeVisible()
+    expect(within(ante as HTMLElement).getByText('Amount', { exact: true })).toBeVisible()
     expect(within(level).queryByRole('textbox', { name: 'Level note' })).not.toBeInTheDocument()
     expect(within(level).queryByRole('checkbox', { name: 'Until end' })).not.toBeInTheDocument()
     expect(within(level).queryByText('Note', { exact: true })).not.toBeInTheDocument()
     expect(within(level).queryByText('Until end', { exact: true })).not.toBeInTheDocument()
+  })
+
+  it('renders breaks as a spanning label with minutes and actions but no poker groups', () => {
+    render(<StructureStateHarness />)
+    const breakRow = screen.getByRole('group', { name: 'Break 1' })
+
+    expect(breakRow.querySelector('.structure-break-label')).toContainElement(
+      within(breakRow).getByRole('textbox', { name: 'Break label' }),
+    )
+    expect(within(breakRow).getByRole('spinbutton', { name: 'Duration minutes' })).toBeVisible()
+    expect(within(breakRow).getByRole('button', { name: 'Delete' })).toBeVisible()
+    expect(breakRow.querySelector('.structure-blinds-group')).not.toBeInTheDocument()
+    expect(breakRow.querySelector('.structure-ante-group')).not.toBeInTheDocument()
+  })
+
+  it('keeps grouped validation errors beside the precise invalid controls', () => {
+    const level = createInitialState().structure.find((entry) => entry.kind === 'level')
+    if (!level || level.kind !== 'level') throw new Error('Expected a level fixture')
+
+    render(
+      <StructureRow
+        entry={level}
+        label="Level 1"
+        tone="odd"
+        index={0}
+        total={1}
+        issues={[
+          { entryId: level.id, field: 'smallBlind', message: 'Small blind error' },
+          { entryId: level.id, field: 'ante', message: 'Ante error' },
+        ]}
+        onChange={vi.fn()}
+        onMove={vi.fn()}
+        onDelete={vi.fn()}
+      />,
+    )
+
+    const smallBlindField = screen.getByRole('spinbutton', { name: 'Small blind' }).closest('label')
+    const bigBlindField = screen.getByRole('spinbutton', { name: 'Big blind' }).closest('label')
+    const anteField = screen.getByRole('spinbutton', { name: 'Ante' }).closest('label')
+    expect(within(smallBlindField as HTMLElement).getByText('Small blind error')).toBeVisible()
+    expect(within(bigBlindField as HTMLElement).queryByText('Small blind error')).not.toBeInTheDocument()
+    expect(within(anteField as HTMLElement).getByText('Ante error')).toBeVisible()
   })
 
   it('shows the final untimed level as a non-editable duration marker', () => {
@@ -317,15 +355,29 @@ describe('Structure editor responsive CSS', () => {
     expect(headingRule).toMatch(/background:/)
   })
 
-  it('uses a consistent six-pixel radius for rows, editor inputs, and the action well', () => {
+  it('uses one bounded table surface with separator rows', () => {
+    const tableRule = cssRule(directorCss, '.structure-editor-table')
     const rowRule = cssRule(directorCss, '.structure-editor-row')
-    const inputRule = cssRule(directorCss, `.director-overlay .structure-editor-row input,
-.director-overlay .structure-editor-row select`)
-    const actionRule = cssRule(directorCss, '.row-order-actions')
 
-    expect(rowRule).toMatch(/border-radius:\s*(?:\.375rem|6px)/)
-    expect(inputRule).toMatch(/border-radius:\s*(?:\.375rem|6px)/)
-    expect(actionRule).toMatch(/border-radius:\s*(?:\.375rem|6px)/)
+    expect(tableRule).toMatch(/border:\s*1px solid/)
+    expect(tableRule).toMatch(/border-radius:/)
+    expect(tableRule).toMatch(/background:/)
+    expect(rowRule).toMatch(/border-bottom:\s*1px solid/)
+    expect(rowRule).not.toMatch(/border-radius:/)
+  })
+
+  it('shares the exact five-column desktop template between header and rows', () => {
+    const template = /grid-template-columns:\s*5\.25rem 5\.75rem minmax\(12rem, 1fr\) minmax\(13rem, 1\.05fr\) 8\.7rem/
+
+    expect(cssRule(directorCss, '.structure-editor-columns')).toMatch(template)
+    expect(cssRule(directorCss, '.structure-row-grid')).toMatch(template)
+  })
+
+  it('lays out each grouped field well as two compact columns', () => {
+    const groupRule = cssRule(directorCss, '.structure-field-group')
+
+    expect(groupRule).toMatch(/display:\s*grid/)
+    expect(groupRule).toMatch(/grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/)
   })
 
   it('uses tabular numeric typography for structure number inputs', () => {
@@ -356,41 +408,47 @@ describe('Structure editor responsive CSS', () => {
     expect(cssRule(collapseCss, '.director-nav')).toMatch(/overflow-x:\s*auto/)
   })
 
-  it('wraps the seven-column editor before it can overflow the Director content column', () => {
+  it('reduces the five-column groups before they can overflow the Director content column', () => {
     const mediumStart = directorCss.indexOf('@media (max-width: 1180px)')
     const mobileStart = directorCss.indexOf('@media (max-width: 620px)')
     const mediumCss = directorCss.slice(mediumStart, mobileStart)
 
     expect(mediumStart).toBeGreaterThan(-1)
     expect(cssRule(mediumCss, '.structure-editor-columns')).toMatch(/display:\s*none/)
-    expect(cssRule(mediumCss, '.structure-row-grid')).toMatch(/grid-template-columns:\s*5\.25rem 5\.75rem repeat\(3, minmax\(4\.75rem, 1fr\)\) 8\.7rem/)
+    expect(cssRule(mediumCss, '.structure-row-grid')).toMatch(/grid-template-columns:\s*4\.75rem 5\.25rem minmax\(10rem, 1fr\) minmax\(11rem, 1\.05fr\) 8\.7rem/)
     expect(cssRule(mediumCss, '.structure-cell-label')).toMatch(/display:\s*block/)
-    expect(cssRule(mediumCss, '.structure-editor-row--level .structure-ante-type')).toMatch(/grid-column:\s*2 \/ 6/)
-    expect(cssRule(mediumCss, '.structure-editor-row--break .structure-break-label')).toMatch(/grid-column:\s*3 \/ 6/)
-    expect(cssRule(mediumCss, '.structure-actions-cell')).toMatch(/grid-column:\s*6/)
-    expect(cssRule(mediumCss, '.structure-actions-cell')).toMatch(/grid-row:\s*1 \/ 3/)
+    expect(cssRule(mediumCss, '.structure-compact-field > span')).toMatch(/display:\s*block/)
+    expect(cssRule(mediumCss, '.structure-editor-row--break .structure-break-label')).toMatch(/grid-column:\s*3 \/ 5/)
+    expect(cssRule(mediumCss, '.structure-actions-cell')).toMatch(/grid-column:\s*5/)
   })
 
-  it('keeps actions in the seventh desktop grid column and makes untimed durations non-interactive', () => {
+  it('keeps actions in the fifth desktop grid column and preserves 44-pixel targets', () => {
+    const inputRule = cssRule(directorCss, `.director-overlay .structure-editor-row input,
+.director-overlay .structure-editor-row select`)
+
     expect(cssRule(directorCss, '.row-order-actions')).toMatch(/display:\s*grid/)
     expect(cssRule(directorCss, '.row-order-actions')).toMatch(/grid-template-columns:\s*repeat\(3, 2\.75rem\)/)
     expect(cssRule(directorCss, '.row-order-actions')).not.toMatch(/position:\s*absolute/)
     expect(cssRule(directorCss, '.row-order-actions button')).toMatch(/width:\s*2\.75rem/)
     expect(cssRule(directorCss, '.row-order-actions button')).toMatch(/height:\s*2\.75rem/)
     expect(cssRule(directorCss, '.row-order-actions button')).not.toMatch(/position:\s*absolute/)
-    expect(cssRule(directorCss, '.structure-actions-cell')).toMatch(/grid-column:\s*7/)
+    expect(inputRule).toMatch(/min-height:\s*2\.75rem/)
+    expect(cssRule(directorCss, '.structure-actions-cell')).toMatch(/grid-column:\s*5/)
     expect(cssRule(directorCss, '.structure-untimed-duration')).toMatch(/min-height:\s*2\.75rem/)
     expect(cssRule(directorCss, '.structure-untimed-duration')).toMatch(/cursor:\s*default/)
+    expect(cssRule(directorCss, '.structure-editor-row--break .structure-break-label')).toMatch(/grid-column:\s*3 \/ 5/)
   })
 
-  it('uses a two-column mobile grid with full-width identity and actions', () => {
+  it('uses a contained two-column mobile grid with full-width identity, groups, and actions', () => {
     const mobileCss = directorCss.slice(directorCss.indexOf('@media (max-width: 620px)'))
     const fullWidthSelector = `.structure-row-identity,
+  .structure-field-group,
   .structure-actions-cell`
 
     expect(cssRule(mobileCss, '.structure-row-grid')).toMatch(/grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/)
     expect(cssRule(mobileCss, fullWidthSelector)).toMatch(/grid-column:\s*1 \/ -1/)
-    expect(mobileCss).toMatch(/\.structure-editor-row--break \.structure-break-label,\s*\n\s*\.structure-actions-cell\s*\{[^}]*grid-column:\s*auto/s)
+    expect(cssRule(mobileCss, '.structure-field-group')).toMatch(/min-width:\s*0/)
+    expect(cssRule(mobileCss, '.structure-editor-row--break .structure-break-label')).toMatch(/grid-column:\s*1 \/ -1/)
   })
 })
 

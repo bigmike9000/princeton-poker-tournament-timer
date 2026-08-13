@@ -108,37 +108,37 @@ export function StructureEditor() {
         <p role="alert" className="validation-banner">Add at least one valid poker level before applying.</p>
       )}
 
-      <div className="structure-editor-columns" aria-hidden="true">
-        <span>Level</span>
-        <span>Duration</span>
-        <span>Small</span>
-        <span>Big</span>
-        <span>Ante</span>
-        <span>Type</span>
-        <span>Actions</span>
-      </div>
-      <div className="structure-editor-list">
-        {draft.map((entry, index) => {
-          const entryNumber = draft
-            .slice(0, index + 1)
-            .filter((candidate) => candidate.kind === entry.kind)
-            .length
-          const label = entry.kind === 'level' ? `Level ${entryNumber}` : `Break ${entryNumber}`
-          return (
-            <StructureRow
-              key={entry.id}
-              entry={entry}
-              label={label}
-              tone={index % 2 === 0 ? 'odd' : 'even'}
-              index={index}
-              total={draft.length}
-              issues={validation.issues.filter((issue) => issue.entryId === entry.id)}
-              onChange={(next) => updateEntry(index, next)}
-              onMove={(delta) => moveEntry(index, delta)}
-              onDelete={() => deleteEntry(index)}
-            />
-          )
-        })}
+      <div className="structure-editor-table">
+        <div className="structure-editor-columns" aria-hidden="true">
+          <span>Level</span>
+          <span>Minutes</span>
+          <span>Blinds</span>
+          <span>Ante</span>
+          <span>Actions</span>
+        </div>
+        <div className="structure-editor-list">
+          {draft.map((entry, index) => {
+            const entryNumber = draft
+              .slice(0, index + 1)
+              .filter((candidate) => candidate.kind === entry.kind)
+              .length
+            const label = entry.kind === 'level' ? `Level ${entryNumber}` : `Break ${entryNumber}`
+            return (
+              <StructureRow
+                key={entry.id}
+                entry={entry}
+                label={label}
+                tone={index % 2 === 0 ? 'odd' : 'even'}
+                index={index}
+                total={draft.length}
+                issues={validation.issues.filter((issue) => issue.entryId === entry.id)}
+                onChange={(next) => updateEntry(index, next)}
+                onMove={(delta) => moveEntry(index, delta)}
+                onDelete={() => deleteEntry(index)}
+              />
+            )
+          })}
+        </div>
       </div>
 
       <div className="structure-sticky-actions">
