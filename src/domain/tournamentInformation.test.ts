@@ -33,7 +33,14 @@ describe('tournament information', () => {
         'Starting stack: 200 chips',
       ],
       prizeLines: [
-        'Prize structure will be announced by the Tournament Director before play begins.',
+        '1: 300',
+        '2: 200',
+        '3: 140',
+        '4: 100',
+        '5: 80',
+        '6: 70',
+        '7: 60',
+        '8: 50',
       ],
       houseNotes: [
         'Big-blind ante begins at 10/20.',
@@ -82,12 +89,12 @@ describe('tournament information', () => {
   it('accepts the exact measured projector-safe boundary for every collection', () => {
     expect(PROJECTOR_INFORMATION_BUDGETS).toEqual({
       chipLines: { maxLines: 6, maxCharacters: 120 },
-      prizeLines: { maxLines: 4, maxCharacters: 96 },
+      prizeLines: { maxLines: 8, maxCharacters: 96 },
       houseNotes: { maxLines: 4, maxCharacters: 120 },
     })
     const information = {
       chipLines: Array.from({ length: 6 }, () => 'x'.repeat(20)),
-      prizeLines: Array.from({ length: 4 }, () => 'x'.repeat(24)),
+      prizeLines: Array.from({ length: 8 }, () => 'x'.repeat(12)),
       houseNotes: Array.from({ length: 4 }, () => 'x'.repeat(30)),
     }
 
@@ -95,7 +102,7 @@ describe('tournament information', () => {
       valid: true,
       fields: {
         chipLines: { lineCount: 6, characterCount: 120, error: null },
-        prizeLines: { lineCount: 4, characterCount: 96, error: null },
+        prizeLines: { lineCount: 8, characterCount: 96, error: null },
         houseNotes: { lineCount: 4, characterCount: 120, error: null },
       },
     })

@@ -974,8 +974,7 @@ select:focus-visible {
 
 .info-card h2,
 .info-card h3,
-.info-kicker,
-.info-footer p {
+.info-kicker {
   margin: 0;
 }
 
@@ -1066,7 +1065,7 @@ select:focus-visible {
 
 .info-page--overview {
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr);
 }
 
 .info-page--projector-safe {
@@ -1169,7 +1168,7 @@ select:focus-visible {
 .info-overview-details {
   display: grid;
   min-height: 0;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: clamp(.65rem, 1.5vw, 1rem);
 }
 
@@ -1295,35 +1294,56 @@ select:focus-visible {
   font-variant-numeric: tabular-nums;
 }
 
-.info-prizes ul {
-  margin-top: .42rem;
-}
-
-.info-house-notes {
-  margin-top: .65rem;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: .55rem;
-}
-
-.info-house-notes ul {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-top: 0;
-}
-
-.info-rules-grid {
+.info-prize-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(.7rem, 1.6vw, 1.25rem);
-  margin-top: .6rem;
+  gap: 0;
+  margin-top: .42rem;
+  padding: 0;
+  list-style: none;
 }
 
-.info-rules-grid ul {
-  margin-top: 0;
+.info-prize-list li {
+  display: grid;
+  min-height: clamp(1.9rem, 4.2vh, 2.65rem);
+  grid-template-columns: minmax(2.75rem, .3fr) minmax(0, 1fr);
+  align-items: center;
+  border-top: 1px solid rgb(184 154 97 / 16%);
+  padding: .18rem .25rem;
 }
 
-.info-rules-grid ul + ul {
-  border-left: 1px solid var(--line);
-  padding-left: calc(1.1rem + clamp(.7rem, 1.6vw, 1.25rem));
+.info-prize-list li:first-child {
+  border-top: 0;
+}
+
+.info-prize-rank {
+  color: var(--orange-400);
+  font-family: var(--font-numeric);
+  font-weight: 820;
+  font-variant-numeric: tabular-nums;
+}
+
+.info-prize-value {
+  color: var(--ivory-50);
+  font-family: var(--font-numeric);
+  font-weight: 760;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.info-prize-line--custom {
+  grid-column: 1 / -1;
+}
+
+.info-chip-reminder {
+  margin: 0;
+  border: 1px solid rgb(217 121 43 / 38%);
+  border-left: 3px solid var(--orange-500);
+  padding: clamp(.55rem, 1.2vh, .8rem) clamp(.65rem, 1.2vw, .9rem);
+  color: var(--ivory-50);
+  background: rgb(37 24 13 / 84%);
+  font-size: clamp(.72rem, .8vw, .9rem);
+  font-weight: 760;
+  line-height: 1.3;
 }
 
 .info-page--structure {
@@ -1482,38 +1502,6 @@ select:focus-visible {
   white-space: normal;
 }
 
-.info-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  border-top: 1px solid var(--line);
-  padding: .3rem clamp(.75rem, 1.5vw, 1rem);
-  color: var(--slate-400);
-  background: rgb(10 10 8 / 72%);
-  font-size: .7rem;
-  line-height: 1.45;
-}
-
-.info-footer a {
-  display: inline-flex;
-  min-height: 2.75rem;
-  align-items: center;
-  padding: 0 .3rem;
-  color: var(--orange-400);
-  font-weight: 760;
-  text-underline-offset: .2rem;
-}
-
-.info-footer a:hover {
-  color: var(--ivory-50);
-}
-
-.info-footer a:focus-visible {
-  outline: 3px solid var(--orange-400);
-  outline-offset: 2px;
-}
-
 @media (max-width: 640px) {
   .info-overlay { padding: 0; }
   .info-panel { width: 100%; height: 100dvh; border: 0; border-top: 2px solid var(--orange-500); }
@@ -1545,11 +1533,9 @@ select:focus-visible {
   .info-totals div { padding-top: .24rem; }
   .info-totals dt { font-size: .65rem; }
   .info-totals dd { margin-top: .08rem; font-size: .75rem; }
-  .info-house-notes { margin-top: .28rem; padding-bottom: .28rem; }
-  .info-rules-grid { gap: .3rem; margin-top: .3rem; }
-  .info-rules-grid ul + ul { padding-left: calc(.75rem + .3rem); }
-  .info-footer { gap: .3rem; padding: .1rem .45rem; font-size: .55rem; line-height: 1.2; }
-  .info-footer a { min-height: 2.75rem; }
+  .info-prize-list { margin-top: .2rem; }
+  .info-prize-list li { min-height: 1.75rem; padding: .08rem .15rem; }
+  .info-chip-reminder { padding: .35rem .45rem; font-size: .65rem; }
   .info-page--structure { gap: .25rem; padding: .35rem; }
   .info-structure-list { gap: .15rem .25rem; }
   .info-structure-entry { grid-template-columns: minmax(2.6rem, .78fr) minmax(2.8rem, 1fr) minmax(2.3rem, auto); gap: 0 .2rem; padding: .08rem .2rem; }

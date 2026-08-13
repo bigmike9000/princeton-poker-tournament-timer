@@ -15,7 +15,7 @@ export interface ProjectorInformationBudget {
 
 export const PROJECTOR_INFORMATION_BUDGETS = {
   chipLines: { maxLines: 6, maxCharacters: 120 },
-  prizeLines: { maxLines: 4, maxCharacters: 96 },
+  prizeLines: { maxLines: 8, maxCharacters: 96 },
   houseNotes: { maxLines: 4, maxCharacters: 120 },
 } as const satisfies Record<TournamentInformationField, ProjectorInformationBudget>
 
@@ -38,7 +38,14 @@ export const DEFAULT_TOURNAMENT_INFORMATION: ReadonlyTournamentInformation = {
     'Starting stack: 200 chips',
   ],
   prizeLines: [
-    'Prize structure will be announced by the Tournament Director before play begins.',
+    '1: 300',
+    '2: 200',
+    '3: 140',
+    '4: 100',
+    '5: 80',
+    '6: 70',
+    '7: 60',
+    '8: 50',
   ],
   houseNotes: [
     'Big-blind ante begins at 10/20.',

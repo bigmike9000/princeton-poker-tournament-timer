@@ -28,7 +28,7 @@ describe('TournamentInformationEditor', () => {
 
     expect(screen.getByRole('textbox', { name: 'Chip denominations and starting stack' })).toHaveAttribute('rows', '5')
     expect(screen.getByRole('textbox', { name: 'Prize structure' })).toHaveValue(
-      'Prize structure will be announced by the Tournament Director before play begins.',
+      '1: 300\n2: 200\n3: 140\n4: 100\n5: 80\n6: 70\n7: 60\n8: 50',
     )
     expect(screen.getByRole('textbox', { name: 'House notes' })).toBeVisible()
   })
@@ -63,7 +63,7 @@ describe('TournamentInformationEditor', () => {
     await user.click(screen.getByRole('button', { name: 'Save tournament information' }))
 
     expect(screen.getByLabelText('Saved prize information')).toHaveTextContent(
-      'Prize structure will be announced by the Tournament Director before play begins.',
+      '1: 300|2: 200|3: 140|4: 100|5: 80|6: 70|7: 60|8: 50',
     )
   })
 
@@ -74,7 +74,7 @@ describe('TournamentInformationEditor', () => {
     const prizes = screen.getByRole('textbox', { name: 'Prize structure' })
     const notes = screen.getByRole('textbox', { name: 'House notes' })
     const chipBoundary = Array.from({ length: 6 }, () => 'x'.repeat(20)).join('\n')
-    const prizeBoundary = Array.from({ length: 4 }, () => 'x'.repeat(24)).join('\n')
+    const prizeBoundary = Array.from({ length: 8 }, () => 'x'.repeat(12)).join('\n')
     const houseBoundary = Array.from({ length: 4 }, () => 'x'.repeat(30)).join('\n')
 
     fireEvent.change(chips, { target: { value: chipBoundary } })
@@ -82,7 +82,7 @@ describe('TournamentInformationEditor', () => {
     fireEvent.change(notes, { target: { value: houseBoundary } })
 
     expect(screen.getByText('6 of 6 lines · 120 of 120 characters')).toBeVisible()
-    expect(screen.getByText('4 of 4 lines · 96 of 96 characters')).toBeVisible()
+    expect(screen.getByText('8 of 8 lines · 96 of 96 characters')).toBeVisible()
     expect(screen.getByText('4 of 4 lines · 120 of 120 characters')).toBeVisible()
     expect(screen.getByRole('button', { name: 'Save tournament information' })).toBeEnabled()
 

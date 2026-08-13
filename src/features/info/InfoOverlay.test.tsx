@@ -159,37 +159,14 @@ describe('InfoOverlay', () => {
     expect(overlay.getByRole('tabpanel')).toHaveClass('info-page--projector-safe')
     expect(overlay.queryByText('Legacy information exceeds projector layout')).not.toBeInTheDocument()
     expect(overlay.queryByRole('list', { name: 'Tournament blind structure' })).not.toBeInTheDocument()
-    expect(overlay.getByText(
-      'Prize structure will be announced by the Tournament Director before play begins.',
-    )).toBeVisible()
-    expect(overlay.getByText('Big-blind ante begins at 10/20.')).toBeVisible()
-    expect(overlay.getByText(
-      'Chip-ups occur during the scheduled breaks shown in the structure.',
-    )).toBeVisible()
-
-    const rules = [
-      'Fairness and the best interest of the game guide floor decisions.',
-      'Protect your hand, act in turn, and make actions clear.',
-      'One player to a hand; no coaching during a live hand.',
-      'Keep chips visible and countable.',
-      'Do not use electronic devices while holding a live hand.',
-      'Table all hands face up at an all-in showdown.',
-      'Clear verbal declarations made in turn are binding.',
-      'The Tournament Director administers clock calls and makes final rulings.',
-    ]
-    rules.forEach((rule) => expect(overlay.getByText(rule)).toBeVisible())
-
-    expect(overlay.getByRole('link', { name: '2024 Poker TDA rules' })).toHaveAttribute(
-      'href',
-      'https://www.pokertda.com/view-poker-tda-rules/',
-    )
-    expect(overlay.getByRole('link', { name: '2024 Poker TDA rules' })).toHaveAttribute(
-      'target',
-      '_blank',
-    )
-    expect(overlay.getByText(
-      'PPC house rules and Tournament Director decisions govern this event.',
-    )).toBeVisible()
+    expect(overlay.getByText('Keep chips visible and countable.')).toBeVisible()
+    expect(overlay.getAllByRole('listitem', { name: /place prize/i })).toHaveLength(8)
+    expect(overlay.getByRole('listitem', { name: '1 place prize, 300' })).toBeVisible()
+    expect(overlay.getByRole('listitem', { name: '8 place prize, 50' })).toBeVisible()
+    expect(overlay.queryByRole('heading', { name: /rules/i })).not.toBeInTheDocument()
+    expect(overlay.queryByText('House notes')).not.toBeInTheDocument()
+    expect(overlay.queryByText('Big-blind ante begins at 10/20.')).not.toBeInTheDocument()
+    expect(overlay.queryByRole('link', { name: '2024 Poker TDA rules' })).not.toBeInTheDocument()
 
     await user.click(overlay.getByRole('tab', { name: 'Blind structure' }))
     expect(overlay.getByRole('tab', { name: 'Blind structure' })).toHaveAttribute('aria-selected', 'true')
@@ -206,12 +183,32 @@ describe('InfoOverlay', () => {
     expect(within(reopened.dialog).getByText('Page 1 of 2')).toBeVisible()
   })
 
-  it('warns about legacy oversize information and keeps every legacy line in the reachable fallback', () => {
+  it('ignores hidden over-budget house notes when choosing the public projector layout', () => {
+    const state = createInitialState()
+    state.information = {
+      chipLines: ['Tournament chips'],
+      prizeLines: ['1: 300'],
+      houseNotes: Array.from({ length: 5 }, (_, index) => `Hidden house note ${index + 1}`),
+    }
+    saveSnapshot(localStorage, state, Date.now())
+
+    render(<App />)
+    const { dialog } = openInfo()
+    const overlay = within(dialog)
+    const overview = overlay.getByRole('tabpanel')
+
+    expect(overview).toHaveClass('info-page--projector-safe')
+    expect(overview).not.toHaveClass('info-page--legacy-oversize')
+    expect(overlay.queryByText('Legacy information exceeds projector layout')).not.toBeInTheDocument()
+    expect(overlay.queryByText('Hidden house note 1')).not.toBeInTheDocument()
+  })
+
+  it('warns about oversize public chips and keeps every legacy chip line reachable', () => {
     const state = createInitialState()
     state.information = {
       chipLines: Array.from({ length: 24 }, (_, index) => `Legacy chip line ${String(index + 1).padStart(2, '0')} ${'x'.repeat(120)}`),
-      prizeLines: ['Legacy prize ' + 'p'.repeat(120)],
-      houseNotes: ['Legacy house ' + 'h'.repeat(120)],
+      prizeLines: ['1: 300'],
+      houseNotes: ['Hidden legacy house note'],
     }
     saveSnapshot(localStorage, state, Date.now())
 
@@ -225,8 +222,29 @@ describe('InfoOverlay', () => {
     expect(overview).not.toHaveClass('info-page--projector-safe')
     expect(overlay.getByText(/^Legacy chip line 01 /)).toBeVisible()
     expect(overlay.getByText(/^Legacy chip line 24 /)).toBeVisible()
-    expect(overlay.getByText(/^Legacy prize /)).toBeVisible()
-    expect(overlay.getByText(/^Legacy house /)).toBeVisible()
+    expect(overlay.getByRole('listitem', { name: '1 place prize, 300' })).toBeVisible()
+    expect(overlay.queryByText('Hidden legacy house note')).not.toBeInTheDocument()
+  })
+
+  it('aligns colon-delimited prizes and lets custom prize copy span the row', () => {
+    const state = createInitialState()
+    state.information = {
+      chipLines: [...state.information!.chipLines],
+      prizeLines: ['Winner takes the trophy', 'Runner-up: Medal'],
+      houseNotes: [...state.information!.houseNotes],
+    }
+    saveSnapshot(localStorage, state, Date.now())
+
+    render(<App />)
+    const { dialog } = openInfo()
+    const overlay = within(dialog)
+    const prizeList = overlay.getByRole('list', { name: 'Prize structure' })
+
+    const customPrize = within(prizeList).getByRole('listitem', { name: 'Winner takes the trophy' })
+    expect(customPrize.firstElementChild).toHaveClass('info-prize-line--custom')
+    expect(within(prizeList).getByRole('listitem', { name: 'Runner-up place prize, Medal' }))
+      .toHaveTextContent('Runner-upMedal')
+    expect(cssRule(displayCss, '.info-prize-line--custom')).toMatch(/grid-column:\s*1\s*\/\s*-1/)
   })
 
   it('shows canonical chip cards and live tournament totals', () => {
@@ -249,12 +267,14 @@ describe('InfoOverlay', () => {
     expect(within(twentyFive).getByText('Green')).toBeVisible()
     expect(within(twentyFive).getByText('6 chips')).toBeVisible()
 
-    expect(overlay.getByText('Starting stack')).toBeVisible()
-    expect(overlay.getByText('200')).toBeVisible()
-    expect(overlay.getByText('Players')).toBeVisible()
-    expect(overlay.getByText('80')).toBeVisible()
-    expect(overlay.getByText('Chips in play')).toBeVisible()
-    expect(overlay.getByText('16,000')).toBeVisible()
+    const totals = overlay.getByText('Starting stack').closest('dl')
+    expect(totals).not.toBeNull()
+    expect(within(totals as HTMLElement).getByText('Starting stack')).toBeVisible()
+    expect(within(totals as HTMLElement).getByText('200')).toBeVisible()
+    expect(within(totals as HTMLElement).getByText('Players')).toBeVisible()
+    expect(within(totals as HTMLElement).getByText('80')).toBeVisible()
+    expect(within(totals as HTMLElement).getByText('Chips in play')).toBeVisible()
+    expect(within(totals as HTMLElement).getByText('16,000')).toBeVisible()
   })
 
   it('moves between tabs with arrow keys and exposes only the selected tab in the tab order', () => {

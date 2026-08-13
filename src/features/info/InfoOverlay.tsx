@@ -23,7 +23,9 @@ export function InfoOverlay({ open, onClose, onAfterClose }: InfoOverlayProps) {
   const overlayRef = useRef<HTMLElement>(null)
   const { state } = useTournament()
   const information = selectTournamentInformation(state)
-  const projectorSafeInformation = validateProjectorInformation(information).valid
+  const validation = validateProjectorInformation(information)
+  const projectorSafeInformation = validation.fields.chipLines.error === null &&
+    validation.fields.prizeLines.error === null
 
   useEffect(() => {
     // The overlay persists while closed, so each open cycle deliberately starts on page one.
@@ -161,7 +163,6 @@ export function InfoOverlay({ open, onClose, onAfterClose }: InfoOverlayProps) {
               state={state}
               chipLines={information.chipLines}
               prizeLines={information.prizeLines}
-              houseNotes={information.houseNotes}
             />
           </div>
         ) : (

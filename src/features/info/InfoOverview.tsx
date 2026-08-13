@@ -1,4 +1,3 @@
-import { TOURNAMENT_RULE_SUMMARY } from '../../domain/tournamentInformation'
 import type { TournamentState } from '../../domain/types'
 import { ChipDenominations } from './ChipDenominations'
 
@@ -6,14 +5,12 @@ interface InfoOverviewProps {
   state: TournamentState
   chipLines: readonly string[]
   prizeLines: readonly string[]
-  houseNotes: readonly string[]
 }
 
 export function InfoOverview({
   state,
   chipLines,
   prizeLines,
-  houseNotes,
 }: InfoOverviewProps) {
   return (
     <>
@@ -24,40 +21,31 @@ export function InfoOverview({
           <section className="info-card info-prizes" aria-labelledby="info-prizes-title">
             <p className="info-kicker">Awards</p>
             <h2 id="info-prizes-title">Prize structure</h2>
-            <ul>
-              {prizeLines.map((line, index) => <li key={`${line}-${index}`}>{line}</li>)}
+            <ul className="info-prize-list" aria-labelledby="info-prizes-title">
+              {prizeLines.map((line, index) => {
+                const separatorIndex = line.indexOf(':')
+                if (separatorIndex === -1) {
+                  return (
+                    <li key={`${line}-${index}`} aria-label={line}>
+                      <span className="info-prize-line--custom">{line}</span>
+                    </li>
+                  )
+                }
+
+                const rank = line.slice(0, separatorIndex).trim()
+                const value = line.slice(separatorIndex + 1).trim()
+                return (
+                  <li key={`${line}-${index}`} aria-label={`${rank} place prize, ${value}`}>
+                    <span className="info-prize-rank" aria-hidden="true">{rank}</span>
+                    <span className="info-prize-value" aria-hidden="true">{value}</span>
+                  </li>
+                )
+              })}
             </ul>
           </section>
-
-          <section className="info-card info-rules" aria-labelledby="info-rules-title">
-            <p className="info-kicker">Play well</p>
-            <h2 id="info-rules-title">Tournament rules &amp; information</h2>
-            <div className="info-house-notes">
-              <h3>House notes</h3>
-              <ul>
-                {houseNotes.map((line, index) => <li key={`${line}-${index}`}>{line}</li>)}
-              </ul>
-            </div>
-            <div className="info-rules-grid">
-              <ul>
-                {TOURNAMENT_RULE_SUMMARY.slice(0, 4).map((rule) => <li key={rule}>{rule}</li>)}
-              </ul>
-              <ul>
-                {TOURNAMENT_RULE_SUMMARY.slice(4).map((rule) => <li key={rule}>{rule}</li>)}
-              </ul>
-            </div>
-          </section>
+          <p className="info-chip-reminder">Keep chips visible and countable.</p>
         </div>
       </div>
-
-      <footer className="info-footer">
-        <p>Reference: <a
-          href="https://www.pokertda.com/view-poker-tda-rules/"
-          target="_blank"
-          rel="noreferrer"
-        >2024 Poker TDA rules</a></p>
-        <p>PPC house rules and Tournament Director decisions govern this event.</p>
-      </footer>
     </>
   )
 }
