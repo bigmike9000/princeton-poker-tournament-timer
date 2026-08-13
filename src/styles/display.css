@@ -412,6 +412,11 @@ select:focus-visible {
   place-items: center;
 }
 
+.sponsor-marks--display .sponsor-logo-card {
+  width: 8.5rem;
+  height: 2.25rem;
+}
+
 .sponsor-logo-card--jane-street {
   border-radius: .12rem;
   padding: .18rem .38rem;
@@ -897,8 +902,9 @@ select:focus-visible {
   .club-logo { width: 3.2rem; height: 3.2rem; }
   .stage-content { padding-top: .75rem; }
   .clock { margin: .7rem 0 1rem; padding-bottom: .65rem; font-size: clamp(6.5rem, 12.2vw, 12rem); }
-  .sponsor-strip { height: 1.5rem; gap: .5rem; margin-top: .5rem; font-size: .5rem; }
+  .sponsor-strip { height: 1.85rem; gap: .5rem; margin-top: .5rem; font-size: .5rem; }
   .sponsor-logo-card { width: 5.5rem; height: 1.5rem; }
+  .sponsor-marks--display .sponsor-logo-card { width: 7.25rem; height: 1.85rem; }
   .sponsor-logo-card--jane-street { padding: .14rem .28rem; }
   .structure-header { min-height: 5.6rem; }
   .structure-row { min-height: 3.25rem; }
@@ -945,6 +951,7 @@ select:focus-visible {
   .stats-grid { grid-template-columns: 1fr; }
   .sponsor-strip { height: 1.5rem; gap: .5rem; overflow: hidden; white-space: nowrap; }
   .sponsor-logo-card { width: 5.5rem; height: 1.5rem; }
+  .sponsor-marks--display .sponsor-logo-card { width: 5.5rem; height: 1.5rem; }
   .sponsor-logo-card--jane-street { padding: .14rem .28rem; }
   .control-group { flex-wrap: wrap; }
 }

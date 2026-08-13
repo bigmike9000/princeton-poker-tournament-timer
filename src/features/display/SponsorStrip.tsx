@@ -8,7 +8,7 @@ export function SponsorStrip({ labels }: SponsorStripProps) {
   return (
     <footer className="sponsor-strip" aria-label="Tournament sponsors">
       <span>Presented with support from</span>
-      <SponsorMarks labels={labels} />
+      <SponsorMarks labels={labels} className="sponsor-marks--display" />
     </footer>
   )
 }

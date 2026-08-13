@@ -20,7 +20,24 @@ describe('SponsorStrip', () => {
     const { container } = render(<SponsorStrip labels={['Jane Street']} />)
 
     expect(screen.getByText('Presented with support from')).toBeVisible()
-    expect(container.querySelector('.sponsor-marks')).not.toBeNull()
+    expect(container.querySelector('.sponsor-marks.sponsor-marks--display')).not.toBeNull()
+  })
+
+  it('enlarges only the main sponsor rack at full and short projector heights', () => {
+    const displayRule = cssRule(displayCss, '.sponsor-marks--display .sponsor-logo-card')
+    const shortHeightCss = displayCss.slice(displayCss.indexOf('@media (max-height: 820px)'))
+    const shortHeightRule = cssRule(shortHeightCss, '.sponsor-marks--display .sponsor-logo-card')
+    const phoneCss = displayCss.slice(displayCss.indexOf('@media (max-width: 640px)'))
+    const phoneRule = cssRule(phoneCss, '.sponsor-marks--display .sponsor-logo-card')
+    const infoRule = cssRule(displayCss, '.sponsor-marks--info .sponsor-logo-card')
+
+    expect(displayRule).toMatch(/width:\s*8\.5rem/)
+    expect(displayRule).toMatch(/height:\s*2\.25rem/)
+    expect(shortHeightRule).toMatch(/width:\s*7\.25rem/)
+    expect(shortHeightRule).toMatch(/height:\s*1\.85rem/)
+    expect(phoneRule).toMatch(/width:\s*5\.5rem/)
+    expect(phoneRule).toMatch(/height:\s*1\.5rem/)
+    expect(infoRule).not.toMatch(/8\.5rem|2\.25rem|7\.25rem|1\.85rem/)
   })
 
   it('contains both intrinsic logo images inside the bounded sponsor cards', () => {
