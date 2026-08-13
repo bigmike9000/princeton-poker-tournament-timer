@@ -283,7 +283,7 @@ describe('TournamentDisplay', () => {
   it('uses interface typography for operational surfaces while preserving heritage branding', () => {
     const tokenRoot = cssRule(tokensCss, ':root')
 
-    expect(tokenRoot).toMatch(/--font-interface:\s*"Gill Sans",\s*"Avenir Next",\s*Avenir,\s*"Segoe UI",\s*ui-sans-serif,\s*system-ui,\s*sans-serif/)
+    expect(tokenRoot).toMatch(/--font-interface:\s*"Avenir Next",\s*Avenir,\s*"Segoe UI",\s*ui-sans-serif,\s*system-ui,\s*sans-serif/)
     expect(tokenRoot).toMatch(/--font-heritage:\s*Baskerville,\s*"Iowan Old Style",\s*"Palatino Linotype",\s*Palatino,\s*Georgia,\s*serif/)
     expect(tokenRoot).toMatch(/--font-numeric:\s*"Avenir Next Condensed",\s*"Arial Narrow",\s*"Roboto Condensed",\s*"Segoe UI",\s*sans-serif/)
     expect(cssRule(indexCss, ':root')).toMatch(/font-family:\s*var\(--font-interface\)/)

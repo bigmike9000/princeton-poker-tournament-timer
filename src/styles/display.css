@@ -146,7 +146,7 @@ select:focus-visible {
   background: var(--surface);
   box-shadow: inset 0 1px rgb(255 249 232 / 3%);
   font-size: .68rem;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: .1em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -189,7 +189,7 @@ select:focus-visible {
 .eyebrow {
   color: var(--slate-400);
   font-size: clamp(.63rem, .72vw, .76rem);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: .19em;
   text-transform: uppercase;
 }
@@ -226,7 +226,7 @@ select:focus-visible {
   font-family: var(--font-numeric);
   font-size: clamp(2.5rem, 4.4vw, 5rem);
   font-variant-numeric: tabular-nums;
-  font-weight: 760;
+  font-weight: 600;
   letter-spacing: -.045em;
   line-height: .95;
 }
@@ -235,7 +235,7 @@ select:focus-visible {
   margin-top: .55rem;
   color: var(--orange-400);
   font-size: clamp(.82rem, 1.1vw, 1.16rem);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: .08em;
 }
 
@@ -260,7 +260,7 @@ select:focus-visible {
 .next-level-card small {
   color: var(--slate-300);
   font-size: .75rem;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: .1em;
   text-transform: uppercase;
 }
@@ -283,7 +283,7 @@ select:focus-visible {
   font-size: clamp(7.5rem, 14.2vw, 16rem);
   font-stretch: condensed;
   font-variant-numeric: tabular-nums;
-  font-weight: 780;
+  font-weight: 600;
   letter-spacing: -.075em;
   line-height: .74;
   text-align: center;
@@ -358,7 +358,7 @@ select:focus-visible {
 .stat-card span {
   color: var(--slate-400);
   font-size: clamp(.61rem, .68vw, .71rem);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: .14em;
   text-transform: uppercase;
 }
@@ -369,6 +369,7 @@ select:focus-visible {
   font-family: var(--font-numeric);
   font-size: clamp(1.35rem, 2.2vw, 2.45rem);
   font-variant-numeric: tabular-nums;
+  font-weight: 600;
   letter-spacing: -.035em;
   text-overflow: ellipsis;
 }
@@ -405,7 +406,7 @@ select:focus-visible {
   margin-top: .8rem;
   color: var(--slate-500);
   font-size: .58rem;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: .15em;
   text-transform: uppercase;
 }
@@ -589,7 +590,7 @@ select:focus-visible {
   color: var(--slate-400);
   font-family: var(--font-numeric);
   font-size: .75rem;
-  font-weight: 800;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
@@ -621,7 +622,7 @@ select:focus-visible {
   overflow: hidden;
   color: var(--slate-400);
   font-size: .61rem;
-  font-weight: 760;
+  font-weight: 500;
   letter-spacing: .08em;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -641,7 +642,7 @@ select:focus-visible {
   color: var(--slate-400);
   font-family: var(--font-numeric);
   font-size: .7rem;
-  font-weight: 700;
+  font-weight: 500;
   white-space: nowrap;
 }
 
@@ -656,7 +657,7 @@ select:focus-visible {
   background: var(--orange-500);
   box-shadow: 0 4px 12px rgb(0 0 0 / 28%);
   font-size: .5rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: .13em;
 }
 
@@ -729,7 +730,7 @@ select:focus-visible {
   background: linear-gradient(180deg, #201d17, #12110e);
   box-shadow: inset 0 1px rgb(255 249 232 / 4%);
   font-size: .74rem;
-  font-weight: 780;
+  font-weight: 600;
   letter-spacing: .055em;
   cursor: pointer;
 }
@@ -884,7 +885,7 @@ select:focus-visible {
   left: 0;
   color: var(--slate-400);
   font-size: .55rem;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: .12em;
   line-height: 1.15;
   text-transform: uppercase;
@@ -901,7 +902,7 @@ select:focus-visible {
   font-family: var(--font-numeric);
   font-size: 1.25rem;
   font-variant-numeric: tabular-nums;
-  font-weight: 700;
+  font-weight: 600;
   text-align: center;
   appearance: textfield;
 }
@@ -1085,7 +1086,7 @@ select:focus-visible {
 .info-kicker {
   color: var(--orange-400);
   font-size: .62rem;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: .16em;
   text-transform: uppercase;
 }
@@ -1249,7 +1250,7 @@ select:focus-visible {
   margin-bottom: .42rem;
   color: var(--brass-400);
   font-size: .68rem;
-  font-weight: 820;
+  font-weight: 600;
   letter-spacing: .12em;
   text-transform: uppercase;
 }
@@ -1340,7 +1341,7 @@ select:focus-visible {
   border-radius: 50%;
   font-family: var(--font-numeric);
   font-size: clamp(.85rem, 1.7vh, 1.15rem);
-  font-weight: 900;
+  font-weight: 700;
   box-shadow: 0 .35rem .8rem rgb(0 0 0 / 35%);
 }
 
@@ -1404,7 +1405,7 @@ select:focus-visible {
 .info-chip-copy span {
   color: var(--slate-400);
   font-size: .67rem;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: .08em;
   text-transform: uppercase;
 }
@@ -1429,7 +1430,7 @@ select:focus-visible {
 .info-totals dt {
   color: var(--slate-400);
   font-size: clamp(.5rem, .65vw, .6rem);
-  font-weight: 820;
+  font-weight: 600;
   letter-spacing: .06em;
   line-height: 1.15;
   overflow-wrap: anywhere;
@@ -1442,7 +1443,7 @@ select:focus-visible {
   color: var(--ivory-50);
   font-family: var(--font-numeric);
   font-size: clamp(.9rem, 1.45vw, 1.25rem);
-  font-weight: 760;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1470,14 +1471,14 @@ select:focus-visible {
 .info-prize-rank {
   color: var(--orange-400);
   font-family: var(--font-numeric);
-  font-weight: 820;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
 .info-prize-value {
   color: var(--ivory-50);
   font-family: var(--font-numeric);
-  font-weight: 760;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
@@ -1494,7 +1495,7 @@ select:focus-visible {
   color: var(--ivory-50);
   background: rgb(37 24 13 / 84%);
   font-size: clamp(.72rem, .8vw, .9rem);
-  font-weight: 760;
+  font-weight: 600;
   line-height: 1.3;
 }
 
@@ -1525,7 +1526,7 @@ select:focus-visible {
   color: var(--brass-400);
   font-family: var(--font-numeric);
   font-size: clamp(.72rem, .8vw, .88rem);
-  font-weight: 800;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   letter-spacing: .1em;
   white-space: nowrap;
@@ -1569,7 +1570,7 @@ select:focus-visible {
 .info-entry-marker {
   color: var(--brass-400);
   font-size: clamp(.82rem, .85vw, 1rem);
-  font-weight: 850;
+  font-weight: 600;
   letter-spacing: .11em;
   text-transform: uppercase;
 }
@@ -1586,7 +1587,7 @@ select:focus-visible {
   padding: .1rem .22rem;
   color: var(--orange-400);
   font-size: clamp(.625rem, .68vw, .8rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: .08em;
 }
 
@@ -1606,7 +1607,7 @@ select:focus-visible {
   justify-self: end;
   color: var(--orange-400);
   font-size: clamp(.82rem, .85vw, 1rem);
-  font-weight: 750;
+  font-weight: 600;
   letter-spacing: .055em;
   white-space: nowrap;
 }
@@ -1615,7 +1616,7 @@ select:focus-visible {
   display: none;
   color: var(--brass-400);
   font-size: .68rem;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: .04em;
   line-height: 1.4;
 }

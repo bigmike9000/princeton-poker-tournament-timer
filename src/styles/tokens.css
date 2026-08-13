@@ -22,7 +22,7 @@
   --radius-compact: .375rem;
   --radius-control: .625rem;
   --radius-card: .75rem;
-  --font-interface: "Gill Sans", "Avenir Next", Avenir, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --font-interface: "Avenir Next", Avenir, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
   --font-heritage: Baskerville, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --font-numeric: "Avenir Next Condensed", "Arial Narrow", "Roboto Condensed", "Segoe UI", sans-serif;
 }
