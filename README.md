@@ -55,7 +55,7 @@ Keep the production server or installed app available on the tournament laptop. 
 ## Tournament operation
 
 - Use the bottom rail for Start/Pause, previous or next level, player eliminations, mute, fullscreen, and Tournament Director controls.
-- Open **TD Controls** for precise time edits, direct level navigation, current-level and full-tournament resets, blind-structure editing, presets, tournament details, and settings.
+- Open **Tournament Director** for precise time edits, direct level navigation, current-level and full-tournament resets, blind-structure editing, presets, tournament details, and settings.
 - Reset and live-structure replacement actions require confirmation.
 - The player-minus control never reduces the field below one player.
 - The highlighted blind-structure row follows the active level automatically.
@@ -69,12 +69,10 @@ Shortcuts work outside text fields, selects, and buttons:
 | Key | Action |
 | --- | --- |
 | Space | Start or pause the clock |
-| Left Arrow | Previous level or break |
-| Right Arrow | Next level or break |
 | M | Mute or unmute alerts |
 | F | Enter or exit fullscreen |
 
-The same reference appears in **TD Controls → Settings**.
+Left and right arrows never change the live blind level. While Tournament Info is open, they switch only between Overview and Blind Structure. The same shortcut reference appears in **Tournament Director → Settings**.
 
 ## Persistence and recovery
 
