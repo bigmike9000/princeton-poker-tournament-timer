@@ -30,6 +30,8 @@ describe('SponsorStrip', () => {
     const phoneCss = displayCss.slice(displayCss.indexOf('@media (max-width: 640px)'))
     const phoneRule = cssRule(phoneCss, '.sponsor-marks--display .sponsor-logo-card')
     const infoRule = cssRule(displayCss, '.sponsor-marks--info .sponsor-logo-card')
+    const narrowInfoCss = displayCss.slice(displayCss.lastIndexOf('@media (max-width: 640px)'))
+    const narrowInfoRule = cssRule(narrowInfoCss, '.sponsor-marks--info .sponsor-logo-card')
 
     expect(displayRule).toMatch(/width:\s*8\.5rem/)
     expect(displayRule).toMatch(/height:\s*2\.25rem/)
@@ -37,7 +39,10 @@ describe('SponsorStrip', () => {
     expect(shortHeightRule).toMatch(/height:\s*1\.85rem/)
     expect(phoneRule).toMatch(/width:\s*5\.5rem/)
     expect(phoneRule).toMatch(/height:\s*1\.5rem/)
-    expect(infoRule).not.toMatch(/8\.5rem|2\.25rem|7\.25rem|1\.85rem/)
+    expect(infoRule).toMatch(/width:\s*5\.9rem/)
+    expect(infoRule).toMatch(/height:\s*1\.65rem/)
+    expect(narrowInfoRule).toMatch(/width:\s*4\.35rem/)
+    expect(narrowInfoRule).toMatch(/height:\s*1\.22rem/)
   })
 
   it('contains both intrinsic logo images inside the bounded sponsor cards', () => {
