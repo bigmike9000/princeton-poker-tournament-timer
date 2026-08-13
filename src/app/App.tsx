@@ -45,10 +45,6 @@ function AppContent() {
       if (shortcut === 'toggle-running') {
         audioAlerts.unlock()
         dispatch({ type: state.runtime.status === 'running' ? 'PAUSE' : 'START', now })
-      } else if (shortcut === 'next') {
-        dispatch({ type: 'GO_TO_ENTRY', index: state.runtime.currentEntryIndex + 1, now })
-      } else if (shortcut === 'previous') {
-        dispatch({ type: 'GO_TO_ENTRY', index: state.runtime.currentEntryIndex - 1, now })
       } else if (shortcut === 'mute') {
         audioAlerts.unlock()
         dispatch({ type: 'SET_SETTINGS', settings: { ...state.settings, muted: !state.settings.muted } })

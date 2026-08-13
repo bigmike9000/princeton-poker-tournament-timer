@@ -74,6 +74,14 @@ export function InfoOverlay({ open, onClose, onAfterClose }: InfoOverlayProps) {
           requestClose()
           return
         }
+        if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+          event.preventDefault()
+          const nextPage = event.key === 'ArrowRight' ? 'structure' : 'overview'
+          setPage(nextPage)
+          if (nextPage === 'structure') structureTabRef.current?.focus()
+          else overviewTabRef.current?.focus()
+          return
+        }
         if (event.key !== 'Tab') return
 
         const focusable = Array.from(overlayRef.current?.querySelectorAll<HTMLElement>('*') ?? [])
@@ -120,12 +128,6 @@ export function InfoOverlay({ open, onClose, onAfterClose }: InfoOverlayProps) {
                 aria-controls="info-overview-panel"
                 tabIndex={page === 'overview' ? 0 : -1}
                 onClick={() => setPage('overview')}
-                onKeyDown={(event) => {
-                  if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
-                  event.preventDefault()
-                  setPage('structure')
-                  structureTabRef.current?.focus()
-                }}
               >Overview</button>
               <button
                 ref={structureTabRef}
@@ -136,12 +138,6 @@ export function InfoOverlay({ open, onClose, onAfterClose }: InfoOverlayProps) {
                 aria-controls="info-structure-panel"
                 tabIndex={page === 'structure' ? 0 : -1}
                 onClick={() => setPage('structure')}
-                onKeyDown={(event) => {
-                  if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
-                  event.preventDefault()
-                  setPage('overview')
-                  overviewTabRef.current?.focus()
-                }}
               >Blind structure</button>
             </div>
             <span className="info-page-count">Page {page === 'overview' ? 1 : 2} of 2</span>

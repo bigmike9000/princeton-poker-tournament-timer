@@ -144,7 +144,17 @@ describe('InfoOverlay', () => {
 
   it('gives the compact prize list winning base and narrow selectors', () => {
     const prizeListRule = cssRule(displayCss, '.info-card .info-prize-list')
+    const prizeRowRule = cssRule(displayCss, '.info-prize-list li')
+    const lastPrizeRowRule = cssRule(displayCss, '.info-prize-list li:last-child')
     const narrowStart = displayCss.lastIndexOf('@media (max-width: 640px)')
+    const narrowOverviewRule = cssRule(
+      displayCss.slice(narrowStart),
+      '.info-overview-grid',
+    )
+    const narrowDetailsRule = cssRule(
+      displayCss.slice(narrowStart),
+      '.info-overview-details',
+    )
     const narrowPrizeListRule = cssRule(
       displayCss.slice(narrowStart),
       '.info-card .info-prize-list',
@@ -155,6 +165,10 @@ describe('InfoOverlay', () => {
     expect(prizeListRule).toMatch(/overflow:\s*hidden/)
     expect(prizeListRule).toMatch(/margin:\s*\.42rem 0 0/)
     expect(prizeListRule).toMatch(/padding:\s*0/)
+    expect(prizeRowRule).toMatch(/line-height:\s*1\.25/)
+    expect(lastPrizeRowRule).toMatch(/padding-bottom:\s*\.3rem/)
+    expect(narrowOverviewRule).toMatch(/align-items:\s*start/)
+    expect(narrowDetailsRule).toMatch(/grid-template-rows:\s*auto auto/)
     expect(narrowPrizeListRule).toMatch(/margin:\s*\.2rem 0 0/)
     expect(cssRule(displayCss, '.info-prize-line--custom')).toMatch(/max-width:\s*100%/)
     expect(cssRule(displayCss, '.info-prize-line--custom')).toMatch(/overflow-wrap:\s*anywhere/)
@@ -394,6 +408,22 @@ describe('InfoOverlay', () => {
     fireEvent.keyDown(structure, { key: 'ArrowLeft' })
     expect(overview).toHaveFocus()
     expect(overview).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('reserves arrows for Info pages without changing the tournament level', () => {
+    render(<App />)
+    const { dialog } = openInfo()
+    const overlay = within(dialog)
+    const close = overlay.getByRole('button', { name: 'Close tournament information' })
+
+    expect(screen.getByRole('region', { name: 'Current poker level' })).toHaveTextContent('LEVEL 1')
+    close.focus()
+    fireEvent.keyDown(close, { key: 'ArrowRight' })
+    expect(overlay.getByRole('tab', { name: 'Blind structure' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('region', { name: 'Current poker level' })).toHaveTextContent('LEVEL 1')
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'ArrowLeft' })
+    expect(overlay.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('region', { name: 'Current poker level' })).toHaveTextContent('LEVEL 1')
   })
 
   it('filters canonical allocations and every stale stack line before supplemental chip copy', () => {

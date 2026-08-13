@@ -76,8 +76,10 @@ describe('representative tournament flow', () => {
 
     expect(screen.getByRole('timer')).toHaveTextContent('09:43')
 
-    expect(fireEvent.keyDown(breakButton, { key: 'ArrowRight' })).toBe(false)
-
+    expect(fireEvent.keyDown(breakButton, { key: 'ArrowRight' })).toBe(true)
+    expect(screen.getByRole('region', { name: 'Current break' })).toBeVisible()
+    expect(screen.getByRole('timer')).toHaveTextContent('09:43')
+    fireEvent.click(screen.getByRole('button', { name: 'Next level' }))
     expect(screen.getByRole('region', { name: 'Current poker level' })).toHaveTextContent('LEVEL 6')
     expect(screen.getByRole('timer')).toHaveTextContent('15:00')
 

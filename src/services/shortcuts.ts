@@ -1,7 +1,5 @@
 export type TournamentShortcut =
   | 'toggle-running'
-  | 'next'
-  | 'previous'
   | 'fullscreen'
   | 'mute'
 
@@ -17,16 +15,12 @@ function isScheduleShortcutTarget(target: EventTarget | null): boolean {
 
 export function shortcutForEvent(event: KeyboardEvent): TournamentShortcut | null {
   if (event.metaKey || event.ctrlKey || event.altKey) return null
-  const scheduleKey = event.key === ' ' || event.key === 'ArrowRight' || event.key === 'ArrowLeft'
-  if (isEditableTarget(event.target) && !(scheduleKey && isScheduleShortcutTarget(event.target))) return null
+  const clockKey = event.key === ' '
+  if (isEditableTarget(event.target) && !(clockKey && isScheduleShortcutTarget(event.target))) return null
 
   switch (event.key) {
     case ' ':
       return 'toggle-running'
-    case 'ArrowRight':
-      return 'next'
-    case 'ArrowLeft':
-      return 'previous'
     default: {
       const key = event.key.toLowerCase()
       if (key === 'f') return 'fullscreen'

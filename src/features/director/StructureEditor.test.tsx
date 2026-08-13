@@ -541,6 +541,7 @@ describe('Structure editor responsive CSS', () => {
   it('keeps unrelated mobile layouts at the 620px global breakpoint', () => {
     const globalMobileCss = directorCss.slice(directorCss.indexOf('@media (max-width: 620px)'))
 
+    expect(cssRule(directorCss, '.shortcut-grid')).toMatch(/grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/)
     expect(cssRule(globalMobileCss, '.structure-editor-heading')).toMatch(/display:\s*block/)
     expect(cssRule(globalMobileCss, '.alert-options, .shortcut-grid')).toMatch(/grid-template-columns:\s*1fr/)
     expect(cssRule(globalMobileCss, '.preset-actions button')).toMatch(/min-height:\s*2\.75rem/)

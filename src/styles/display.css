@@ -1475,10 +1475,15 @@ select:focus-visible {
   border-top: 1px solid rgb(184 154 97 / 16%);
   padding: .18rem .25rem;
   font-size: clamp(1.05rem, 1.35vw, 1.35rem);
+  line-height: 1.25;
 }
 
 .info-prize-list li:first-child {
   border-top: 0;
+}
+
+.info-prize-list li:last-child {
+  padding-bottom: .3rem;
 }
 
 .info-prize-rank {
@@ -1681,8 +1686,8 @@ select:focus-visible {
   .info-tabs { gap: .2rem; }
   .info-tabs button { min-height: 2.75rem; padding: 0 .55rem; font-size: .57rem; }
   .info-page-count { font-size: .52rem; }
-  .info-overview-grid { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: .35rem; padding: .35rem; }
-  .info-overview-details { gap: .35rem; }
+  .info-overview-grid { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: start; gap: .35rem; padding: .35rem; }
+  .info-overview-details { grid-template-rows: auto auto; gap: .35rem; }
   .info-card { padding: .45rem; }
   .info-kicker { font-size: .55rem; }
   .info-card h2,
@@ -1709,6 +1714,7 @@ select:focus-visible {
   .info-totals dd { margin: 0; font-size: .75rem; }
   .info-card .info-prize-list { margin: .2rem 0 0; }
   .info-prize-list li { min-height: 1.75rem; padding: .08rem .15rem; }
+  .info-prize-list li:last-child { padding-bottom: .2rem; }
   .info-chip-reminder { padding: .35rem .45rem; font-size: .65rem; }
   .info-page--structure { gap: .25rem; padding: .35rem; }
   .info-structure-key { margin-bottom: .04rem; font-size: .65rem; letter-spacing: .035em; }

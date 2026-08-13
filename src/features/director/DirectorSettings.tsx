@@ -58,7 +58,6 @@ export function DirectorSettings() {
         <div className="director-card-heading"><div><span>Keyboard</span><h3>Room controls at a glance</h3></div></div>
         <dl className="shortcut-grid">
           <div><dt><kbd>Spacebar</kbd></dt><dd>Toggle tournament clock</dd></div>
-          <div><dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Previous / Next</dd></div>
           <div><dt><kbd>M</kbd></dt><dd>Mute / Unmute</dd></div>
           <div><dt><kbd>F</kbd></dt><dd>Fullscreen</dd></div>
         </dl>
