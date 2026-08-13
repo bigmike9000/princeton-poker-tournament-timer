@@ -397,13 +397,14 @@ describe('Structure editor responsive CSS', () => {
     expect(headingRule).toMatch(/background:/)
   })
 
-  it('uses one bounded table surface with separator rows', () => {
+  it('renders one flat table surface with only row dividers', () => {
     const tableRule = cssRule(directorCss, '.structure-editor-table')
     const rowRule = cssRule(directorCss, '.structure-editor-row')
 
-    expect(tableRule).toMatch(/border:\s*1px solid/)
-    expect(tableRule).toMatch(/border-radius:/)
-    expect(tableRule).toMatch(/background:/)
+    expect(tableRule).toMatch(/border:\s*0/)
+    expect(tableRule).toMatch(/background:\s*transparent/)
+    expect(tableRule).not.toMatch(/box-shadow:/)
+    expect(rowRule).toMatch(/border:\s*0/)
     expect(rowRule).toMatch(/border-bottom:\s*1px solid/)
     expect(rowRule).not.toMatch(/border-radius:/)
   })
@@ -415,11 +416,23 @@ describe('Structure editor responsive CSS', () => {
     expect(cssRule(directorCss, '.structure-row-grid')).toMatch(template)
   })
 
-  it('lays out each grouped field well as two compact columns', () => {
+  it('lays out each field group as two flat compact columns', () => {
     const groupRule = cssRule(directorCss, '.structure-field-group')
 
     expect(groupRule).toMatch(/display:\s*grid/)
     expect(groupRule).toMatch(/grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/)
+    expect(groupRule).toMatch(/border:\s*0/)
+    expect(groupRule).toMatch(/background:\s*transparent/)
+    expect(groupRule).toMatch(/padding:\s*0/)
+  })
+
+  it('keeps row actions unboxed and operational labels in the interface typeface', () => {
+    const actionRule = cssRule(directorCss, '.row-order-actions')
+
+    expect(actionRule).toMatch(/border:\s*0/)
+    expect(actionRule).toMatch(/background:\s*transparent/)
+    expect(cssRule(directorCss, '.structure-editor-columns')).toMatch(/font-family:\s*var\(--font-interface\)/)
+    expect(cssRule(directorCss, '.structure-row-identity')).toMatch(/font-family:\s*var\(--font-interface\)/)
   })
 
   it('uses tabular numeric typography for structure number inputs', () => {
