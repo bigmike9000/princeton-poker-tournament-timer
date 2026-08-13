@@ -184,7 +184,7 @@ export function InfoOverlay({ open, onClose, onAfterClose }: InfoOverlayProps) {
               <p
                 className="info-structure-key"
                 aria-label="Blind values are shown as small blind, big blind, ante"
-              >SB / BB / ANTE</p>
+              >SB / BB · BBA BELOW</p>
             </div>
             <InfoStructure state={state} />
           </section>

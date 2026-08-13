@@ -450,7 +450,7 @@ describe('InfoOverlay', () => {
 
     const structure = overlay.getByRole('list', { name: 'Tournament blind structure' })
     const entries = within(structure).getAllByRole('listitem')
-    expect(overlay.getByText('SB / BB / ANTE')).toBeVisible()
+    expect(overlay.getByText('SB / BB · BBA BELOW')).toBeVisible()
     expect(entries).toHaveLength(20)
     expect(entries.slice(0, 11).every((entry) => entry.dataset.column === '1')).toBe(true)
     expect(entries.slice(11).every((entry) => entry.dataset.column === '2')).toBe(true)
@@ -467,10 +467,12 @@ describe('InfoOverlay', () => {
     expect(entries[0]).toHaveTextContent('12 min')
     expect(entries[0]).toHaveAccessibleName('Level 1, small blind 1, big blind 2, no ante, 12 min')
 
-    expect(within(entries[1]).getByText('2 / 4 / 1', { exact: true })).toBeVisible()
+    expect(within(entries[1]).getByText('2 / 4', { exact: true })).toBeVisible()
+    expect(within(entries[1]).getByText('ANTE 1', { exact: true })).toBeVisible()
     expect(entries[1]).toHaveAccessibleName('Level 2, small blind 2, big blind 4, ante 1, 12 min')
 
-    expect(within(entries[6]).getByText('10 / 20 / 20', { exact: true })).toBeVisible()
+    expect(within(entries[6]).getByText('10 / 20', { exact: true })).toBeVisible()
+    expect(within(entries[6]).getByText('BBA 20', { exact: true })).toBeVisible()
     expect(entries[6]).toHaveAccessibleName(
       'Level 6, small blind 10, big blind 20, big-blind ante 20, 15 min',
     )
@@ -488,11 +490,10 @@ describe('InfoOverlay', () => {
     expect(structure).not.toHaveTextContent(/chip up to 25s and 100s/i)
 
     expect(entries[19]).toHaveTextContent('Level 18')
-    expect(within(entries[19]).getByText('500 / 1,000 / 1,000', { exact: true })).toBeVisible()
+    expect(within(entries[19]).getByText('500 / 1,000', { exact: true })).toBeVisible()
+    expect(within(entries[19]).getByText('BBA 1,000', { exact: true })).toBeVisible()
     expect(entries[19]).toHaveTextContent('Until end')
-    for (const entry of entries) {
-      expect(entry).not.toHaveTextContent(/NO ANTE|BBA|ANTE \d/i)
-    }
+    expect(entries[0]).not.toHaveTextContent(/NO ANTE|BBA|ANTE \d/i)
     expect(structure).not.toHaveTextContent('Director-only final table setup')
     expect(entries[14]).not.toHaveAccessibleName(/Director-only final table setup/)
     expect(scrollIntoView).not.toHaveBeenCalled()

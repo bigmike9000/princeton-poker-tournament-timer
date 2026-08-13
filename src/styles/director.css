@@ -173,7 +173,7 @@
 .director-section {
   display: grid;
   max-width: 74rem;
-  gap: 1rem;
+  gap: .8rem;
   margin: 0 auto;
 }
 
@@ -212,7 +212,7 @@
   border: 1px solid var(--line);
   border-top-color: rgb(184 154 97 / 38%);
   border-radius: var(--radius-card);
-  padding: clamp(1rem, 1.7vw, 1.5rem);
+  padding: clamp(.85rem, 1.2vw, 1.15rem);
   background: linear-gradient(145deg, rgb(27 25 20 / 92%), rgb(13 13 11 / 90%));
   box-shadow:
     0 18px 45px rgb(0 0 0 / 16%),
@@ -224,7 +224,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 1.15rem;
+  margin-bottom: .8rem;
 }
 
 .director-card-heading span,
@@ -405,7 +405,7 @@
 
 .tournament-configuration-form {
   display: grid;
-  gap: 1rem;
+  gap: .75rem;
 }
 
 .settings-form .section-intro {
@@ -426,8 +426,8 @@
 
 .information-fields {
   display: grid;
-  gap: 1rem;
-  margin-top: 1.15rem;
+  gap: .75rem;
+  margin-top: .85rem;
 }
 
 .information-editor-actions {
@@ -924,7 +924,7 @@
   gap: 1rem;
   border: 1px solid rgb(217 121 43 / 28%);
   border-radius: var(--radius-card);
-  padding: 1.2rem;
+  padding: 1rem;
   background: linear-gradient(90deg, rgb(217 121 43 / 10%), rgb(19 18 15 / 88%));
 }
 
@@ -964,7 +964,7 @@
   gap: 1rem;
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
-  padding: .9rem;
+  padding: .75rem;
   background: rgb(19 18 15 / 82%);
 }
 
@@ -1040,7 +1040,7 @@
 .settings-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: .75rem;
 }
 
 .settings-card {
@@ -1057,7 +1057,7 @@
   gap: .75rem;
   border: 1px solid var(--line);
   border-radius: var(--radius-control);
-  padding: .85rem;
+  padding: .7rem;
   color: var(--slate-300);
   background: rgb(13 13 11 / 54%);
   cursor: pointer;

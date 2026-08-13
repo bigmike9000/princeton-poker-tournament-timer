@@ -9,9 +9,14 @@ function formatNumber(value: number): string {
   return value.toLocaleString('en-US')
 }
 
-function visualLevel(entry: PokerLevel): string {
-  const ante = entry.anteType === 'none' || entry.ante === 0 ? [] : [entry.ante]
-  return [entry.smallBlind, entry.bigBlind, ...ante].map(formatNumber).join(' / ')
+function visualBlinds(entry: PokerLevel): string {
+  return [entry.smallBlind, entry.bigBlind].map(formatNumber).join(' / ')
+}
+
+function visualAnte(entry: PokerLevel): string | null {
+  if (entry.anteType === 'none' || entry.ante === 0) return null
+  const label = entry.anteType === 'big-blind' ? 'BBA' : 'ANTE'
+  return `${label} ${formatNumber(entry.ante)}`
 }
 
 function accessibleAnte(entry: PokerLevel): string {
@@ -51,7 +56,8 @@ export function InfoStructure({ state }: InfoStructureProps) {
         }
 
         const levelNumber = selectPokerLevelNumber(state, index)
-        const values = visualLevel(entry)
+        const blinds = visualBlinds(entry)
+        const visualAnteLabel = visualAnte(entry)
         const ante = accessibleAnte(entry)
         const duration = durationLabel(entry)
         const label = [
@@ -76,7 +82,10 @@ export function InfoStructure({ state }: InfoStructureProps) {
               <span className="info-entry-marker">Level {levelNumber}</span>
               {current && <span className="info-current-marker">CURRENT</span>}
             </div>
-            <strong>{values}</strong>
+            <div className="info-entry-blinds">
+              <strong>{blinds}</strong>
+              {visualAnteLabel && <small>{visualAnteLabel}</small>}
+            </div>
             <span className="info-entry-duration">{duration}</span>
           </li>
         )
