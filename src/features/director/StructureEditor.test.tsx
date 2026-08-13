@@ -439,16 +439,29 @@ describe('Structure editor responsive CSS', () => {
     expect(cssRule(directorCss, '.structure-editor-row--break .structure-break-label')).toMatch(/grid-column:\s*3 \/ 5/)
   })
 
-  it('uses a contained two-column mobile grid with full-width identity, groups, and actions', () => {
-    const mobileCss = directorCss.slice(directorCss.indexOf('@media (max-width: 620px)'))
+  it('switches only structure rows to a contained two-column layout before the 700px clipping band', () => {
+    const containedStart = directorCss.indexOf('@media (max-width: 760px)')
+    const globalMobileStart = directorCss.indexOf('@media (max-width: 620px)')
+    const containedCss = containedStart < 0 ? '' : directorCss.slice(containedStart, globalMobileStart)
     const fullWidthSelector = `.structure-row-identity,
   .structure-field-group,
   .structure-actions-cell`
 
-    expect(cssRule(mobileCss, '.structure-row-grid')).toMatch(/grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/)
-    expect(cssRule(mobileCss, fullWidthSelector)).toMatch(/grid-column:\s*1 \/ -1/)
-    expect(cssRule(mobileCss, '.structure-field-group')).toMatch(/min-width:\s*0/)
-    expect(cssRule(mobileCss, '.structure-editor-row--break .structure-break-label')).toMatch(/grid-column:\s*1 \/ -1/)
+    expect(containedStart).toBeGreaterThan(directorCss.indexOf('@media (max-width: 1000px)'))
+    expect(containedStart).toBeLessThan(globalMobileStart)
+    expect(cssRule(containedCss, '.structure-row-grid')).toMatch(/grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/)
+    expect(cssRule(containedCss, fullWidthSelector)).toMatch(/grid-column:\s*1 \/ -1/)
+    expect(cssRule(containedCss, '.structure-field-group')).toMatch(/min-width:\s*0/)
+    expect(cssRule(containedCss, '.structure-editor-row--break .structure-break-label')).toMatch(/grid-column:\s*1 \/ -1/)
+    expect(cssRule(containedCss, '.alert-options, .shortcut-grid')).toBe('')
+  })
+
+  it('keeps unrelated mobile layouts at the 620px global breakpoint', () => {
+    const globalMobileCss = directorCss.slice(directorCss.indexOf('@media (max-width: 620px)'))
+
+    expect(cssRule(globalMobileCss, '.structure-editor-heading')).toMatch(/display:\s*block/)
+    expect(cssRule(globalMobileCss, '.alert-options, .shortcut-grid')).toMatch(/grid-template-columns:\s*1fr/)
+    expect(cssRule(globalMobileCss, '.preset-actions button')).toMatch(/min-height:\s*2\.75rem/)
   })
 })
 

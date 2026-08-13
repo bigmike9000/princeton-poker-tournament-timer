@@ -1203,9 +1203,7 @@
   .settings-grid { grid-template-columns: 1fr; }
 }
 
-@media (max-width: 620px) {
-  .structure-editor-heading { display: block; }
-  .structure-add-actions { margin-top: 1rem; }
+@media (max-width: 760px) {
   .structure-row-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: .65rem;
@@ -1217,6 +1215,11 @@
   .structure-field-group { min-width: 0; }
   .structure-editor-row--break .structure-break-label { grid-column: 1 / -1; }
   .row-order-actions { justify-content: end; }
+}
+
+@media (max-width: 620px) {
+  .structure-editor-heading { display: block; }
+  .structure-add-actions { margin-top: 1rem; }
   .alert-options, .shortcut-grid { grid-template-columns: 1fr; }
   .row-order-actions button { width: 2.75rem; height: 2.75rem; }
   .preset-actions button { min-height: 2.75rem; }
