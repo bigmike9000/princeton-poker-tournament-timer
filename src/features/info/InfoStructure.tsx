@@ -1,7 +1,8 @@
-import { breakPresentation } from '../../domain/breakPresentation'
 import { durationLabel } from '../../domain/structure'
 import type { PokerLevel, TournamentState } from '../../domain/types'
 import { selectPokerLevelNumber } from '../../state/selectors'
+
+const INFO_LEFT_COLUMN_COUNT = 11
 
 function formatNumber(value: number): string {
   return value.toLocaleString('en-US')
@@ -23,24 +24,21 @@ export function InfoStructure({ state }: InfoStructureProps) {
       {state.structure.map((entry, index) => {
         const current = index === state.runtime.currentEntryIndex
         if (entry.kind === 'break') {
-          const presentation = breakPresentation(entry)
+          const minutes = entry.durationSeconds / 60
           return (
             <li
               key={entry.id}
               aria-current={current ? 'step' : undefined}
-              aria-label={presentation.accessibleLabel}
+              aria-label={`Break, ${minutes} min`}
               data-state={current ? 'current' : undefined}
-              data-column={index < 10 ? '1' : '2'}
+              data-column={index < INFO_LEFT_COLUMN_COUNT ? '1' : '2'}
               data-sequence={index + 1}
               className="info-structure-entry info-structure-entry--break"
             >
               <div className="info-entry-heading">
-                <strong>{presentation.heading}</strong>
+                <strong>BREAK · {minutes} MIN</strong>
                 {current && <span className="info-current-marker">CURRENT</span>}
               </div>
-              {presentation.subtitle && (
-                <span className="info-break-subtitle">{presentation.subtitle}</span>
-              )}
             </li>
           )
         }
@@ -62,7 +60,7 @@ export function InfoStructure({ state }: InfoStructureProps) {
             aria-current={current ? 'step' : undefined}
             aria-label={label}
             data-state={current ? 'current' : undefined}
-            data-column={index < 10 ? '1' : '2'}
+            data-column={index < INFO_LEFT_COLUMN_COUNT ? '1' : '2'}
             data-sequence={index + 1}
             className="info-structure-entry"
           >

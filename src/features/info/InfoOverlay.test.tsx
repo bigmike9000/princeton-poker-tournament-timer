@@ -88,7 +88,6 @@ describe('InfoOverlay', () => {
   it('keeps essential projector information fluid and above readable desktop floors', () => {
     expect(fluidFontFloor('.info-entry-marker')).toBeGreaterThanOrEqual(0.75)
     expect(fluidFontFloor('.info-entry-ante,\n.info-entry-duration')).toBeGreaterThanOrEqual(0.75)
-    expect(fluidFontFloor('.info-break-subtitle')).toBeGreaterThanOrEqual(0.75)
     expect(fluidFontFloor('.info-current-marker')).toBeGreaterThanOrEqual(0.625)
     expect(fluidFontFloor('.info-card ul')).toBeGreaterThanOrEqual(0.82)
   })
@@ -101,12 +100,11 @@ describe('InfoOverlay', () => {
     expect(inertBackground).toMatch(/overflow:\s*hidden/)
   })
 
-  it('keeps required narrow labels wrapping without ellipsis or nowrap clipping', () => {
+  it('keeps required narrow total labels wrapping without ellipsis or nowrap clipping', () => {
     const totalsRule = cssRule(displayCss, '.info-totals dt')
-    const breakSubtitleRule = cssRule(displayCss, '.info-break-subtitle')
     const informationItemRule = cssRule(displayCss, '.info-card li')
 
-    for (const rule of [totalsRule, breakSubtitleRule]) {
+    for (const rule of [totalsRule]) {
       expect(rule).not.toMatch(/text-overflow:\s*ellipsis/)
       expect(rule).not.toMatch(/white-space:\s*nowrap/)
       expect(rule).not.toMatch(/overflow:\s*hidden/)
@@ -122,8 +120,7 @@ describe('InfoOverlay', () => {
     const metadataRule = cssRule(narrowCss, `.info-entry-marker,
   .info-entry-ante,
   .info-entry-duration`)
-    const breakRule = cssRule(narrowCss, `.info-structure-entry--break strong,
-  .info-break-subtitle`)
+    const breakRule = cssRule(narrowCss, '.info-structure-entry--break strong')
     const currentRule = cssRule(narrowCss, '.info-current-marker')
     const totalRule = cssRule(narrowCss, '.info-totals dt')
 
@@ -423,7 +420,7 @@ describe('InfoOverlay', () => {
     expect(within(dialog).getByText('50,000')).toBeVisible()
   })
 
-  it('shows all structure entries in two ordered columns with concise shared break copy', async () => {
+  it('shows all structure entries in two ordered columns with Info-only break copy', async () => {
     const user = userEvent.setup()
     const state = createInitialState()
     const notedLevel = state.structure.find((entry) => entry.id === 'level-13')
@@ -440,14 +437,12 @@ describe('InfoOverlay', () => {
     const structure = overlay.getByRole('list', { name: 'Tournament blind structure' })
     const entries = within(structure).getAllByRole('listitem')
     expect(entries).toHaveLength(19)
-    entries.slice(0, 10).forEach((entry, index) => {
-      expect(entry).toHaveAttribute('data-column', '1')
-      expect(entry).toHaveAttribute('data-sequence', String(index + 1))
-    })
-    entries.slice(10).forEach((entry, index) => {
-      expect(entry).toHaveAttribute('data-column', '2')
-      expect(entry).toHaveAttribute('data-sequence', String(index + 11))
-    })
+    expect(entries.slice(0, 11).every((entry) => entry.dataset.column === '1')).toBe(true)
+    expect(entries.slice(11).every((entry) => entry.dataset.column === '2')).toBe(true)
+    expect(entries[10]).toHaveTextContent('Level 10')
+    expect(entries[11]).toHaveAccessibleName('Break, 10 min')
+    expect(entries[11]).toHaveTextContent('BREAK · 10 MIN')
+    expect(entries[11]).not.toHaveTextContent(/chip up/i)
 
     expect(entries[0]).toHaveAttribute('aria-current', 'step')
     expect(entries[0]).toHaveAttribute('data-state', 'current')
@@ -458,16 +453,16 @@ describe('InfoOverlay', () => {
     expect(entries[0]).toHaveTextContent('12 min')
 
     const firstBreak = entries[5]
-    expect(firstBreak).toHaveAccessibleName('Break, 10 min, Chip up to 5s')
+    expect(firstBreak).toHaveAccessibleName('Break, 10 min')
     expect(within(firstBreak).getAllByText(/break/i)).toHaveLength(1)
     expect(within(firstBreak).getByText('BREAK · 10 MIN')).toBeVisible()
-    expect(within(firstBreak).getByText('Chip up to 5s')).toBeVisible()
 
     const secondBreak = entries[11]
-    expect(secondBreak).toHaveAccessibleName('Break, 10 min, Chip up to 25s and 100s')
+    expect(secondBreak).toHaveAccessibleName('Break, 10 min')
     expect(within(secondBreak).getAllByText(/break/i)).toHaveLength(1)
     expect(within(secondBreak).getByText('BREAK · 10 MIN')).toBeVisible()
-    expect(within(secondBreak).getByText('Chip up to 25s and 100s')).toBeVisible()
+    expect(structure).not.toHaveTextContent(/chip up to 5s/i)
+    expect(structure).not.toHaveTextContent(/chip up to 25s and 100s/i)
 
     expect(entries[18]).toHaveTextContent('Level 17')
     expect(entries[18]).toHaveTextContent('500 / 1,000')

@@ -43,15 +43,17 @@ function structureNote(structure: StructureEntry[], id: string): string | undefi
 describe('preset repository', () => {
   beforeEach(() => localStorage.clear())
 
-  it('starts with a copy-safe sample preset', () => {
+  it('starts with a copy-safe protected sample preset', () => {
     const repository = createPresetRepository(localStorage)
     const [sample] = repository.list()
 
     expect(sample).toMatchObject({
       id: BUILT_IN_PRESET_ID,
       name: 'Princeton Poker Club Standard',
-      structure: sampleStructure,
     })
+    expect(sample.structure).toEqual(sampleStructure)
+    expect(sample.structure[0]).toMatchObject({ smallBlind: 1, bigBlind: 2, anteType: 'none' })
+    expect(sample.structure.at(-1)).toMatchObject({ smallBlind: 500, bigBlind: 1_000, durationSeconds: null })
     sample.structure[0].durationSeconds = 60
     expect(repository.load(sample.id).structure[0].durationSeconds).toBe(720)
   })
