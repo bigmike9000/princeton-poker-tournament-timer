@@ -55,7 +55,7 @@ describe('representative tournament flow', () => {
     render(<App />)
 
     const breakButton = screen.getByRole('button', {
-      name: 'Break, 10 min, Chip up to 5s',
+      name: 'Break, 10 min, Count and stack white chips in stacks of 10',
     })
     fireEvent.click(breakButton)
     fireEvent.click(screen.getByRole('button', { name: 'Start tournament' }))
