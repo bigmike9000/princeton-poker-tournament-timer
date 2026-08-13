@@ -55,7 +55,6 @@ export function BlindStructure({ state, onSelectEntry }: BlindStructureProps) {
                   <span className="break-rule" aria-hidden="true" />
                   <span className="structure-break-copy">
                     <strong>{presentation.heading}</strong>
-                    {presentation.subtitle && <small>{presentation.subtitle}</small>}
                   </span>
                   <span className="break-rule" aria-hidden="true" />
                 </button>

@@ -3,6 +3,7 @@ import { ClubBrandLockup } from '../../components/ClubBrandLockup'
 import { isUntimedEntry } from '../../domain/structure'
 import { selectCurrentEntry, selectRemainingMs } from '../../state/selectors'
 import { BlindStructure } from './BlindStructure'
+import { BreakProcedure } from './BreakProcedure'
 import { Clock } from './Clock'
 import { CurrentLevel } from './CurrentLevel'
 import { DisplayControls } from './DisplayControls'
@@ -52,6 +53,7 @@ export function TournamentDisplay({
             <CurrentLevel state={state} />
             <Clock remainingMs={remainingMs} untimed={isUntimedEntry(currentEntry)} />
             <PlayerStats state={state} />
+            <BreakProcedure entry={currentEntry} />
           </div>
 
           <SponsorStrip labels={state.configuration.sponsorLabels} />

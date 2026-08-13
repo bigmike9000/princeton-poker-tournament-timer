@@ -451,12 +451,12 @@ describe('InfoOverlay', () => {
     const structure = overlay.getByRole('list', { name: 'Tournament blind structure' })
     const entries = within(structure).getAllByRole('listitem')
     expect(overlay.getByText('SB / BB / ANTE')).toBeVisible()
-    expect(entries).toHaveLength(19)
+    expect(entries).toHaveLength(20)
     expect(entries.slice(0, 11).every((entry) => entry.dataset.column === '1')).toBe(true)
     expect(entries.slice(11).every((entry) => entry.dataset.column === '2')).toBe(true)
     expect(entries[10]).toHaveTextContent('Level 10')
     expect(entries[11]).toHaveAccessibleName('Break, 10 min')
-    expect(entries[11]).toHaveTextContent('BREAK · 10 MIN')
+    expect(entries[11]).toHaveTextContent('BREAK — 10 MIN')
     expect(entries[11]).not.toHaveTextContent(/chip up/i)
 
     expect(entries[0]).toHaveAttribute('aria-current', 'step')
@@ -478,18 +478,18 @@ describe('InfoOverlay', () => {
     const firstBreak = entries[5]
     expect(firstBreak).toHaveAccessibleName('Break, 10 min')
     expect(within(firstBreak).getAllByText(/break/i)).toHaveLength(1)
-    expect(within(firstBreak).getByText('BREAK · 10 MIN')).toBeVisible()
+    expect(within(firstBreak).getByText('BREAK — 10 MIN')).toBeVisible()
 
     const secondBreak = entries[11]
     expect(secondBreak).toHaveAccessibleName('Break, 10 min')
     expect(within(secondBreak).getAllByText(/break/i)).toHaveLength(1)
-    expect(within(secondBreak).getByText('BREAK · 10 MIN')).toBeVisible()
+    expect(within(secondBreak).getByText('BREAK — 10 MIN')).toBeVisible()
     expect(structure).not.toHaveTextContent(/chip up to 5s/i)
     expect(structure).not.toHaveTextContent(/chip up to 25s and 100s/i)
 
-    expect(entries[18]).toHaveTextContent('Level 17')
-    expect(within(entries[18]).getByText('500 / 1,000 / 1,000', { exact: true })).toBeVisible()
-    expect(entries[18]).toHaveTextContent('Until end')
+    expect(entries[19]).toHaveTextContent('Level 18')
+    expect(within(entries[19]).getByText('500 / 1,000 / 1,000', { exact: true })).toBeVisible()
+    expect(entries[19]).toHaveTextContent('Until end')
     for (const entry of entries) {
       expect(entry).not.toHaveTextContent(/NO ANTE|BBA|ANTE \d/i)
     }

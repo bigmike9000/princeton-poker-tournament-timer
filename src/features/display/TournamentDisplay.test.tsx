@@ -86,15 +86,21 @@ describe('TournamentDisplay', () => {
 
     renderDisplay()
 
-    const currentBreak = within(screen.getByRole('region', { name: 'Current break' }))
-    expect(currentBreak.getByRole('heading', { name: 'BREAK' })).toBeVisible()
-    expect(currentBreak.queryByText('BREAK · 10 MIN')).not.toBeInTheDocument()
-    expect(currentBreak.getByText('Count and stack white chips in stacks of 10')).toBeVisible()
+    const currentBreak = screen.getByRole('region', { name: 'Current break' })
+    expect(within(currentBreak).getByRole('heading', { name: 'BREAK' })).toBeVisible()
+    expect(currentBreak).not.toHaveTextContent('Count and stack white chips')
+    const procedure = screen.getByRole('status', { name: 'Break procedure' })
+    expect(procedure).toHaveTextContent('Count and stack white chips in stacks of 10')
+    expect(
+      procedure.compareDocumentPosition(screen.getByLabelText('Tournament statistics')) & Node.DOCUMENT_POSITION_PRECEDING,
+    ).toBeTruthy()
     const schedule = within(screen.getByRole('complementary', { name: 'Blind Structure' }))
-    const scheduledBreak = schedule.getByRole('button', {
-      name: 'Break, 10 min, Count and stack white chips in stacks of 10',
-    })
-    expect(within(scheduledBreak).getByText('BREAK · 10 MIN')).toBeVisible()
+    const scheduledBreaks = schedule.getAllByRole('button', { name: 'Break, 10 min' })
+    expect(scheduledBreaks).toHaveLength(2)
+    for (const scheduledBreak of scheduledBreaks) {
+      expect(scheduledBreak).toHaveTextContent('BREAK — 10 MIN')
+      expect(scheduledBreak).not.toHaveTextContent(/Count and stack (white|red) chips/)
+    }
     expect(screen.getByText(/Next: Level 6/)).toBeVisible()
     expect(screen.getAllByText(/10 \/ 20/).length).toBeGreaterThan(0)
   })
@@ -108,9 +114,10 @@ describe('TournamentDisplay', () => {
 
     renderDisplay()
 
-    const currentBreak = within(screen.getByRole('region', { name: 'Current break' }))
-    expect(currentBreak.getByRole('heading', { name: 'BREAK' })).toBeVisible()
-    expect(currentBreak.getByText('Count and stack red chips')).toBeVisible()
+    const currentBreak = screen.getByRole('region', { name: 'Current break' })
+    expect(within(currentBreak).getByRole('heading', { name: 'BREAK' })).toBeVisible()
+    expect(currentBreak).not.toHaveTextContent('Count and stack red chips')
+    expect(screen.getByRole('status', { name: 'Break procedure' })).toHaveTextContent('Count and stack red chips')
   })
 
   it('renders a generic break label once and opts its current schedule row into shortcuts', () => {
@@ -123,10 +130,13 @@ describe('TournamentDisplay', () => {
 
     renderDisplay()
 
-    const currentBreak = within(screen.getByRole('region', { name: 'Current break' }))
-    expect(currentBreak.getByRole('heading', { name: 'BREAK' })).toBeVisible()
-    expect(currentBreak.queryByText('BREAK · 10 MIN')).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Break, 10 min' })).toHaveAttribute('data-tournament-shortcuts', 'true')
+    const currentBreak = screen.getByRole('region', { name: 'Current break' })
+    expect(within(currentBreak).getByRole('heading', { name: 'BREAK' })).toBeVisible()
+    expect(currentBreak).not.toHaveTextContent('Break procedure')
+    expect(screen.queryByRole('status', { name: 'Break procedure' })).not.toBeInTheDocument()
+    const currentScheduleBreak = screen.getByRole('listitem', { current: 'step' })
+    expect(within(currentScheduleBreak).getByRole('button', { name: 'Break, 10 min' }))
+      .toHaveAttribute('data-tournament-shortcuts', 'true')
   })
 
   it('highlights the current structure row and lists completed levels', () => {
@@ -152,7 +162,7 @@ describe('TournamentDisplay', () => {
     expect(screen.getByRole('timer')).toHaveTextContent('12:00')
   })
 
-  it('keeps break descriptions but hides saved organizer level notes from the public schedule', async () => {
+  it('keeps break procedures out of poker levels and hides saved organizer level notes from the public schedule', async () => {
     const user = userEvent.setup()
     const state = createInitialState()
     const notedLevel = state.structure.find((entry) => entry.id === 'level-13')
@@ -162,21 +172,25 @@ describe('TournamentDisplay', () => {
     renderDisplay()
     const schedule = screen.getByRole('complementary', { name: 'Blind Structure' })
 
-    expect(within(schedule).getByText(/Count and stack white chips in stacks of 10/)).toBeVisible()
-    expect(within(schedule).getByText(/Count and stack red chips/)).toBeVisible()
+    expect(within(schedule).queryByText(/Count and stack white chips in stacks of 10/)).not.toBeInTheDocument()
+    expect(within(schedule).queryByText(/Count and stack red chips/)).not.toBeInTheDocument()
     expect(within(schedule).queryByText('Director-only final table setup')).not.toBeInTheDocument()
     expect(within(schedule).queryByRole('button', { name: /Director-only final table setup/ })).not.toBeInTheDocument()
-    expect(within(schedule).getByRole('button', {
-      name: 'Break, 10 min, Count and stack white chips in stacks of 10',
-    })).toBeVisible()
+    const scheduledBreaks = within(schedule).getAllByRole('button', { name: 'Break, 10 min' })
+    expect(scheduledBreaks).toHaveLength(2)
+    for (const scheduledBreak of scheduledBreaks) {
+      expect(scheduledBreak).toHaveTextContent('BREAK — 10 MIN')
+      expect(scheduledBreak).not.toHaveTextContent(/Count and stack (white|red) chips/)
+    }
     expect(within(schedule).getByRole('button', {
       name: 'Level 13 100 / 200, BIG BLIND ANTE: 200, 15 min',
     })).toBeVisible()
 
-    await user.click(within(schedule).getByRole('button', { name: /^Level 17 500 \/ 1,000/ }))
+    await user.click(within(schedule).getByRole('button', { name: /^Level 18 500 \/ 1,000/ }))
 
-    expect(screen.getByRole('region', { name: 'Current poker level' })).toHaveTextContent('LEVEL 17')
+    expect(screen.getByRole('region', { name: 'Current poker level' })).toHaveTextContent('LEVEL 18')
     expect(screen.getByRole('region', { name: 'Current poker level' })).not.toHaveTextContent('Final level')
+    expect(screen.queryByRole('status', { name: 'Break procedure' })).not.toBeInTheDocument()
     expect(screen.getByRole('timer')).toHaveTextContent('UNTIL END')
   })
 

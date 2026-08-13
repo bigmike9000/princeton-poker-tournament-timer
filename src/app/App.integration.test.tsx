@@ -54,9 +54,8 @@ describe('representative tournament flow', () => {
   it('preserves a running break across schedule shortcuts and transient Info state', () => {
     render(<App />)
 
-    const breakButton = screen.getByRole('button', {
-      name: 'Break, 10 min, Count and stack white chips in stacks of 10',
-    })
+    const [breakButton] = screen.getAllByRole('button', { name: 'Break, 10 min' })
+    if (!breakButton) throw new Error('Missing first break shortcut')
     fireEvent.click(breakButton)
     fireEvent.click(screen.getByRole('button', { name: 'Start tournament' }))
     act(() => vi.advanceTimersByTime(15_000))
@@ -80,7 +79,7 @@ describe('representative tournament flow', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Open tournament information' }))
     fireEvent.click(screen.getByRole('tab', { name: 'Blind structure' }))
     const structure = screen.getByRole('list', { name: 'Tournament blind structure' })
-    expect(within(structure).getAllByRole('listitem')).toHaveLength(19)
+    expect(within(structure).getAllByRole('listitem')).toHaveLength(20)
     expect(within(structure).getAllByRole('listitem').filter((row) => row.dataset.state === 'current')).toHaveLength(1)
 
     fireEvent.click(screen.getByRole('button', { name: 'Close tournament information' }))

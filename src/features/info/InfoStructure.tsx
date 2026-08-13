@@ -1,4 +1,5 @@
 import { durationLabel } from '../../domain/structure'
+import { breakPresentation } from '../../domain/breakPresentation'
 import type { PokerLevel, TournamentState } from '../../domain/types'
 import { selectPokerLevelNumber } from '../../state/selectors'
 
@@ -30,19 +31,19 @@ export function InfoStructure({ state }: InfoStructureProps) {
       {state.structure.map((entry, index) => {
         const current = index === state.runtime.currentEntryIndex
         if (entry.kind === 'break') {
-          const minutes = entry.durationSeconds / 60
+          const presentation = breakPresentation(entry)
           return (
             <li
               key={entry.id}
               aria-current={current ? 'step' : undefined}
-              aria-label={`Break, ${minutes} min`}
+              aria-label={presentation.accessibleLabel}
               data-state={current ? 'current' : undefined}
               data-column={index < INFO_LEFT_COLUMN_COUNT ? '1' : '2'}
               data-sequence={index + 1}
               className="info-structure-entry info-structure-entry--break"
             >
               <div className="info-entry-heading">
-                <strong>BREAK · {minutes} MIN</strong>
+                <strong>{presentation.heading}</strong>
                 {current && <span className="info-current-marker">CURRENT</span>}
               </div>
             </li>

@@ -1,5 +1,4 @@
 import { formatChips } from '../../domain/calculations'
-import { breakPresentation } from '../../domain/breakPresentation'
 import type { TournamentState } from '../../domain/types'
 import { selectCurrentEntry, selectNextPokerLevel, selectPokerLevelNumber } from '../../state/selectors'
 import { anteLabel } from './format'
@@ -8,7 +7,6 @@ export function CurrentLevel({ state }: { state: TournamentState }) {
   const entry = selectCurrentEntry(state)
 
   if (entry.kind === 'break') {
-    const presentation = breakPresentation(entry)
     const nextLevel = selectNextPokerLevel(state)
     const nextIndex = nextLevel
       ? state.structure.findIndex((candidate) => candidate.id === nextLevel.id)
@@ -19,7 +17,6 @@ export function CurrentLevel({ state }: { state: TournamentState }) {
       <section className="current-level current-level--break" aria-label="Current break">
         <p className="eyebrow eyebrow--accent">Tournament break</p>
         <h2 className="level-heading">BREAK</h2>
-        {presentation.subtitle && <p className="current-level-note current-level-note--break">{presentation.subtitle}</p>}
         {nextLevel && nextNumber !== null ? (
           <div className="next-level-card">
             <span>Next: Level {nextNumber}</span>
