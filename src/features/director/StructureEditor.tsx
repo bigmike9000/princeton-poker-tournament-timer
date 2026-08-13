@@ -44,36 +44,41 @@ export function StructureEditor() {
   }
 
   const addLevel = () => {
-    const previous = [...draft].reverse().find((entry): entry is PokerLevel => entry.kind === 'level')
-    setDraft((current) => [...current, {
-      id: newId('level'),
-      kind: 'level',
-      durationSeconds: previous?.durationSeconds ?? 900,
-      smallBlind: previous?.bigBlind ?? 100,
-      bigBlind: previous ? previous.bigBlind * 2 : 200,
-      ante: previous ? previous.bigBlind * 2 : 200,
-      anteType: 'big-blind',
-    }])
+    setDraft((current) => {
+      const previous = [...current].reverse().find((entry): entry is PokerLevel => entry.kind === 'level')
+      const level: PokerLevel = {
+        id: newId('level'),
+        kind: 'level',
+        durationSeconds: previous?.durationSeconds ?? 900,
+        smallBlind: previous?.bigBlind ?? 100,
+        bigBlind: previous ? previous.bigBlind * 2 : 200,
+        ante: previous ? previous.bigBlind * 2 : 200,
+        anteType: 'big-blind',
+      }
+      const untimedIndex = current.findIndex((entry) => entry.kind === 'level' && entry.durationSeconds === null)
+      return untimedIndex === -1
+        ? [...current, level]
+        : [...current.slice(0, untimedIndex), level, ...current.slice(untimedIndex)]
+    })
   }
 
   const addBreak = () => {
-    setDraft((current) => [...current, {
-      id: newId('break'),
-      kind: 'break',
-      durationSeconds: 600,
-      label: 'Break',
-    }])
+    setDraft((current) => {
+      const breakEntry: StructureEntry = {
+        id: newId('break'),
+        kind: 'break',
+        durationSeconds: 600,
+        label: 'Break',
+      }
+      const untimedIndex = current.findIndex((entry) => entry.kind === 'level' && entry.durationSeconds === null)
+      return untimedIndex === -1
+        ? [...current, breakEntry]
+        : [...current.slice(0, untimedIndex), breakEntry, ...current.slice(untimedIndex)]
+    })
   }
 
   const applyStructure = () => {
-    const normalized = structuredClone(draft)
-    normalized.forEach((entry) => {
-      if (entry.kind === 'level' && entry.note !== undefined && entry.note.trim() === '') {
-        delete entry.note
-      }
-    })
-    setDraft(normalized)
-    dispatch({ type: 'SET_STRUCTURE', structure: normalized, now: Date.now() })
+    dispatch({ type: 'SET_STRUCTURE', structure: structuredClone(draft), now: Date.now() })
   }
 
   return (
@@ -110,7 +115,6 @@ export function StructureEditor() {
         <span>Big</span>
         <span>Ante</span>
         <span>Type</span>
-        <span>Note</span>
         <span>Actions</span>
       </div>
       <div className="structure-editor-list">

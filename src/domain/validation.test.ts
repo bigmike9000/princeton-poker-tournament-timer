@@ -60,16 +60,16 @@ describe('validateStructure', () => {
     ]))
   })
 
-  it('rejects notes longer than 80 characters', () => {
+  it('accepts notes longer than the retired editor field limit', () => {
     const structure = structuredClone(sampleStructure)
     const level = structure.find((entry) => entry.kind === 'level')!
     level.note = 'x'.repeat(81)
-    expect(validateStructure(structure).issues).toEqual(expect.arrayContaining([
+    expect(validateStructure(structure).issues).not.toEqual(expect.arrayContaining([
       expect.objectContaining({ entryId: level.id, field: 'note' }),
     ]))
   })
 
-  it('accepts notes that are exactly 80 characters', () => {
+  it('accepts notes that were within the retired editor field limit', () => {
     const structure = structuredClone(sampleStructure)
     const level = structure.find((entry) => entry.kind === 'level')!
     level.note = 'x'.repeat(80)

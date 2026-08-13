@@ -48,19 +48,11 @@ export function StructureRow({
           <>
             <div className="structure-cell structure-duration-field">
               <span className="structure-cell-label">Duration minutes</span>
-              <div className="structure-duration-controls">
-                {entry.durationSeconds !== null && (
-                  <input aria-label="Duration minutes" type="number" min="1" step="1" value={entry.durationSeconds / 60} onChange={(event) => updateNumber('durationSeconds', String(Number(event.target.value) * 60))} />
-                )}
-                <label className="structure-until-end">
-                  <input
-                    type="checkbox"
-                    checked={entry.durationSeconds === null}
-                    onChange={(event) => onChange({ ...entry, durationSeconds: event.target.checked ? null : 900 })}
-                  />
-                  <span>Until end</span>
-                </label>
-              </div>
+              {entry.durationSeconds !== null ? (
+                <input aria-label="Duration minutes" type="number" min="1" step="1" value={entry.durationSeconds / 60} onChange={(event) => updateNumber('durationSeconds', String(Number(event.target.value) * 60))} />
+              ) : (
+                <span className="structure-untimed-duration" aria-label="Untimed level">—</span>
+              )}
               <FieldIssue field="durationSeconds" issues={issues} />
             </div>
             <label className="structure-cell structure-small-blind">
@@ -92,11 +84,6 @@ export function StructureRow({
                 <option value="traditional">Traditional ante</option>
                 <option value="big-blind">Big Blind Ante</option>
               </select>
-            </label>
-            <label className="structure-cell structure-level-note">
-              <span className="structure-cell-label">Level note</span>
-              <input aria-label="Level note" value={entry.note ?? ''} maxLength={80} onChange={(event) => onChange({ ...entry, note: event.target.value })} />
-              <FieldIssue field="note" issues={issues} />
             </label>
           </>
         ) : (

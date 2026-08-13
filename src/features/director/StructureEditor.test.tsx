@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { useReducer } from 'react'
@@ -17,8 +17,13 @@ async function openTab(user: ReturnType<typeof userEvent.setup>, name: 'Structur
   await user.click(screen.getByRole('button', { name }))
 }
 
-function StructureStateHarness() {
-  const [state, dispatch] = useReducer(tournamentReducer, undefined, createInitialState)
+function StructureStateHarness({ seededNote = 'Featured table' }: { seededNote?: string } = {}) {
+  const [state, dispatch] = useReducer(tournamentReducer, undefined, () => {
+    const initial = createInitialState()
+    const level = initial.structure.find((entry) => entry.id === 'level-6')
+    if (level?.kind === 'level') level.note = seededNote
+    return initial
+  })
   const level = state.structure.find((entry) => entry.id === 'level-6')
   const note = level?.kind === 'level' && level.note !== undefined
     ? JSON.stringify(level.note)
@@ -51,7 +56,6 @@ describe('StructureEditor', () => {
       'Big',
       'Ante',
       'Type',
-      'Note',
       'Actions',
     ])
   })
@@ -69,7 +73,7 @@ describe('StructureEditor', () => {
     ])
   })
 
-  it('keeps every poker field editable and applies the complete draft', async () => {
+  it('keeps every visible poker field editable and applies the complete draft', async () => {
     const user = userEvent.setup()
     render(<StructureStateHarness />)
     const level = screen.getByRole('group', { name: 'Level 1' })
@@ -83,12 +87,35 @@ describe('StructureEditor', () => {
     await user.clear(within(level).getByRole('spinbutton', { name: 'Ante' }))
     await user.type(within(level).getByRole('spinbutton', { name: 'Ante' }), '5')
     await user.selectOptions(within(level).getByRole('combobox', { name: 'Ante type' }), 'traditional')
-    await user.type(within(level).getByRole('textbox', { name: 'Level note' }), 'Opening orbit')
     await user.click(screen.getByRole('button', { name: 'Apply structure' }))
 
     expect(screen.getByLabelText('Applied structure')).toHaveTextContent(
-      '"id":"level-1","kind":"level","durationSeconds":780,"smallBlind":2,"bigBlind":5,"ante":5,"anteType":"traditional","note":"Opening orbit"',
+      '"id":"level-1","kind":"level","durationSeconds":780,"smallBlind":2,"bigBlind":5,"ante":5,"anteType":"traditional"',
     )
+  })
+
+  it('preserves hidden level note and untimed duration data when another draft field is applied', async () => {
+    const user = userEvent.setup()
+    render(<StructureStateHarness />)
+    const level = screen.getByRole('group', { name: 'Level 1' })
+
+    await user.clear(within(level).getByRole('spinbutton', { name: 'Small blind' }))
+    await user.type(within(level).getByRole('spinbutton', { name: 'Small blind' }), '2')
+    await user.click(screen.getByRole('button', { name: 'Apply structure' }))
+
+    expect(screen.getByLabelText('Applied level 6 note')).toHaveTextContent('"Featured table"')
+    expect(screen.getByLabelText('Applied structure')).toHaveTextContent('"id":"level-17","kind":"level","durationSeconds":null')
+  })
+
+  it('allows applying an imported hidden note that is longer than the retired editor limit', async () => {
+    const user = userEvent.setup()
+    const importedNote = 'x'.repeat(81)
+    render(<StructureStateHarness seededNote={importedNote} />)
+
+    expect(screen.getByRole('button', { name: 'Apply structure' })).toBeEnabled()
+    await user.click(screen.getByRole('button', { name: 'Apply structure' }))
+
+    expect(screen.getByLabelText('Applied level 6 note')).toHaveTextContent(JSON.stringify(importedNote))
   })
 
   it('keeps break label and duration editable and applies both values', async () => {
@@ -107,18 +134,16 @@ describe('StructureEditor', () => {
     )
   })
 
-  it('retains an accessible name for every responsive row control', () => {
+  it('retains an accessible name for every visible responsive row control', () => {
     render(<StructureStateHarness />)
     const level = screen.getByRole('group', { name: 'Level 1' })
     const breakRow = screen.getByRole('group', { name: 'Break 1' })
 
     expect(within(level).getByRole('spinbutton', { name: 'Duration minutes' })).toBeVisible()
-    expect(within(level).getByRole('checkbox', { name: 'Until end' })).toBeVisible()
     expect(within(level).getByRole('spinbutton', { name: 'Small blind' })).toBeVisible()
     expect(within(level).getByRole('spinbutton', { name: 'Big blind' })).toBeVisible()
     expect(within(level).getByRole('spinbutton', { name: 'Ante' })).toBeVisible()
     expect(within(level).getByRole('combobox', { name: 'Ante type' })).toBeVisible()
-    expect(within(level).getByRole('textbox', { name: 'Level note' })).toBeVisible()
     expect(within(level).getByRole('button', { name: 'Move up' })).toBeVisible()
     expect(within(level).getByRole('button', { name: 'Move down' })).toBeVisible()
     expect(within(level).getByRole('button', { name: 'Delete' })).toBeVisible()
@@ -126,7 +151,7 @@ describe('StructureEditor', () => {
     expect(within(breakRow).getByRole('spinbutton', { name: 'Duration minutes' })).toBeVisible()
   })
 
-  it('renders responsive field-label hooks for every level and break cell', () => {
+  it('renders responsive field-label hooks without note or until-end controls', () => {
     render(<StructureStateHarness />)
     const level = screen.getByRole('group', { name: 'Level 1' })
     const breakRow = screen.getByRole('group', { name: 'Break 1' })
@@ -137,7 +162,6 @@ describe('StructureEditor', () => {
       'Big blind',
       'Ante',
       'Ante type',
-      'Level note',
       'Actions',
     ])
     expect(Array.from(breakRow.querySelectorAll('.structure-cell-label'), (label) => label.textContent)).toEqual([
@@ -145,6 +169,20 @@ describe('StructureEditor', () => {
       'Break label',
       'Actions',
     ])
+    expect(within(level).queryByRole('textbox', { name: 'Level note' })).not.toBeInTheDocument()
+    expect(within(level).queryByRole('checkbox', { name: 'Until end' })).not.toBeInTheDocument()
+    expect(within(level).queryByText('Note', { exact: true })).not.toBeInTheDocument()
+    expect(within(level).queryByText('Until end', { exact: true })).not.toBeInTheDocument()
+  })
+
+  it('shows the final untimed level as a non-editable duration marker', () => {
+    render(<StructureStateHarness />)
+    const level = screen.getByRole('group', { name: 'Level 17' })
+    const duration = level.querySelector('.structure-untimed-duration')
+
+    expect(duration).toHaveAccessibleName('Untimed level')
+    expect(duration).toHaveTextContent('—')
+    expect(within(level).queryByRole('spinbutton', { name: 'Duration minutes' })).not.toBeInTheDocument()
   })
 
   it('keeps a semantic legend and grid-contained actions without placeholder break fields', () => {
@@ -211,56 +249,6 @@ describe('StructureEditor', () => {
     expect(screen.queryByLabelText('Seconds remaining')).not.toBeInTheDocument()
   })
 
-  it('switches a poker level to Until end and removes timed duration editing', async () => {
-    const user = userEvent.setup()
-    const onChange = vi.fn()
-    const entry = createInitialState().structure[0]
-    if (entry.kind !== 'level') throw new Error('Expected the opening entry to be a poker level')
-
-    const { rerender } = render(
-      <StructureRow entry={entry} label="Level 1" tone="odd" index={0} total={1} issues={[]} onChange={onChange} onMove={vi.fn()} onDelete={vi.fn()} />,
-    )
-    await user.click(screen.getByRole('checkbox', { name: 'Until end' }))
-    expect(onChange).toHaveBeenLastCalledWith({ ...entry, durationSeconds: null })
-
-    rerender(
-      <StructureRow entry={{ ...entry, durationSeconds: null }} label="Level 1" tone="odd" index={0} total={1} issues={[]} onChange={onChange} onMove={vi.fn()} onDelete={vi.fn()} />,
-    )
-    expect(screen.getByRole('checkbox', { name: 'Until end' })).toBeChecked()
-    expect(screen.queryByLabelText('Duration minutes')).not.toBeInTheDocument()
-    await user.click(screen.getByRole('checkbox', { name: 'Until end' }))
-    expect(onChange).toHaveBeenLastCalledWith({ ...entry, durationSeconds: 900 })
-  })
-
-  it('emits the raw Level note draft and leaves length validation to the field contract', async () => {
-    const onChange = vi.fn()
-    const entry = createInitialState().structure[0]
-    if (entry.kind !== 'level') throw new Error('Expected the opening entry to be a poker level')
-
-    render(
-      <StructureRow entry={entry} label="Level 1" tone="odd" index={0} total={1} issues={[]} onChange={onChange} onMove={vi.fn()} onDelete={vi.fn()} />,
-    )
-    const note = screen.getByRole('textbox', { name: 'Level note' })
-    expect(note).toHaveAttribute('maxlength', '80')
-    fireEvent.change(note, { target: { value: '  Final table  ' } })
-
-    expect(onChange).toHaveBeenLastCalledWith({ ...entry, note: '  Final table  ' })
-  })
-
-  it('removes a cleared note when the draft is applied while preserving the whitespace draft', async () => {
-    const user = userEvent.setup()
-    render(<StructureStateHarness />)
-    const level = screen.getByRole('group', { name: 'Level 6' })
-    const note = within(level).getByRole('textbox', { name: 'Level note' })
-    await user.clear(note)
-    fireEvent.change(note, { target: { value: '   ' } })
-
-    expect(note).toHaveValue('   ')
-    await user.click(screen.getByRole('button', { name: 'Apply structure' }))
-
-    expect(screen.getByLabelText('Applied level 6 note')).toHaveTextContent('absent')
-  })
-
   it('inserts a break, reorders it, and applies the draft atomically', async () => {
     const user = userEvent.setup()
     render(<App />)
@@ -278,17 +266,18 @@ describe('StructureEditor', () => {
     expect(screen.getByRole('listitem', { name: 'BREAK · 11 MIN' })).toBeVisible()
   })
 
-  it('adds a timed 15-minute level after an untimed final level', async () => {
+  it('adds a timed 15-minute level before an untimed final level and keeps the draft valid', async () => {
     const user = userEvent.setup()
     render(<App />)
     await openTab(user, 'Structure')
 
     await user.click(screen.getByRole('button', { name: /Add level/ }))
-    const levels = screen.getAllByRole('group', { name: /Level/ })
-    const addedLevel = levels[levels.length - 1]
+    const addedLevel = screen.getByRole('group', { name: 'Level 17' })
 
     expect(within(addedLevel).getByLabelText('Duration minutes')).toHaveValue(15)
-    expect(within(addedLevel).getByRole('checkbox', { name: 'Until end' })).not.toBeChecked()
+    expect(within(addedLevel).queryByRole('checkbox', { name: 'Until end' })).not.toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Level 18' }).querySelector('.structure-untimed-duration')).toHaveTextContent('—')
+    expect(screen.getByRole('button', { name: 'Apply structure' })).toBeEnabled()
   })
 
   it('shows field validation and blocks malformed levels', async () => {
@@ -367,7 +356,7 @@ describe('Structure editor responsive CSS', () => {
     expect(cssRule(collapseCss, '.director-nav')).toMatch(/overflow-x:\s*auto/)
   })
 
-  it('wraps before the desktop grid can overflow the Director content column', () => {
+  it('wraps the seven-column editor before it can overflow the Director content column', () => {
     const mediumStart = directorCss.indexOf('@media (max-width: 1180px)')
     const mobileStart = directorCss.indexOf('@media (max-width: 620px)')
     const mediumCss = directorCss.slice(mediumStart, mobileStart)
@@ -376,28 +365,27 @@ describe('Structure editor responsive CSS', () => {
     expect(cssRule(mediumCss, '.structure-editor-columns')).toMatch(/display:\s*none/)
     expect(cssRule(mediumCss, '.structure-row-grid')).toMatch(/grid-template-columns:\s*5\.25rem 5\.75rem repeat\(3, minmax\(4\.75rem, 1fr\)\) 8\.7rem/)
     expect(cssRule(mediumCss, '.structure-cell-label')).toMatch(/display:\s*block/)
-    expect(cssRule(mediumCss, '.structure-editor-row--level .structure-level-note')).toMatch(/grid-column:\s*4 \/ 6/)
+    expect(cssRule(mediumCss, '.structure-editor-row--level .structure-ante-type')).toMatch(/grid-column:\s*2 \/ 6/)
     expect(cssRule(mediumCss, '.structure-editor-row--break .structure-break-label')).toMatch(/grid-column:\s*3 \/ 6/)
     expect(cssRule(mediumCss, '.structure-actions-cell')).toMatch(/grid-column:\s*6/)
     expect(cssRule(mediumCss, '.structure-actions-cell')).toMatch(/grid-row:\s*1 \/ 3/)
   })
 
-  it('keeps actions in the desktop grid and makes the full Until end target 44 pixels', () => {
+  it('keeps actions in the seventh desktop grid column and makes untimed durations non-interactive', () => {
     expect(cssRule(directorCss, '.row-order-actions')).toMatch(/display:\s*grid/)
     expect(cssRule(directorCss, '.row-order-actions')).toMatch(/grid-template-columns:\s*repeat\(3, 2\.75rem\)/)
     expect(cssRule(directorCss, '.row-order-actions')).not.toMatch(/position:\s*absolute/)
     expect(cssRule(directorCss, '.row-order-actions button')).toMatch(/width:\s*2\.75rem/)
     expect(cssRule(directorCss, '.row-order-actions button')).toMatch(/height:\s*2\.75rem/)
     expect(cssRule(directorCss, '.row-order-actions button')).not.toMatch(/position:\s*absolute/)
-    expect(cssRule(directorCss, '.structure-actions-cell')).toMatch(/grid-column:\s*8/)
-    expect(cssRule(directorCss, '.structure-until-end')).toMatch(/min-width:\s*2\.75rem/)
-    expect(cssRule(directorCss, '.structure-until-end')).toMatch(/min-height:\s*2\.75rem/)
+    expect(cssRule(directorCss, '.structure-actions-cell')).toMatch(/grid-column:\s*7/)
+    expect(cssRule(directorCss, '.structure-untimed-duration')).toMatch(/min-height:\s*2\.75rem/)
+    expect(cssRule(directorCss, '.structure-untimed-duration')).toMatch(/cursor:\s*default/)
   })
 
-  it('uses a two-column mobile grid with full-width notes and actions', () => {
+  it('uses a two-column mobile grid with full-width identity and actions', () => {
     const mobileCss = directorCss.slice(directorCss.indexOf('@media (max-width: 620px)'))
     const fullWidthSelector = `.structure-row-identity,
-  .structure-editor-row--level .structure-level-note,
   .structure-actions-cell`
 
     expect(cssRule(mobileCss, '.structure-row-grid')).toMatch(/grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/)

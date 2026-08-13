@@ -72,9 +72,6 @@ export function validateStructure(entries: StructureEntry[]): ValidationResult {
     } else if (entry.anteType !== 'none' && entry.ante <= 0) {
       issues.push({ entryId: entry.id, field: 'ante', message: 'This ante type requires a positive ante.' })
     }
-    if (entry.note !== undefined && entry.note.length > 80) {
-      issues.push({ entryId: entry.id, field: 'note', message: 'Note must be 80 characters or fewer.' })
-    }
   }
 
   return { valid: issues.length === 0, issues }
