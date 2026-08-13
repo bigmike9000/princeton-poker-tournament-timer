@@ -42,14 +42,13 @@ export function BlindStructure({ state, onSelectEntry }: BlindStructureProps) {
                 ref={current ? currentRef : undefined}
                 className={`structure-row structure-row--break structure-row--${rowState}`}
                 data-state={rowState}
-                aria-current={current ? 'step' : undefined}
-                aria-label={presentation.heading}
               >
                 <button
                   type="button"
                   className="structure-row-button"
                   data-tournament-shortcuts="true"
                   aria-label={presentation.accessibleLabel}
+                  aria-current={current ? 'step' : undefined}
                   onClick={() => onSelectEntry(index)}
                 >
                   <span className="break-rule" aria-hidden="true" />
@@ -74,14 +73,13 @@ export function BlindStructure({ state, onSelectEntry }: BlindStructureProps) {
               ref={current ? currentRef : undefined}
               className={`structure-row structure-row--${rowState}`}
               data-state={rowState}
-              aria-current={current ? 'step' : undefined}
-              aria-label={label}
             >
               <button
                 type="button"
                 className="structure-row-button"
                 data-tournament-shortcuts="true"
                 aria-label={label}
+                aria-current={current ? 'step' : undefined}
                 onClick={() => onSelectEntry(index)}
               >
                 <span className="level-index">{String(levelNumber).padStart(2, '0')}</span>

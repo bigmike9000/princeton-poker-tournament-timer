@@ -38,6 +38,11 @@ describe('representative tournament flow', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Blind structure' }))
     const structure = screen.getByRole('list', { name: 'Tournament blind structure' })
     expect(within(structure).getAllByRole('listitem')[1]).toHaveAttribute('aria-current', 'step')
+    const publicSchedule = screen.getByRole('complementary', { name: 'Blind Structure' })
+    const publicCurrentRow = within(publicSchedule).getAllByRole('listitem')[1]
+    expect(publicCurrentRow).not.toHaveAttribute('aria-label')
+    expect(publicCurrentRow).not.toHaveAttribute('aria-current')
+    expect(within(publicCurrentRow).getByRole('button', { name: /^Level 2 / })).toHaveAttribute('aria-current', 'step')
 
     act(() => vi.advanceTimersByTime(3_000))
 

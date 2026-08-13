@@ -239,16 +239,6 @@ select:focus-visible {
   letter-spacing: .08em;
 }
 
-.current-level-note {
-  margin: .45rem 0 0;
-  color: var(--brass-400);
-  font-size: clamp(.68rem, .8vw, .84rem);
-  font-weight: 700;
-  letter-spacing: .07em;
-  line-height: 1.35;
-  text-transform: uppercase;
-}
-
 .current-level--break {
   grid-template-columns: minmax(13rem, .65fr) minmax(20rem, 1fr);
 }
@@ -418,6 +408,19 @@ select:focus-visible {
   line-height: 1.35;
   overflow-wrap: anywhere;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.break-procedure--empty {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
   white-space: nowrap;
 }
 

@@ -2,13 +2,19 @@ import { breakPresentation } from '../../domain/breakPresentation'
 import type { StructureEntry } from '../../domain/types'
 
 export function BreakProcedure({ entry }: { entry: StructureEntry }) {
-  if (entry.kind !== 'break') return null
-  const { subtitle } = breakPresentation(entry)
-  if (!subtitle) return null
+  const subtitle = entry.kind === 'break' ? breakPresentation(entry).subtitle : null
   return (
-    <aside className="break-procedure" role="status" aria-label="Break procedure">
-      <span>Break procedure</span>
-      <strong>{subtitle}</strong>
+    <aside
+      className={subtitle ? 'break-procedure' : 'break-procedure break-procedure--empty'}
+      role="status"
+      aria-atomic="true"
+    >
+      {subtitle && (
+        <>
+          <span aria-hidden="true">Break procedure</span>
+          <strong>{subtitle}</strong>
+        </>
+      )}
     </aside>
   )
 }

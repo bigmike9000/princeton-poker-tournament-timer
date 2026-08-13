@@ -56,7 +56,7 @@ describe('DirectorSettings', () => {
 
     fireEvent.keyDown(window, { key: 'f' })
 
-    expect(await screen.findByRole('status')).toHaveTextContent(/fullscreen is unavailable/i)
+    expect(await screen.findByText(/fullscreen is unavailable/i, { selector: '[role="status"]' })).toBeVisible()
     expect(screen.getByRole('timer')).toBeVisible()
   })
 })

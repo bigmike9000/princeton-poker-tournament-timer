@@ -343,7 +343,7 @@ describe('StructureEditor', () => {
     await user.click(within(newBreak).getByRole('button', { name: 'Move up' }))
     await user.click(screen.getByRole('button', { name: 'Apply structure' }))
 
-    expect(screen.getByRole('listitem', { name: 'BREAK — 11 MIN' })).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Break, 11 min' })).toHaveTextContent('BREAK — 11 MIN')
   })
 
   it('adds a timed 15-minute level before an untimed final level and keeps the draft valid', async () => {

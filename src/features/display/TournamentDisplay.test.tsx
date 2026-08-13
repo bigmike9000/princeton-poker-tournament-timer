@@ -28,6 +28,13 @@ function cssRule(css: string, selector: string) {
   return css.match(new RegExp(`${escapedSelector}\\s*\\{([^}]*)\\}`))?.[1] ?? ''
 }
 
+function cssRuleWithinMedia(css: string, mediaQuery: string, selector: string) {
+  const mediaStart = css.indexOf(`@media (${mediaQuery})`)
+  if (mediaStart < 0) return ''
+  const nextMediaStart = css.indexOf('@media', mediaStart + 1)
+  return cssRule(css.slice(mediaStart, nextMediaStart < 0 ? undefined : nextMediaStart), selector)
+}
+
 describe('TournamentDisplay', () => {
   it('shows the Princeton Poker Club logo', () => {
     renderDisplay()
@@ -90,7 +97,10 @@ describe('TournamentDisplay', () => {
     const currentBreak = screen.getByRole('region', { name: 'Current break' })
     expect(within(currentBreak).getByRole('heading', { name: 'BREAK' })).toBeVisible()
     expect(currentBreak).not.toHaveTextContent('Count and stack white chips')
-    const procedure = screen.getByRole('status', { name: 'Break procedure' })
+    const procedure = screen.getByRole('status')
+    expect(procedure).toHaveAttribute('aria-atomic', 'true')
+    expect(procedure).not.toHaveAttribute('aria-label')
+    expect(within(procedure).getByText('Break procedure')).toHaveAttribute('aria-hidden', 'true')
     expect(procedure).toHaveTextContent('Count and stack white chips in stacks of 10')
     expect(
       procedure.compareDocumentPosition(screen.getByLabelText('Tournament statistics')) & Node.DOCUMENT_POSITION_PRECEDING,
@@ -102,6 +112,11 @@ describe('TournamentDisplay', () => {
       expect(scheduledBreak).toHaveTextContent('BREAK — 10 MIN')
       expect(scheduledBreak).not.toHaveTextContent(/Count and stack (white|red) chips/)
     }
+    const currentBreakRow = scheduledBreaks[0].closest('li')
+    expect(currentBreakRow).not.toHaveAttribute('aria-label')
+    expect(currentBreakRow).not.toHaveAttribute('aria-current')
+    expect(scheduledBreaks[0]).toHaveAttribute('aria-current', 'step')
+    expect(scheduledBreaks[1]).not.toHaveAttribute('aria-current')
     expect(screen.getByText(/Next: Level 6/)).toBeVisible()
     expect(screen.getAllByText(/10 \/ 20/).length).toBeGreaterThan(0)
   })
@@ -118,7 +133,29 @@ describe('TournamentDisplay', () => {
     const currentBreak = screen.getByRole('region', { name: 'Current break' })
     expect(within(currentBreak).getByRole('heading', { name: 'BREAK' })).toBeVisible()
     expect(currentBreak).not.toHaveTextContent('Count and stack red chips')
-    expect(screen.getByRole('status', { name: 'Break procedure' })).toHaveTextContent('Count and stack red chips')
+    const procedure = screen.getByRole('status')
+    expect(within(procedure).getByText('Break procedure')).toHaveAttribute('aria-hidden', 'true')
+    expect(procedure).toHaveTextContent('Count and stack red chips')
+  })
+
+  it('announces a break procedure by updating the status node mounted during poker levels', async () => {
+    const user = userEvent.setup()
+    renderDisplay()
+
+    const levelStatus = screen.getByRole('status')
+    expect(levelStatus).toHaveAttribute('aria-atomic', 'true')
+    expect(levelStatus).toHaveClass('break-procedure--empty')
+    expect(levelStatus).toBeEmptyDOMElement()
+
+    const schedule = screen.getByRole('complementary', { name: 'Blind Structure' })
+    await user.click(within(schedule).getAllByRole('button', { name: 'Break, 10 min' })[0])
+
+    const breakStatus = screen.getByRole('status')
+    expect(breakStatus).toBe(levelStatus)
+    expect(breakStatus).not.toHaveClass('break-procedure--empty')
+    expect(breakStatus).not.toHaveAttribute('aria-label')
+    expect(within(breakStatus).getByText('Break procedure')).toHaveAttribute('aria-hidden', 'true')
+    expect(within(breakStatus).getByText('Count and stack white chips in stacks of 10')).toBeVisible()
   })
 
   it('renders a generic break label once and opts its current schedule row into shortcuts', () => {
@@ -134,10 +171,15 @@ describe('TournamentDisplay', () => {
     const currentBreak = screen.getByRole('region', { name: 'Current break' })
     expect(within(currentBreak).getByRole('heading', { name: 'BREAK' })).toBeVisible()
     expect(currentBreak).not.toHaveTextContent('Break procedure')
-    expect(screen.queryByRole('status', { name: 'Break procedure' })).not.toBeInTheDocument()
-    const currentScheduleBreak = screen.getByRole('listitem', { current: 'step' })
-    expect(within(currentScheduleBreak).getByRole('button', { name: 'Break, 10 min' }))
-      .toHaveAttribute('data-tournament-shortcuts', 'true')
+    expect(screen.getByRole('status')).toHaveClass('break-procedure--empty')
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
+    const schedule = screen.getByRole('complementary', { name: 'Blind Structure' })
+    const currentScheduleBreak = within(schedule).getAllByRole('listitem')[5]
+    const currentBreakButton = within(currentScheduleBreak).getByRole('button', { name: 'Break, 10 min' })
+    expect(currentScheduleBreak).not.toHaveAttribute('aria-label')
+    expect(currentScheduleBreak).not.toHaveAttribute('aria-current')
+    expect(currentBreakButton).toHaveAttribute('aria-current', 'step')
+    expect(currentBreakButton).toHaveAttribute('data-tournament-shortcuts', 'true')
   })
 
   it('highlights the current structure row and lists completed levels', () => {
@@ -149,8 +191,14 @@ describe('TournamentDisplay', () => {
 
     renderDisplay()
 
-    expect(screen.getByRole('listitem', { name: /^Level 3 / })).toHaveAttribute('aria-current', 'step')
-    expect(screen.getByRole('listitem', { name: /^Level 1 / })).toHaveAttribute('data-state', 'complete')
+    const schedule = screen.getByRole('complementary', { name: 'Blind Structure' })
+    const rows = within(schedule).getAllByRole('listitem')
+    const currentLevelButton = within(rows[2]).getByRole('button', { name: /^Level 3 / })
+    expect(rows[2]).not.toHaveAttribute('aria-label')
+    expect(rows[2]).not.toHaveAttribute('aria-current')
+    expect(currentLevelButton).toHaveAttribute('aria-current', 'step')
+    expect(rows[0]).not.toHaveAttribute('aria-label')
+    expect(rows[0]).toHaveAttribute('data-state', 'complete')
   })
 
   it('jumps to a schedule entry from the main display', async () => {
@@ -191,7 +239,8 @@ describe('TournamentDisplay', () => {
 
     expect(screen.getByRole('region', { name: 'Current poker level' })).toHaveTextContent('LEVEL 18')
     expect(screen.getByRole('region', { name: 'Current poker level' })).not.toHaveTextContent('Final level')
-    expect(screen.queryByRole('status', { name: 'Break procedure' })).not.toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveClass('break-procedure--empty')
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
     expect(screen.getByRole('timer')).toHaveTextContent('UNTIL END')
   })
 
@@ -222,6 +271,27 @@ describe('TournamentDisplay', () => {
     expect(cssRule(displayCss, '.structure-row--break')).toMatch(/min-height:\s*2\.75rem/)
     expect(cssRule(displayCss, '.structure-row-button')).toMatch(/min-height:\s*inherit/)
     expect(cssRule(displayCss, '.structure-row-button')).toMatch(/padding:\s*\.4rem\s+\.75rem/)
+  })
+
+  it('visually hides the empty procedure status without removing its live-region semantics', () => {
+    const emptyProcedureRule = cssRule(displayCss, '.break-procedure--empty')
+
+    expect(emptyProcedureRule).toMatch(/position:\s*absolute/)
+    expect(emptyProcedureRule).toMatch(/width:\s*1px/)
+    expect(emptyProcedureRule).toMatch(/height:\s*1px/)
+    expect(emptyProcedureRule).toMatch(/overflow:\s*hidden/)
+    expect(emptyProcedureRule).not.toMatch(/display:\s*none|visibility:\s*hidden/)
+  })
+
+  it('stacks and wraps active break procedures at phone widths', () => {
+    const procedureRule = cssRuleWithinMedia(displayCss, 'max-width: 640px', '.break-procedure')
+    const messageRule = cssRuleWithinMedia(displayCss, 'max-width: 640px', '.break-procedure strong')
+
+    expect(procedureRule).toMatch(/grid-template-columns:\s*1fr/)
+    expect(procedureRule).toMatch(/gap:\s*\.18rem/)
+    expect(messageRule).toMatch(/overflow:\s*visible/)
+    expect(messageRule).toMatch(/text-overflow:\s*clip/)
+    expect(messageRule).toMatch(/white-space:\s*normal/)
   })
 
   it('uses restrained radii and clips grouped public surfaces', () => {
