@@ -42,7 +42,6 @@ export function CurrentLevel({ state }: { state: TournamentState }) {
       <div className="blind-display">
         <strong>{formatChips(entry.smallBlind)} / {formatChips(entry.bigBlind)}</strong>
         <span>{anteLabel(entry.anteType, entry.ante)}</span>
-        {entry.note && <small className="current-level-note">{entry.note}</small>}
       </div>
     </section>
   )

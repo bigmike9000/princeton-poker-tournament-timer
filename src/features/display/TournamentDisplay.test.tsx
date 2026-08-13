@@ -151,6 +151,27 @@ describe('TournamentDisplay', () => {
     expect(screen.getByRole('timer')).toHaveTextContent('UNTIL END')
   })
 
+  it('hides a saved organizer note when its poker level is current', () => {
+    const state = createInitialState()
+    const currentLevelIndex = state.structure.findIndex((entry) => entry.id === 'level-13')
+    const currentLevel = state.structure[currentLevelIndex]
+    if (currentLevel?.kind !== 'level') throw new Error('Missing test level')
+    currentLevel.note = 'Public display must not reveal this saved organizer note'
+    state.runtime.currentEntryIndex = currentLevelIndex
+    state.runtime.remainingMs = entryDurationMs(currentLevel) ?? 0
+    state.runtime.status = 'paused'
+    saveSnapshot(localStorage, state, Date.now())
+
+    const { container } = renderDisplay()
+    const currentHero = screen.getByRole('region', { name: 'Current poker level' })
+
+    expect(currentHero).toHaveTextContent('LEVEL 13')
+    expect(currentHero).not.toHaveTextContent('Public display must not reveal this saved organizer note')
+    expect(container.querySelector('.tournament-shell')).not.toHaveTextContent(
+      'Public display must not reveal this saved organizer note',
+    )
+  })
+
   it('keeps the public blind schedule compact without shrinking its buttons below their row height', () => {
     expect(cssRule(displayCss, '.structure-header')).toMatch(/min-height:\s*5\.6rem/)
     expect(cssRule(displayCss, '.structure-row')).toMatch(/min-height:\s*3\.25rem/)
