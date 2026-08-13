@@ -144,6 +144,20 @@ describe('InfoOverlay', () => {
     expect(legacyCardRule).toMatch(/overflow:\s*visible/)
   })
 
+  it('gives the compact prize list winning base and narrow selectors', () => {
+    const prizeListRule = cssRule(displayCss, '.info-card .info-prize-list')
+    const narrowStart = displayCss.lastIndexOf('@media (max-width: 640px)')
+    const narrowPrizeListRule = cssRule(
+      displayCss.slice(narrowStart),
+      '.info-card .info-prize-list',
+    )
+
+    expect(prizeListRule).toMatch(/gap:\s*0/)
+    expect(prizeListRule).toMatch(/margin:\s*\.42rem 0 0/)
+    expect(prizeListRule).toMatch(/padding:\s*0/)
+    expect(narrowPrizeListRule).toMatch(/margin:\s*\.2rem 0 0/)
+  })
+
   it('opens on Overview, switches pages manually, and resets to Overview after closing', async () => {
     const user = userEvent.setup()
 
@@ -224,6 +238,27 @@ describe('InfoOverlay', () => {
     expect(overlay.getByText(/^Legacy chip line 24 /)).toBeVisible()
     expect(overlay.getByRole('listitem', { name: '1 place prize, 300' })).toBeVisible()
     expect(overlay.queryByText('Hidden legacy house note')).not.toBeInTheDocument()
+  })
+
+  it('warns about oversize public prizes and keeps the legacy prize reachable', () => {
+    const state = createInitialState()
+    const legacyPrize = `Legacy prize ${'p'.repeat(120)}`
+    state.information = {
+      chipLines: ['Tournament chips'],
+      prizeLines: [legacyPrize],
+      houseNotes: ['Hidden house note'],
+    }
+    saveSnapshot(localStorage, state, Date.now())
+
+    render(<App />)
+    const { dialog } = openInfo()
+    const overlay = within(dialog)
+    const overview = overlay.getByRole('tabpanel')
+
+    expect(overlay.getByText('Legacy information exceeds projector layout')).toBeVisible()
+    expect(overview).toHaveClass('info-page--legacy-oversize')
+    expect(overview).not.toHaveClass('info-page--projector-safe')
+    expect(overlay.getByRole('listitem', { name: legacyPrize })).toBeVisible()
   })
 
   it('aligns colon-delimited prizes and lets custom prize copy span the row', () => {

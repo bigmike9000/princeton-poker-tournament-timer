@@ -1294,10 +1294,10 @@ select:focus-visible {
   font-variant-numeric: tabular-nums;
 }
 
-.info-prize-list {
+.info-card .info-prize-list {
   display: grid;
   gap: 0;
-  margin-top: .42rem;
+  margin: .42rem 0 0;
   padding: 0;
   list-style: none;
 }
@@ -1533,7 +1533,7 @@ select:focus-visible {
   .info-totals div { padding-top: .24rem; }
   .info-totals dt { font-size: .65rem; }
   .info-totals dd { margin-top: .08rem; font-size: .75rem; }
-  .info-prize-list { margin-top: .2rem; }
+  .info-card .info-prize-list { margin: .2rem 0 0; }
   .info-prize-list li { min-height: 1.75rem; padding: .08rem .15rem; }
   .info-chip-reminder { padding: .35rem .45rem; font-size: .65rem; }
   .info-page--structure { gap: .25rem; padding: .35rem; }
