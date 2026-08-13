@@ -140,6 +140,7 @@ select:focus-visible {
   margin-left: auto;
   border: 1px solid var(--line);
   border-left: 2px solid var(--slate-500);
+  border-radius: var(--radius-compact);
   padding: .58rem .82rem;
   color: var(--slate-300);
   background: var(--surface);
@@ -248,11 +249,6 @@ select:focus-visible {
   text-transform: uppercase;
 }
 
-.current-level-note--break {
-  grid-column: 1;
-  max-width: 20rem;
-}
-
 .current-level--break {
   grid-template-columns: minmax(13rem, .65fr) minmax(20rem, 1fr);
 }
@@ -336,9 +332,13 @@ select:focus-visible {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1px;
-  border: 1px solid var(--line);
+  overflow: hidden;
+  border: 1px solid rgb(184 154 97 / 18%);
+  border-radius: var(--radius-card);
   background: var(--line);
-  box-shadow: 0 18px 52px rgb(0 0 0 / 27%);
+  box-shadow:
+    inset 0 1px rgb(255 249 232 / 3%),
+    0 18px 52px rgb(0 0 0 / 27%);
 }
 
 .stat-card {
@@ -346,7 +346,7 @@ select:focus-visible {
   display: grid;
   min-width: 0;
   gap: .34rem;
-  padding: clamp(.75rem, 1.2vw, 1.15rem) clamp(.8rem, 1.4vw, 1.45rem);
+  padding: clamp(.75rem, 1.2vw, 1.15rem) clamp(1rem, 1.8vw, 1.75rem);
   background: linear-gradient(160deg, #1b1914, #100f0c 78%);
   box-shadow: inset 0 1px rgb(255 249 232 / 3%);
 }
@@ -381,6 +381,44 @@ select:focus-visible {
   font-variant-numeric: tabular-nums;
   letter-spacing: -.035em;
   text-overflow: ellipsis;
+}
+
+.break-procedure {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: .7rem;
+  margin-top: .55rem;
+  border: 1px solid rgb(184 154 97 / 18%);
+  border-left: 3px solid var(--orange-500);
+  border-radius: var(--radius-card);
+  padding: .62rem .85rem;
+  background: linear-gradient(90deg, rgb(217 121 43 / 11%), rgb(13 13 11 / 72%));
+  box-shadow:
+    inset 0 1px rgb(255 249 232 / 3%),
+    0 12px 32px rgb(0 0 0 / 20%);
+}
+
+.break-procedure span {
+  color: var(--orange-400);
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.break-procedure strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ivory-100);
+  font-size: clamp(.74rem, .9vw, .88rem);
+  font-weight: 700;
+  letter-spacing: .02em;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sponsor-strip {
@@ -487,6 +525,7 @@ select:focus-visible {
 
 .structure-count {
   border: 1px solid var(--line);
+  border-radius: var(--radius-compact);
   padding: .42rem .66rem;
   color: var(--slate-300);
   background: rgb(7 7 5 / 38%);
@@ -513,6 +552,7 @@ select:focus-visible {
   margin: 0 .7rem;
   border: 1px solid transparent;
   border-bottom-color: rgb(184 154 97 / 14%);
+  border-radius: var(--radius-compact);
   padding: 0;
   list-style: none;
   transition: opacity 180ms ease, border-color 180ms ease, background 180ms ease;
@@ -527,6 +567,7 @@ select:focus-visible {
   align-items: center;
   gap: .55rem;
   border: 1px solid transparent;
+  border-radius: var(--radius-compact);
   padding: .4rem .75rem;
   color: inherit;
   background: transparent;
@@ -569,6 +610,7 @@ select:focus-visible {
   height: 1.85rem;
   place-items: center;
   border: 1px solid var(--line);
+  border-radius: var(--radius-compact);
   color: var(--slate-400);
   font-family: var(--font-numeric);
   font-size: .75rem;
@@ -633,6 +675,7 @@ select:focus-visible {
   top: -.42rem;
   right: .55rem;
   border: 1px solid #e59350;
+  border-radius: var(--radius-compact);
   padding: .14rem .4rem;
   color: var(--ink-950);
   background: var(--orange-500);
@@ -661,16 +704,6 @@ select:focus-visible {
 .structure-break-copy {
   display: grid;
   gap: .18rem;
-}
-
-.structure-break-copy small {
-  color: var(--brass-400);
-  font-family: var(--font-sans);
-  font-size: .57rem;
-  font-weight: 700;
-  letter-spacing: .08em;
-  line-height: 1.3;
-  text-transform: uppercase;
 }
 
 .break-rule {
@@ -716,7 +749,6 @@ select:focus-visible {
 .player-stepper button {
   min-height: 3.4rem;
   border: 1px solid var(--line);
-  border-radius: .12rem;
   padding: 0 1rem;
   color: var(--slate-300);
   background: linear-gradient(180deg, #201d17, #12110e);
@@ -725,6 +757,12 @@ select:focus-visible {
   font-weight: 780;
   letter-spacing: .055em;
   cursor: pointer;
+}
+
+.control-button,
+.icon-button,
+.director-button {
+  border-radius: var(--radius-control);
 }
 
 .control-button:hover,
@@ -802,8 +840,11 @@ select:focus-visible {
 .player-stepper {
   display: grid;
   grid-template-columns: 3.4rem minmax(5.2rem, auto) 3.4rem;
+  min-height: 3.4rem;
+  overflow: hidden;
   align-items: stretch;
   border: 1px solid var(--line);
+  border-radius: var(--radius-control);
   background: var(--ink-900);
   box-shadow: 0 8px 24px rgb(0 0 0 / 18%);
 }
@@ -818,12 +859,18 @@ select:focus-visible {
   font-size: 1.45rem;
 }
 
+.player-stepper button:focus-visible {
+  outline-offset: -3px;
+}
+
 .player-stepper div {
   display: grid;
-  min-width: 5.5rem;
+  min-width: 6rem;
   place-content: center;
+  gap: .08rem;
   border-right: 1px solid var(--line);
   border-left: 1px solid var(--line);
+  padding: .28rem .65rem;
   text-align: center;
 }
 
@@ -832,6 +879,7 @@ select:focus-visible {
   font-size: .55rem;
   font-weight: 800;
   letter-spacing: .12em;
+  line-height: 1.15;
   text-transform: uppercase;
 }
 
@@ -949,6 +997,8 @@ select:focus-visible {
   .clock { font-size: 24vw; }
   .clock.clock--untimed { font-size: 15vw; }
   .stats-grid { grid-template-columns: 1fr; }
+  .break-procedure { grid-template-columns: 1fr; gap: .18rem; }
+  .break-procedure strong { overflow: visible; text-overflow: clip; white-space: normal; }
   .sponsor-strip { height: 1.5rem; gap: .5rem; overflow: hidden; white-space: nowrap; }
   .sponsor-logo-card { width: 5.5rem; height: 1.5rem; }
   .sponsor-marks--display .sponsor-logo-card { width: 5.5rem; height: 1.5rem; }

@@ -67,7 +67,7 @@ describe('StructureEditor', () => {
 
     expect(tones).toEqual([
       'odd', 'even', 'odd', 'even', 'odd', 'even', 'odd', 'even', 'odd', 'even',
-      'odd', 'even', 'odd', 'even', 'odd', 'even', 'odd', 'even', 'odd',
+      'odd', 'even', 'odd', 'even', 'odd', 'even', 'odd', 'even', 'odd', 'even',
     ])
   })
 
@@ -257,7 +257,7 @@ describe('StructureEditor', () => {
 
   it('shows the final untimed level as a non-editable duration marker', () => {
     render(<StructureStateHarness />)
-    const level = screen.getByRole('group', { name: 'Level 17' })
+    const level = screen.getByRole('group', { name: 'Level 18' })
     const duration = level.querySelector('.structure-untimed-duration')
 
     expect(duration).toHaveAccessibleName('Untimed level')
@@ -343,7 +343,7 @@ describe('StructureEditor', () => {
     await user.click(within(newBreak).getByRole('button', { name: 'Move up' }))
     await user.click(screen.getByRole('button', { name: 'Apply structure' }))
 
-    expect(screen.getByRole('listitem', { name: 'BREAK · 11 MIN' })).toBeVisible()
+    expect(screen.getByRole('listitem', { name: 'BREAK — 11 MIN' })).toBeVisible()
   })
 
   it('adds a timed 15-minute level before an untimed final level and keeps the draft valid', async () => {
@@ -352,11 +352,11 @@ describe('StructureEditor', () => {
     await openTab(user, 'Structure')
 
     await user.click(screen.getByRole('button', { name: /Add level/ }))
-    const addedLevel = screen.getByRole('group', { name: 'Level 17' })
+    const addedLevel = screen.getByRole('group', { name: 'Level 18' })
 
     expect(within(addedLevel).getByLabelText('Duration minutes')).toHaveValue(15)
     expect(within(addedLevel).queryByRole('checkbox', { name: 'Until end' })).not.toBeInTheDocument()
-    expect(screen.getByRole('group', { name: 'Level 18' }).querySelector('.structure-untimed-duration')).toHaveTextContent('—')
+    expect(screen.getByRole('group', { name: 'Level 19' }).querySelector('.structure-untimed-duration')).toHaveTextContent('—')
     expect(screen.getByRole('button', { name: 'Apply structure' })).toBeEnabled()
   })
 

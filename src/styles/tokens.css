@@ -19,6 +19,9 @@
   --line: rgb(184 154 97 / 24%);
   --surface: rgb(19 18 15 / 94%);
   --shadow: 0 28px 80px rgb(0 0 0 / 44%);
+  --radius-compact: .25rem;
+  --radius-control: .375rem;
+  --radius-card: .5rem;
   --font-heritage: Georgia, "Times New Roman", Times, serif;
   --font-numeric: "Arial Narrow", "Aptos Narrow", "Roboto Condensed", ui-sans-serif, system-ui, sans-serif;
 }

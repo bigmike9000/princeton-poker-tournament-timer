@@ -99,7 +99,7 @@ describe('ResetControls', () => {
     expect(screen.getByLabelText('Remaining time')).toHaveTextContent('720000')
     expect(screen.getByLabelText('Players remaining')).toHaveTextContent('80')
     expect(screen.getByLabelText('Opening entry')).toHaveTextContent('level-1')
-    expect(screen.getByLabelText('Structure length')).toHaveTextContent('19')
+    expect(screen.getByLabelText('Structure length')).toHaveTextContent('20')
     expect(resetTournament).toHaveFocus()
   })
 })

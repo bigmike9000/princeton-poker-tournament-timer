@@ -6,6 +6,7 @@ import { createInitialState } from '../../domain/sampleStructure'
 import { entryDurationMs } from '../../domain/structure'
 import { saveSnapshot } from '../../persistence/snapshot'
 import displayCss from '../../styles/display.css?raw'
+import tokensCss from '../../styles/tokens.css?raw'
 import { TournamentDisplay } from './TournamentDisplay'
 
 function renderDisplay(onOpenDirector = vi.fn(), onOpenInfo = vi.fn(), fullscreen = false) {
@@ -221,6 +222,35 @@ describe('TournamentDisplay', () => {
     expect(cssRule(displayCss, '.structure-row--break')).toMatch(/min-height:\s*2\.75rem/)
     expect(cssRule(displayCss, '.structure-row-button')).toMatch(/min-height:\s*inherit/)
     expect(cssRule(displayCss, '.structure-row-button')).toMatch(/padding:\s*\.4rem\s+\.75rem/)
+  })
+
+  it('uses restrained radii and clips grouped public surfaces', () => {
+    const tokenRoot = cssRule(tokensCss, ':root')
+    expect(tokenRoot).toMatch(/--radius-compact:\s*\.25rem/)
+    expect(tokenRoot).toMatch(/--radius-control:\s*\.375rem/)
+    expect(tokenRoot).toMatch(/--radius-card:\s*\.5rem/)
+
+    expect(cssRule(displayCss, '.stats-grid')).toMatch(/border-radius:\s*var\(--radius-card\)/)
+    expect(cssRule(displayCss, '.stats-grid')).toMatch(/overflow:\s*hidden/)
+    expect(cssRule(displayCss, '.break-procedure')).toMatch(/border-radius:\s*var\(--radius-card\)/)
+    expect(cssRule(displayCss, '.player-stepper')).toMatch(/border-radius:\s*var\(--radius-control\)/)
+    expect(cssRule(displayCss, '.player-stepper')).toMatch(/overflow:\s*hidden/)
+    expect(cssRule(displayCss, '.player-stepper button:focus-visible')).toMatch(/outline-offset:\s*-3px/)
+
+    expect(cssRule(displayCss, '.control-button,\n.icon-button,\n.director-button')).toMatch(
+      /border-radius:\s*var\(--radius-control\)/,
+    )
+
+    for (const selector of [
+      '.status-pill',
+      '.structure-count',
+      '.structure-row',
+      '.structure-row-button',
+      '.level-index',
+      '.live-marker',
+    ]) {
+      expect(cssRule(displayCss, selector), selector).toMatch(/border-radius:\s*var\(--radius-compact\)/)
+    }
   })
 
   it('runs safe main-display controls and opens the director overlay', () => {

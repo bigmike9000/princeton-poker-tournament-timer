@@ -2,7 +2,13 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
+import displayCss from '../../styles/display.css?raw'
 import { PlayerCountControl } from './PlayerCountControl'
+
+function cssRule(css: string, selector: string) {
+  const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return css.match(new RegExp(`${escapedSelector}\\s*\\{([^}]*)\\}`))?.[1] ?? ''
+}
 
 function renderHarness({ players, startingPlayers }: { players: number; startingPlayers: number }) {
   const onSetPlayers = vi.fn()
@@ -29,6 +35,10 @@ function renderHarness({ players, startingPlayers }: { players: number; starting
 }
 
 describe('PlayerCountControl', () => {
+  it('keeps the editable player count target at the full control height', () => {
+    expect(cssRule(displayCss, '.player-stepper input')).toMatch(/min-height:\s*3\.4rem/)
+  })
+
   it('commits a typed player count on Enter', async () => {
     const user = userEvent.setup()
     renderHarness({ players: 80, startingPlayers: 80 })
