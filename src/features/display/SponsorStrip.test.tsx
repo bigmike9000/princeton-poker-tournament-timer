@@ -16,6 +16,13 @@ describe('SponsorStrip', () => {
     expect(screen.getByRole('img', { name: 'Susquehanna' })).toHaveAttribute('src', '/branding/susquehanna.png')
   })
 
+  it('keeps its presentation label and delegates its marks to the shared rack', () => {
+    const { container } = render(<SponsorStrip labels={['Jane Street']} />)
+
+    expect(screen.getByText('Presented with support from')).toBeVisible()
+    expect(container.querySelector('.sponsor-marks')).not.toBeNull()
+  })
+
   it('contains both intrinsic logo images inside the bounded sponsor cards', () => {
     render(<SponsorStrip labels={['Jane Street', 'Susquehanna']} />)
     const logoRule = cssRule(displayCss, '.sponsor-logo')

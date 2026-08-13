@@ -397,6 +397,13 @@ select:focus-visible {
   text-transform: uppercase;
 }
 
+.sponsor-marks {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: .75rem;
+}
+
 .sponsor-logo-card {
   display: grid;
   width: 7.5rem;
@@ -1168,8 +1175,47 @@ select:focus-visible {
 .info-overview-details {
   display: grid;
   min-height: 0;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto auto;
   gap: clamp(.65rem, 1.5vw, 1rem);
+}
+
+.info-sponsors {
+  min-width: 0;
+  border: 1px solid rgb(184 154 97 / 28%);
+  padding: clamp(.55rem, 1.1vh, .75rem) clamp(.65rem, 1.2vw, .9rem);
+  background: rgb(7 7 5 / 44%);
+}
+
+.info-sponsors h2 {
+  margin: .18rem 0 0;
+  color: var(--ivory-50);
+  font-family: var(--font-heritage);
+  font-size: clamp(.9rem, 1.2vw, 1.12rem);
+  font-weight: 600;
+  letter-spacing: -.02em;
+}
+
+.sponsor-marks--info {
+  gap: .5rem;
+  margin-top: .42rem;
+}
+
+.sponsor-marks--info .sponsor-logo-card {
+  width: 5.9rem;
+  height: 1.65rem;
+}
+
+.sponsor-marks--info .sponsor-logo-card--jane-street {
+  padding: .14rem .28rem;
+}
+
+.sponsor-marks--info .sponsor-logo-card--susquehanna {
+  padding: .18rem .32rem;
+}
+
+.sponsor-marks--info .sponsor-text-mark {
+  padding: .14rem 0 .14rem .45rem;
+  font-size: .52rem;
 }
 
 .info-chip-grid {
@@ -1235,6 +1281,16 @@ select:focus-visible {
 .chip--green {
   color: #fff8e7;
   background: #216f43;
+}
+
+.chip--black {
+  color: #fff8e7;
+  background: #171712;
+}
+
+.chip--purple {
+  color: #fff8e7;
+  background: #59317f;
 }
 
 .info-chip-copy {
@@ -1529,6 +1585,13 @@ select:focus-visible {
   .info-chip-copy { gap: .05rem; }
   .info-chip-copy strong { font-size: .72rem; }
   .info-chip-copy span { font-size: .55rem; }
+  .info-sponsors { padding: .3rem .4rem; }
+  .info-sponsors h2 { margin-top: .08rem; font-size: .68rem; }
+  .sponsor-marks--info { gap: .3rem; margin-top: .2rem; }
+  .sponsor-marks--info .sponsor-logo-card { width: 4.35rem; height: 1.22rem; }
+  .sponsor-marks--info .sponsor-logo-card--jane-street { padding: .08rem .16rem; }
+  .sponsor-marks--info .sponsor-logo-card--susquehanna { padding: .1rem .2rem; }
+  .sponsor-marks--info .sponsor-text-mark { padding: .08rem 0 .08rem .25rem; font-size: .44rem; }
   .info-totals { gap: .16rem; margin-top: .3rem; }
   .info-totals div { padding-top: .24rem; }
   .info-totals dt { font-size: .65rem; }

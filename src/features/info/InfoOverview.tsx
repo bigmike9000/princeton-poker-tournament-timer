@@ -1,3 +1,4 @@
+import { SponsorMarks } from '../../components/SponsorMarks'
 import type { TournamentState } from '../../domain/types'
 import { ChipDenominations } from './ChipDenominations'
 
@@ -42,6 +43,11 @@ export function InfoOverview({
                 )
               })}
             </ul>
+          </section>
+          <section className="info-sponsors" aria-labelledby="info-sponsors-title">
+            <p className="info-kicker">Presented by</p>
+            <h2 id="info-sponsors-title">Tournament sponsors</h2>
+            <SponsorMarks labels={state.configuration.sponsorLabels} className="sponsor-marks--info" />
           </section>
           <p className="info-chip-reminder">Keep chips visible and countable.</p>
         </div>

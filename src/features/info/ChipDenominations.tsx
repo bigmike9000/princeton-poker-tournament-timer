@@ -3,9 +3,11 @@ import type { TournamentState } from '../../domain/types'
 import { selectSupplementalChipLines } from './selectSupplementalChipLines'
 
 const CHIPS = [
-  { value: 1, color: 'White', quantity: 10, className: 'chip--white' },
-  { value: 5, color: 'Red', quantity: 8, className: 'chip--red' },
-  { value: 25, color: 'Green', quantity: 6, className: 'chip--green' },
+  { value: 1, color: 'White', supportingLabel: '10 chips', accessibleLabel: '10 white 1-value chips', className: 'chip--white' },
+  { value: 5, color: 'Red', supportingLabel: '8 chips', accessibleLabel: '8 red 5-value chips', className: 'chip--red' },
+  { value: 25, color: 'Green', supportingLabel: '6 chips', accessibleLabel: '6 green 25-value chips', className: 'chip--green' },
+  { value: 100, color: 'Black', supportingLabel: 'Color-up chip', accessibleLabel: 'Black 100-value chip', className: 'chip--black' },
+  { value: 500, color: 'Purple', supportingLabel: 'Color-up chip', accessibleLabel: 'Purple 500-value chip', className: 'chip--purple' },
 ] as const
 
 interface ChipDenominationsProps {
@@ -27,14 +29,14 @@ export function ChipDenominations({ state, chipLines }: ChipDenominationsProps) 
             key={chip.value}
             className="info-chip-card"
             role="group"
-            aria-label={`${chip.quantity} ${chip.color.toLowerCase()} ${chip.value}-value chips`}
+            aria-label={chip.accessibleLabel}
           >
             <span className={`info-chip-disk ${chip.className}`} aria-hidden="true">
               {chip.value}
             </span>
             <span className="info-chip-copy">
               <strong>{chip.color}</strong>
-              <span>{chip.quantity} chips</span>
+              <span>{chip.supportingLabel}</span>
             </span>
           </div>
         ))}

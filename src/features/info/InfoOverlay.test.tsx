@@ -337,6 +337,9 @@ describe('InfoOverlay', () => {
     expect(within(twentyFive).getByText('Green')).toBeVisible()
     expect(within(twentyFive).getByText('6 chips')).toBeVisible()
 
+    expect(overlay.getByRole('group', { name: 'Black 100-value chip' })).toHaveTextContent('Color-up chip')
+    expect(overlay.getByRole('group', { name: 'Purple 500-value chip' })).toHaveTextContent('Color-up chip')
+
     const totals = overlay.getByText('Starting stack').closest('dl')
     expect(totals).not.toBeNull()
     expect(within(totals as HTMLElement).getByText('Starting stack')).toBeVisible()
@@ -345,6 +348,20 @@ describe('InfoOverlay', () => {
     expect(within(totals as HTMLElement).getByText('80')).toBeVisible()
     expect(within(totals as HTMLElement).getByText('Chips in play')).toBeVisible()
     expect(within(totals as HTMLElement).getByText('16,000')).toBeVisible()
+  })
+
+  it('places the shared sponsor marks between prize structure and the chip reminder', () => {
+    render(<App />)
+    const { dialog } = openInfo()
+    const overlay = within(dialog)
+    const prizeRegion = overlay.getByRole('region', { name: 'Prize structure' })
+    const sponsors = overlay.getByRole('region', { name: 'Tournament sponsors' })
+    const reminder = overlay.getByText('Keep chips visible and countable.')
+
+    expect(sponsors).toContainElement(overlay.getByRole('img', { name: 'Jane Street' }))
+    expect(sponsors).toContainElement(overlay.getByRole('img', { name: 'Susquehanna' }))
+    expect(prizeRegion.compareDocumentPosition(sponsors) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(sponsors.compareDocumentPosition(reminder) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
   it('moves between tabs with arrow keys and exposes only the selected tab in the tab order', () => {
