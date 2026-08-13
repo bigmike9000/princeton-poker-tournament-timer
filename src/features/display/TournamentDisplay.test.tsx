@@ -281,9 +281,9 @@ describe('TournamentDisplay', () => {
   it('uses interface typography for operational surfaces while preserving heritage branding', () => {
     const tokenRoot = cssRule(tokensCss, ':root')
 
-    expect(tokenRoot).toMatch(/--font-interface:\s*"Avenir Next",\s*"Segoe UI",\s*ui-sans-serif,\s*system-ui,\s*sans-serif/)
+    expect(tokenRoot).toMatch(/--font-interface:\s*-apple-system,\s*BlinkMacSystemFont,\s*"Segoe UI",\s*ui-sans-serif,\s*system-ui,\s*sans-serif/)
     expect(tokenRoot).toMatch(/--font-heritage:\s*"Iowan Old Style",\s*"Palatino Linotype",\s*Palatino,\s*Georgia,\s*serif/)
-    expect(tokenRoot).toMatch(/--font-numeric:\s*"DIN Alternate",\s*"Arial Narrow",\s*"Aptos Narrow",\s*"Roboto Condensed",\s*ui-sans-serif,\s*system-ui,\s*sans-serif/)
+    expect(tokenRoot).toMatch(/--font-numeric:\s*"SF Pro Display",\s*-apple-system,\s*BlinkMacSystemFont,\s*"Segoe UI",\s*ui-sans-serif,\s*system-ui,\s*sans-serif/)
     expect(cssRule(indexCss, ':root')).toMatch(/font-family:\s*var\(--font-interface\)/)
     expect(displayCss).toMatch(/\.structure-header h2\s*\{[^}]*font-family:\s*var\(--font-interface\)/)
     expect(cssRule(displayCss, '.level-heading')).toMatch(/font-family:\s*var\(--font-heritage\)/)
@@ -294,16 +294,17 @@ describe('TournamentDisplay', () => {
     const procedureRule = cssRule(displayCss, '.break-procedure')
 
     expect(procedureRule).toMatch(/margin:\s*\.55rem\s+0\s+0/)
-    expect(procedureRule).toMatch(/font-size:\s*clamp\(\.74rem,\s*\.9vw,\s*\.88rem\)/)
-    expect(procedureRule).toMatch(/line-height:\s*1\.35/)
+    expect(procedureRule).toMatch(/font-size:\s*clamp\(1rem,\s*1\.3vw,\s*1\.3rem\)/)
+    expect(procedureRule).toMatch(/font-weight:\s*600/)
+    expect(procedureRule).toMatch(/line-height:\s*1\.3/)
     expect(procedureRule).not.toMatch(/border\s*:|background\s*:|box-shadow\s*:/)
   })
 
   it('uses restrained radii and clips grouped public surfaces', () => {
     const tokenRoot = cssRule(tokensCss, ':root')
-    expect(tokenRoot).toMatch(/--radius-compact:\s*\.25rem/)
-    expect(tokenRoot).toMatch(/--radius-control:\s*\.375rem/)
-    expect(tokenRoot).toMatch(/--radius-card:\s*\.5rem/)
+    expect(tokenRoot).toMatch(/--radius-compact:\s*\.375rem/)
+    expect(tokenRoot).toMatch(/--radius-control:\s*\.625rem/)
+    expect(tokenRoot).toMatch(/--radius-card:\s*\.75rem/)
 
     expect(cssRule(displayCss, '.stats-grid')).toMatch(/border-radius:\s*var\(--radius-card\)/)
     expect(cssRule(displayCss, '.stats-grid')).toMatch(/overflow:\s*hidden/)

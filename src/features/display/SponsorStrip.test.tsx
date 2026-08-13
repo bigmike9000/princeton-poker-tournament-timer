@@ -39,10 +39,10 @@ describe('SponsorStrip', () => {
     expect(shortHeightRule).toMatch(/height:\s*1\.85rem/)
     expect(phoneRule).toMatch(/width:\s*5\.5rem/)
     expect(phoneRule).toMatch(/height:\s*1\.5rem/)
-    expect(infoRule).toMatch(/width:\s*5\.9rem/)
-    expect(infoRule).toMatch(/height:\s*1\.65rem/)
-    expect(narrowInfoRule).toMatch(/width:\s*4\.35rem/)
-    expect(narrowInfoRule).toMatch(/height:\s*1\.22rem/)
+    expect(infoRule).toMatch(/width:\s*clamp\(7\.5rem,\s*11vw,\s*10rem\)/)
+    expect(infoRule).toMatch(/height:\s*clamp\(2\.1rem,\s*3\.2vw,\s*2\.8rem\)/)
+    expect(narrowInfoRule).toMatch(/width:\s*4\.8rem/)
+    expect(narrowInfoRule).toMatch(/height:\s*1\.45rem/)
   })
 
   it('contains both intrinsic logo images inside the bounded sponsor cards', () => {

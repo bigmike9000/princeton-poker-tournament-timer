@@ -44,12 +44,10 @@ export function InfoOverview({
               })}
             </ul>
           </section>
-          <section className="info-sponsors" aria-labelledby="info-sponsors-title">
+          <section className="info-sponsors" aria-label="Tournament sponsors">
             <p className="info-kicker">Presented by</p>
-            <h2 id="info-sponsors-title">Tournament sponsors</h2>
             <SponsorMarks labels={state.configuration.sponsorLabels} className="sponsor-marks--info" />
           </section>
-          <p className="info-chip-reminder">Keep chips visible and countable.</p>
         </div>
       </div>
     </>

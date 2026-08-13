@@ -128,7 +128,7 @@ describe('InfoOverlay', () => {
     expect(notationKeyRule).toMatch(/font-size:\s*\.65rem/)
     expect(breakRule).toMatch(/font-size:\s*\.65rem/)
     expect(currentRule).toMatch(/display:\s*none/)
-    expect(totalRule).toMatch(/font-size:\s*\.65rem/)
+    expect(totalRule).toMatch(/font-size:\s*\.58rem/)
   })
 
   it('uses a non-scrolling safe Overview and a scoped scrolling legacy fallback', () => {
@@ -171,7 +171,8 @@ describe('InfoOverlay', () => {
     expect(overlay.getByRole('tabpanel')).toHaveClass('info-page--projector-safe')
     expect(overlay.queryByText('Legacy information exceeds projector layout')).not.toBeInTheDocument()
     expect(overlay.queryByRole('list', { name: 'Tournament blind structure' })).not.toBeInTheDocument()
-    expect(overlay.getByText('Keep chips visible and countable.')).toBeVisible()
+    expect(overlay.queryByText('Keep chips visible and countable.')).not.toBeInTheDocument()
+    expect(overlay.queryByRole('heading', { name: 'Tournament sponsors' })).not.toBeInTheDocument()
     expect(overlay.getAllByRole('listitem', { name: /place prize/i })).toHaveLength(8)
     expect(overlay.getByRole('listitem', { name: '1 place prize, 300' })).toBeVisible()
     expect(overlay.getByRole('listitem', { name: '8 place prize, 50' })).toBeVisible()
@@ -357,18 +358,17 @@ describe('InfoOverlay', () => {
     expect(innerMarkRule).toMatch(/border:\s*\.14rem dashed currentcolor/)
   })
 
-  it('places the shared sponsor marks between prize structure and the chip reminder', () => {
+  it('places an enlarged shared sponsor rack directly beneath the prize structure', () => {
     render(<App />)
     const { dialog } = openInfo()
     const overlay = within(dialog)
     const prizeRegion = overlay.getByRole('region', { name: 'Prize structure' })
     const sponsors = overlay.getByRole('region', { name: 'Tournament sponsors' })
-    const reminder = overlay.getByText('Keep chips visible and countable.')
 
     expect(sponsors).toContainElement(overlay.getByRole('img', { name: 'Jane Street' }))
     expect(sponsors).toContainElement(overlay.getByRole('img', { name: 'Susquehanna' }))
     expect(prizeRegion.compareDocumentPosition(sponsors) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(sponsors.compareDocumentPosition(reminder) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(overlay.queryByText('Keep chips visible and countable.')).not.toBeInTheDocument()
   })
 
   it('moves between tabs with arrow keys and exposes only the selected tab in the tab order', () => {
