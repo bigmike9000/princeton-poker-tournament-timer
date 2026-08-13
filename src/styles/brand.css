@@ -37,20 +37,17 @@
 }
 
 .club-brand-lockup.brand-lockup--display .club-brand-organization {
-  font-family: var(--font-heritage);
-  font-size: clamp(1.05rem, 1.4vw, 1.48rem);
-  font-weight: 700;
-  letter-spacing: .025em;
+  font-size: clamp(.72rem, .9vw, .86rem);
 }
 
 .club-brand-lockup.brand-lockup--display h1 {
   overflow: hidden;
-  color: var(--slate-300);
-  font-size: clamp(.72rem, .86vw, .9rem);
-  font-weight: 650;
-  letter-spacing: .12em;
+  color: var(--ivory-50);
+  font-family: var(--font-heritage);
+  font-size: clamp(1.2rem, 2vw, 1.65rem);
+  font-weight: 600;
+  letter-spacing: -.015em;
   text-overflow: ellipsis;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -74,8 +71,8 @@
 }
 
 @media (max-width: 640px) {
-  .club-brand-lockup.brand-lockup--display .club-brand-organization { font-size: 1rem; }
-  .club-brand-lockup.brand-lockup--display h1 { font-size: .66rem; }
+  .club-brand-lockup.brand-lockup--display .club-brand-organization { font-size: .62rem; }
+  .club-brand-lockup.brand-lockup--display h1 { font-size: 1.1rem; }
   .club-brand-lockup.info-brand { gap: .45rem; }
   .club-brand-lockup.info-brand .club-brand-organization { font-size: .54rem; }
   .club-brand-lockup.info-brand h1 { font-size: .92rem; }

@@ -45,9 +45,12 @@ describe('TournamentDisplay', () => {
 
     expect(lockup).not.toBeNull()
     expect(lockup?.firstElementChild).toHaveAttribute('alt', 'Princeton Poker Club logo')
-    expect(within(lockup as HTMLElement).getByText('Princeton Poker Club')).toHaveClass('club-brand-organization')
+    const organization = within(lockup as HTMLElement).getByText('Princeton Poker Club')
+    expect(organization).toHaveClass('club-brand-organization')
     expect(within(lockup as HTMLElement).getAllByRole('heading', { level: 1 })).toHaveLength(1)
-    expect(within(lockup as HTMLElement).getByRole('heading', { level: 1 })).toHaveTextContent('Test 1')
+    const tournamentName = within(lockup as HTMLElement).getByRole('heading', { level: 1 })
+    expect(tournamentName).toHaveTextContent('Test 1')
+    expect(organization.compareDocumentPosition(tournamentName) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
   it('renders the default sponsor marks in the public footer', () => {
