@@ -87,7 +87,7 @@ describe('InfoOverlay', () => {
 
   it('keeps essential projector information fluid and above readable desktop floors', () => {
     expect(fluidFontFloor('.info-entry-marker')).toBeGreaterThanOrEqual(0.75)
-    expect(fluidFontFloor('.info-entry-ante,\n.info-entry-duration')).toBeGreaterThanOrEqual(0.75)
+    expect(fluidFontFloor('.info-entry-duration')).toBeGreaterThanOrEqual(0.75)
     expect(fluidFontFloor('.info-current-marker')).toBeGreaterThanOrEqual(0.625)
     expect(fluidFontFloor('.info-card ul')).toBeGreaterThanOrEqual(0.82)
   })
@@ -118,7 +118,6 @@ describe('InfoOverlay', () => {
     const narrowStart = displayCss.lastIndexOf('@media (max-width: 640px)')
     const narrowCss = displayCss.slice(narrowStart)
     const metadataRule = cssRule(narrowCss, `.info-entry-marker,
-  .info-entry-ante,
   .info-entry-duration`)
     const breakRule = cssRule(narrowCss, '.info-structure-entry--break strong')
     const currentRule = cssRule(narrowCss, '.info-current-marker')
@@ -433,8 +432,12 @@ describe('InfoOverlay', () => {
     const user = userEvent.setup()
     const state = createInitialState()
     const notedLevel = state.structure.find((entry) => entry.id === 'level-13')
+    const traditionalAnte = state.structure.find((entry) => entry.id === 'level-2')
     if (notedLevel?.kind !== 'level') throw new Error('Missing test level')
+    if (traditionalAnte?.kind !== 'level') throw new Error('Missing traditional-ante test level')
     notedLevel.note = 'Director-only final table setup'
+    traditionalAnte.anteType = 'traditional'
+    traditionalAnte.ante = 1
     saveSnapshot(localStorage, state, Date.now())
 
     render(<App />)
@@ -445,6 +448,7 @@ describe('InfoOverlay', () => {
 
     const structure = overlay.getByRole('list', { name: 'Tournament blind structure' })
     const entries = within(structure).getAllByRole('listitem')
+    expect(overlay.getByText('SB / BB / ANTE')).toBeVisible()
     expect(entries).toHaveLength(19)
     expect(entries.slice(0, 11).every((entry) => entry.dataset.column === '1')).toBe(true)
     expect(entries.slice(11).every((entry) => entry.dataset.column === '2')).toBe(true)
@@ -457,9 +461,17 @@ describe('InfoOverlay', () => {
     expect(entries[0]).toHaveAttribute('data-state', 'current')
     expect(entries[0]).toHaveTextContent('CURRENT')
     expect(entries[0]).toHaveTextContent('Level 1')
-    expect(entries[0]).toHaveTextContent('1 / 2')
-    expect(entries[0]).toHaveTextContent('NO ANTE')
+    expect(within(entries[0]).getByText('1 / 2', { exact: true })).toBeVisible()
     expect(entries[0]).toHaveTextContent('12 min')
+    expect(entries[0]).toHaveAccessibleName('Level 1, small blind 1, big blind 2, no ante, 12 min')
+
+    expect(within(entries[1]).getByText('2 / 4 / 1', { exact: true })).toBeVisible()
+    expect(entries[1]).toHaveAccessibleName('Level 2, small blind 2, big blind 4, ante 1, 12 min')
+
+    expect(within(entries[6]).getByText('10 / 20 / 20', { exact: true })).toBeVisible()
+    expect(entries[6]).toHaveAccessibleName(
+      'Level 6, small blind 10, big blind 20, big-blind ante 20, 15 min',
+    )
 
     const firstBreak = entries[5]
     expect(firstBreak).toHaveAccessibleName('Break, 10 min')
@@ -474,9 +486,11 @@ describe('InfoOverlay', () => {
     expect(structure).not.toHaveTextContent(/chip up to 25s and 100s/i)
 
     expect(entries[18]).toHaveTextContent('Level 17')
-    expect(entries[18]).toHaveTextContent('500 / 1,000')
-    expect(entries[18]).toHaveTextContent('BBA 1,000')
+    expect(within(entries[18]).getByText('500 / 1,000 / 1,000', { exact: true })).toBeVisible()
     expect(entries[18]).toHaveTextContent('Until end')
+    for (const entry of entries) {
+      expect(entry).not.toHaveTextContent(/NO ANTE|BBA|ANTE \d/i)
+    }
     expect(structure).not.toHaveTextContent('Director-only final table setup')
     expect(entries[14]).not.toHaveAccessibleName(/Director-only final table setup/)
     expect(scrollIntoView).not.toHaveBeenCalled()

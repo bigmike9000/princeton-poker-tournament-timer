@@ -1441,7 +1441,7 @@ select:focus-visible {
 
 .info-structure-heading {
   display: flex;
-  align-items: baseline;
+  align-items: end;
   justify-content: space-between;
   gap: 1rem;
 }
@@ -1452,6 +1452,17 @@ select:focus-visible {
   font-family: var(--font-heritage);
   font-size: clamp(1.12rem, 1.7vw, 1.55rem);
   font-weight: 600;
+}
+
+.info-structure-key {
+  margin: 0 0 .08rem;
+  color: var(--brass-400);
+  font-family: var(--font-numeric);
+  font-size: clamp(.72rem, .8vw, .88rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .1em;
+  white-space: nowrap;
 }
 
 .info-structure-list {
@@ -1468,8 +1479,8 @@ select:focus-visible {
 
 .info-structure-entry {
   display: grid;
-  grid-template-columns: minmax(5rem, .82fr) minmax(5.5rem, 1fr) minmax(4.5rem, auto);
-  grid-template-rows: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(5rem, .82fr) minmax(8rem, 1.2fr) minmax(4.5rem, auto);
+  grid-template-rows: minmax(0, 1fr);
   min-height: 0;
   align-items: center;
   gap: 0 .55rem;
@@ -1523,17 +1534,11 @@ select:focus-visible {
   letter-spacing: .025em;
 }
 
-.info-entry-ante,
 .info-entry-duration {
   color: var(--slate-300);
   font-size: clamp(.82rem, .85vw, 1rem);
   font-weight: 750;
   letter-spacing: .055em;
-}
-
-.info-entry-ante {
-  grid-column: 2;
-  grid-row: 2;
 }
 
 .info-entry-duration {
@@ -1617,11 +1622,11 @@ select:focus-visible {
   .info-prize-list li { min-height: 1.75rem; padding: .08rem .15rem; }
   .info-chip-reminder { padding: .35rem .45rem; font-size: .65rem; }
   .info-page--structure { gap: .25rem; padding: .35rem; }
+  .info-structure-key { margin-bottom: .04rem; font-size: .58rem; letter-spacing: .035em; }
   .info-structure-list { gap: .15rem .25rem; }
-  .info-structure-entry { grid-template-columns: minmax(2.6rem, .78fr) minmax(2.8rem, 1fr) minmax(2.3rem, auto); gap: 0 .2rem; padding: .08rem .2rem; }
+  .info-structure-entry { grid-template-columns: minmax(2.6rem, .72fr) minmax(4.6rem, 1.25fr) minmax(2.3rem, auto); gap: 0 .2rem; padding: .08rem .2rem; }
   .info-entry-heading { gap: .15rem; }
   .info-entry-marker,
-  .info-entry-ante,
   .info-entry-duration { font-size: .65rem; letter-spacing: .015em; }
   .info-structure-entry strong { font-size: .72rem; letter-spacing: 0; }
   .info-current-marker { padding: .04rem .1rem; font-size: .6rem; letter-spacing: 0; }

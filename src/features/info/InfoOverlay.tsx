@@ -177,8 +177,14 @@ export function InfoOverlay({ open, onClose, onAfterClose }: InfoOverlayProps) {
             aria-labelledby="info-structure-tab"
           >
             <div className="info-structure-heading">
-              <p className="info-kicker">Full schedule</p>
-              <h2 id="info-structure-title">Blind structure</h2>
+              <div>
+                <p className="info-kicker">Full schedule</p>
+                <h2 id="info-structure-title">Blind structure</h2>
+              </div>
+              <p
+                className="info-structure-key"
+                aria-label="Blind values are shown as small blind, big blind, ante"
+              >SB / BB / ANTE</p>
             </div>
             <InfoStructure state={state} />
           </section>

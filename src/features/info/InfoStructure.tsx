@@ -8,10 +8,16 @@ function formatNumber(value: number): string {
   return value.toLocaleString('en-US')
 }
 
-function anteLabel(entry: PokerLevel): string {
-  if (entry.anteType === 'none' || entry.ante === 0) return 'NO ANTE'
-  const prefix = entry.anteType === 'big-blind' ? 'BBA' : 'ANTE'
-  return `${prefix} ${formatNumber(entry.ante)}`
+function visualLevel(entry: PokerLevel): string {
+  const ante = entry.anteType === 'none' || entry.ante === 0 ? [] : [entry.ante]
+  return [entry.smallBlind, entry.bigBlind, ...ante].map(formatNumber).join(' / ')
+}
+
+function accessibleAnte(entry: PokerLevel): string {
+  if (entry.anteType === 'none' || entry.ante === 0) return 'no ante'
+  return entry.anteType === 'big-blind'
+    ? `big-blind ante ${formatNumber(entry.ante)}`
+    : `ante ${formatNumber(entry.ante)}`
 }
 
 interface InfoStructureProps {
@@ -44,12 +50,13 @@ export function InfoStructure({ state }: InfoStructureProps) {
         }
 
         const levelNumber = selectPokerLevelNumber(state, index)
-        const blinds = `${formatNumber(entry.smallBlind)} / ${formatNumber(entry.bigBlind)}`
-        const ante = anteLabel(entry)
+        const values = visualLevel(entry)
+        const ante = accessibleAnte(entry)
         const duration = durationLabel(entry)
         const label = [
           `Level ${levelNumber}`,
-          blinds,
+          `small blind ${formatNumber(entry.smallBlind)}`,
+          `big blind ${formatNumber(entry.bigBlind)}`,
           ante,
           duration,
         ].filter(Boolean).join(', ')
@@ -68,8 +75,7 @@ export function InfoStructure({ state }: InfoStructureProps) {
               <span className="info-entry-marker">Level {levelNumber}</span>
               {current && <span className="info-current-marker">CURRENT</span>}
             </div>
-            <strong>{blinds}</strong>
-            <span className="info-entry-ante">{ante}</span>
+            <strong>{values}</strong>
             <span className="info-entry-duration">{duration}</span>
           </li>
         )
