@@ -98,7 +98,7 @@ export function PresetManager() {
   return (
     <div className="director-section preset-manager">
       <div className="section-intro">
-        <div><span className="section-kicker">Saved structures</span><h2>Presets</h2><p>Save this blind schedule, create variants, or load a structure for a new event.</p></div>
+        <div><span className="section-kicker">Saved structures</span><h2>Presets</h2></div>
       </div>
 
       <section className="save-preset-card">

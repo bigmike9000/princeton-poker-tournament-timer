@@ -392,16 +392,22 @@ describe('Structure editor responsive CSS', () => {
     expect(headingRule).toMatch(/background:/)
   })
 
-  it('renders one flat table surface with only row dividers', () => {
+  it('renders one spreadsheet surface with flat cells and row dividers', () => {
     const tableRule = cssRule(directorCss, '.structure-editor-table')
     const rowRule = cssRule(directorCss, '.structure-editor-row')
+    const inputRule = cssRule(directorCss, `.director-overlay .structure-editor-row input,
+.director-overlay .structure-editor-row select`)
 
     expect(tableRule).toMatch(/border:\s*0/)
-    expect(tableRule).toMatch(/background:\s*transparent/)
+    expect(tableRule).toMatch(/background:\s*rgb/)
     expect(tableRule).not.toMatch(/box-shadow:/)
     expect(rowRule).toMatch(/border:\s*0/)
     expect(rowRule).toMatch(/border-bottom:\s*1px solid/)
     expect(rowRule).not.toMatch(/border-radius:/)
+    expect(inputRule).toMatch(/border:\s*0/)
+    expect(inputRule).toMatch(/border-radius:\s*0/)
+    expect(inputRule).toMatch(/background:\s*transparent/)
+    expect(inputRule).toMatch(/box-shadow:\s*none/)
   })
 
   it('shares the exact seven-column desktop template between header and rows', () => {

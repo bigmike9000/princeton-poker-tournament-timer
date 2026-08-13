@@ -295,10 +295,10 @@ describe('TournamentDisplay', () => {
   it('renders active break instructions as a plain text line', () => {
     const procedureRule = cssRule(displayCss, '.break-procedure')
 
-    expect(procedureRule).toMatch(/margin:\s*\.55rem\s+0\s+0/)
-    expect(procedureRule).toMatch(/font-size:\s*clamp\(1rem,\s*1\.3vw,\s*1\.3rem\)/)
-    expect(procedureRule).toMatch(/font-weight:\s*600/)
-    expect(procedureRule).toMatch(/line-height:\s*1\.3/)
+    expect(procedureRule).toMatch(/margin:\s*clamp\(\.75rem,\s*1\.5vh,\s*1\.2rem\) auto 0/)
+    expect(procedureRule).toMatch(/font-size:\s*clamp\(1\.08rem,\s*1\.45vw,\s*1\.45rem\)/)
+    expect(procedureRule).toMatch(/font-weight:\s*500/)
+    expect(procedureRule).toMatch(/text-align:\s*center/)
     expect(procedureRule).not.toMatch(/border\s*:|background\s*:|box-shadow\s*:/)
   })
 

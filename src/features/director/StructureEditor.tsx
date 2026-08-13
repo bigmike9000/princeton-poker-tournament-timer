@@ -86,7 +86,7 @@ export function StructureEditor() {
       <div className="structure-live-tools">
         <div className="section-intro structure-live-heading">
           <div>
-            <span className="section-kicker">Live entry</span>
+            <span className="section-kicker">Current level</span>
             <h2>{selectEntryLabel(state, state.runtime.currentEntryIndex)}</h2>
             <p>Entry {state.runtime.currentEntryIndex + 1} of {state.structure.length} · {durationLabel(state.structure[state.runtime.currentEntryIndex])}</p>
           </div>
@@ -96,7 +96,7 @@ export function StructureEditor() {
 
       <div className="structure-editor-heading">
         <div className="section-intro">
-          <div><span className="section-kicker">Blind schedule</span><h2>Structure editor</h2><p>Edit a draft, validate it, then apply every change at once.</p></div>
+          <div><span className="section-kicker">Blind schedule</span><h2>Structure editor</h2></div>
         </div>
         <div className="structure-add-actions">
           <button onClick={addLevel}>+ Add level</button>
