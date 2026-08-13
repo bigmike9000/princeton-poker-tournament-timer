@@ -119,13 +119,15 @@ describe('InfoOverlay', () => {
     const narrowCss = displayCss.slice(narrowStart)
     const metadataRule = cssRule(narrowCss, `.info-entry-marker,
   .info-entry-duration`)
+    const notationKeyRule = cssRule(narrowCss, '.info-structure-key')
     const breakRule = cssRule(narrowCss, '.info-structure-entry--break strong')
     const currentRule = cssRule(narrowCss, '.info-current-marker')
     const totalRule = cssRule(narrowCss, '.info-totals dt')
 
     expect(metadataRule).toMatch(/font-size:\s*\.65rem/)
+    expect(notationKeyRule).toMatch(/font-size:\s*\.65rem/)
     expect(breakRule).toMatch(/font-size:\s*\.65rem/)
-    expect(currentRule).toMatch(/font-size:\s*\.6rem/)
+    expect(currentRule).toMatch(/display:\s*none/)
     expect(totalRule).toMatch(/font-size:\s*\.65rem/)
   })
 

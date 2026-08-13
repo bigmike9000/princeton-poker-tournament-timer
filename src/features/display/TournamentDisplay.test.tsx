@@ -242,11 +242,13 @@ describe('TournamentDisplay', () => {
 
   it('keeps public utility glyph controls square and projector-safe', () => {
     const buttonRule = cssRule(displayCss, '.utility-icon-button')
+    const minimumRule = cssRule(displayCss, '.icon-button.utility-icon-button')
     const iconRule = cssRule(displayCss, '.control-icon')
 
     expect(buttonRule).toMatch(/width:\s*3\.4rem/)
     expect(buttonRule).toMatch(/height:\s*3\.4rem/)
     expect(buttonRule).toMatch(/padding:\s*0/)
+    expect(minimumRule).toMatch(/min-width:\s*3\.4rem/)
     expect(iconRule).toMatch(/width:\s*1\.35rem/)
     expect(iconRule).toMatch(/height:\s*1\.35rem/)
   })

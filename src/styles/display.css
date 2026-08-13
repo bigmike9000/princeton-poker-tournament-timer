@@ -746,6 +746,10 @@ select:focus-visible {
   padding: 0;
 }
 
+.icon-button.utility-icon-button {
+  min-width: 3.4rem;
+}
+
 .control-icon {
   display: block;
   width: 1.35rem;
@@ -1535,17 +1539,13 @@ select:focus-visible {
 }
 
 .info-entry-duration {
-  color: var(--slate-300);
-  font-size: clamp(.82rem, .85vw, 1rem);
-  font-weight: 750;
-  letter-spacing: .055em;
-}
-
-.info-entry-duration {
   grid-column: 3;
   grid-row: 1 / -1;
   justify-self: end;
   color: var(--orange-400);
+  font-size: clamp(.82rem, .85vw, 1rem);
+  font-weight: 750;
+  letter-spacing: .055em;
   white-space: nowrap;
 }
 
@@ -1622,14 +1622,14 @@ select:focus-visible {
   .info-prize-list li { min-height: 1.75rem; padding: .08rem .15rem; }
   .info-chip-reminder { padding: .35rem .45rem; font-size: .65rem; }
   .info-page--structure { gap: .25rem; padding: .35rem; }
-  .info-structure-key { margin-bottom: .04rem; font-size: .58rem; letter-spacing: .035em; }
+  .info-structure-key { margin-bottom: .04rem; font-size: .65rem; letter-spacing: .035em; }
   .info-structure-list { gap: .15rem .25rem; }
   .info-structure-entry { grid-template-columns: minmax(2.6rem, .72fr) minmax(4.6rem, 1.25fr) minmax(2.3rem, auto); gap: 0 .2rem; padding: .08rem .2rem; }
   .info-entry-heading { gap: .15rem; }
   .info-entry-marker,
   .info-entry-duration { font-size: .65rem; letter-spacing: .015em; }
   .info-structure-entry strong { font-size: .72rem; letter-spacing: 0; }
-  .info-current-marker { padding: .04rem .1rem; font-size: .6rem; letter-spacing: 0; }
+  .info-current-marker { display: none; }
   .info-structure-entry--break strong { font-size: .65rem; letter-spacing: .005em; }
   .info-legacy-notice { font-size: .65rem; }
 }
