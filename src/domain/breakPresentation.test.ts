@@ -13,7 +13,8 @@ describe('breakPresentation', () => {
 
   it.each([
     ['Chip up to 5s', 'Count and stack white chips in stacks of 10'],
-    ['Chip up to 25s and 100s', 'Count and stack red chips'],
+    ['Chip up to 25s and 100s', 'Count and stack red chips in stacks of 10'],
+    ['Count and stack red chips', 'Count and stack red chips in stacks of 10'],
   ])('updates former bundled instruction %j for saved tournaments', (label, subtitle) => {
     expect(breakPresentation({ id: 'break', kind: 'break', durationSeconds: 600, label })).toEqual({
       heading: 'BREAK — 10 MIN',

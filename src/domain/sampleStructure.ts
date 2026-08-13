@@ -16,7 +16,7 @@ export const sampleStructure: StructureEntry[] = [
   { id: 'level-8', kind: 'level', durationSeconds: 900, smallBlind: 20, bigBlind: 40, ante: 40, anteType: 'big-blind' },
   { id: 'level-9', kind: 'level', durationSeconds: 900, smallBlind: 30, bigBlind: 60, ante: 60, anteType: 'big-blind' },
   { id: 'level-10', kind: 'level', durationSeconds: 900, smallBlind: 40, bigBlind: 80, ante: 80, anteType: 'big-blind' },
-  { id: 'break-2', kind: 'break', durationSeconds: 600, label: 'Count and stack red chips' },
+  { id: 'break-2', kind: 'break', durationSeconds: 600, label: 'Count and stack red chips in stacks of 10' },
   { id: 'level-11', kind: 'level', durationSeconds: 900, smallBlind: 50, bigBlind: 100, ante: 100, anteType: 'big-blind' },
   { id: 'level-12', kind: 'level', durationSeconds: 900, smallBlind: 75, bigBlind: 150, ante: 150, anteType: 'big-blind' },
   { id: 'level-13', kind: 'level', durationSeconds: 900, smallBlind: 100, bigBlind: 200, ante: 200, anteType: 'big-blind' },

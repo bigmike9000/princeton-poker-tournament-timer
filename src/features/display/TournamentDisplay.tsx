@@ -37,9 +37,9 @@ export function TournamentDisplay({
         <section className="tournament-stage">
           <header className="brand-header">
             <ClubBrandLockup
-              className="brand-lockup--display"
-              logoClassName="club-logo"
-              logoSize={64}
+              className="brand-lockup--display director-brand"
+              logoClassName="director-logo"
+              logoSize={46}
               organizationName={state.configuration.organizationName}
               title={state.configuration.tournamentName}
             />

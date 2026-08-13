@@ -9,7 +9,8 @@ export interface BreakPresentation {
 
 const formerBundledMessages: Readonly<Record<string, string>> = {
   'Chip up to 5s': 'Count and stack white chips in stacks of 10',
-  'Chip up to 25s and 100s': 'Count and stack red chips',
+  'Chip up to 25s and 100s': 'Count and stack red chips in stacks of 10',
+  'Count and stack red chips': 'Count and stack red chips in stacks of 10',
 }
 
 function normalized(value: string): string {

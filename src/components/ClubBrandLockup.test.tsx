@@ -25,11 +25,11 @@ describe('ClubBrandLockup styles', () => {
 
     expect(cssRule('.club-brand-lockup .club-brand-organization')).toMatch(/color:\s*var\(--orange-400\)/)
     expect(cssRule('.club-brand-lockup .club-brand-organization')).toMatch(/text-transform:\s*uppercase/)
-    expect(organization).toMatch(/font-size:\s*clamp\(\.7[0-9]rem/)
+    expect(organization).toMatch(/font-size:\s*\.62rem/)
     expect(organization).not.toMatch(/font-family:\s*var\(--font-heritage\)/)
     expect(title).toMatch(/color:\s*var\(--ivory-50\)/)
     expect(title).toMatch(/font-family:\s*var\(--font-heritage\)/)
-    expect(title).toMatch(/font-size:\s*clamp\(1\.[0-9]+rem/)
+    expect(title).toMatch(/font-size:\s*1\.15rem/)
     expect(title).not.toMatch(/text-transform:\s*uppercase/)
   })
 })

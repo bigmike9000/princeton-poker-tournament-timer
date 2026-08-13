@@ -47,7 +47,9 @@ describe('TournamentDisplay', () => {
     const lockup = container.querySelector('.club-brand-lockup.brand-lockup--display')
 
     expect(lockup).not.toBeNull()
+    expect(lockup).toHaveClass('director-brand')
     expect(lockup?.firstElementChild).toHaveAttribute('alt', 'Princeton Poker Club logo')
+    expect(lockup?.firstElementChild).toHaveClass('director-logo')
     const organization = within(lockup as HTMLElement).getByText('Princeton Poker Club')
     expect(organization).toHaveClass('club-brand-organization')
     expect(within(lockup as HTMLElement).getAllByRole('heading', { level: 1 })).toHaveLength(1)
@@ -129,7 +131,7 @@ describe('TournamentDisplay', () => {
     expect(within(currentBreak).getByRole('heading', { name: 'BREAK' })).toBeVisible()
     expect(currentBreak).not.toHaveTextContent('Count and stack red chips')
     const procedure = screen.getByRole('status')
-    expect(procedure).toHaveTextContent('Count and stack red chips')
+    expect(procedure).toHaveTextContent('Count and stack red chips in stacks of 10')
     expect(procedure).not.toHaveTextContent('Break procedure')
   })
 
@@ -281,9 +283,9 @@ describe('TournamentDisplay', () => {
   it('uses interface typography for operational surfaces while preserving heritage branding', () => {
     const tokenRoot = cssRule(tokensCss, ':root')
 
-    expect(tokenRoot).toMatch(/--font-interface:\s*-apple-system,\s*BlinkMacSystemFont,\s*"Segoe UI",\s*ui-sans-serif,\s*system-ui,\s*sans-serif/)
-    expect(tokenRoot).toMatch(/--font-heritage:\s*"Iowan Old Style",\s*"Palatino Linotype",\s*Palatino,\s*Georgia,\s*serif/)
-    expect(tokenRoot).toMatch(/--font-numeric:\s*"SF Pro Display",\s*-apple-system,\s*BlinkMacSystemFont,\s*"Segoe UI",\s*ui-sans-serif,\s*system-ui,\s*sans-serif/)
+    expect(tokenRoot).toMatch(/--font-interface:\s*"Gill Sans",\s*"Avenir Next",\s*Avenir,\s*"Segoe UI",\s*ui-sans-serif,\s*system-ui,\s*sans-serif/)
+    expect(tokenRoot).toMatch(/--font-heritage:\s*Baskerville,\s*"Iowan Old Style",\s*"Palatino Linotype",\s*Palatino,\s*Georgia,\s*serif/)
+    expect(tokenRoot).toMatch(/--font-numeric:\s*"Avenir Next Condensed",\s*"Arial Narrow",\s*"Roboto Condensed",\s*"Segoe UI",\s*sans-serif/)
     expect(cssRule(indexCss, ':root')).toMatch(/font-family:\s*var\(--font-interface\)/)
     expect(displayCss).toMatch(/\.structure-header h2\s*\{[^}]*font-family:\s*var\(--font-interface\)/)
     expect(cssRule(displayCss, '.level-heading')).toMatch(/font-family:\s*var\(--font-heritage\)/)

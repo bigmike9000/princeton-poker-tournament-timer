@@ -23,7 +23,7 @@
 .club-brand-lockup .club-brand-organization {
   color: var(--orange-400);
   font-size: .62rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: .15em;
   text-transform: uppercase;
 }
@@ -37,16 +37,16 @@
 }
 
 .club-brand-lockup.brand-lockup--display .club-brand-organization {
-  font-size: clamp(.72rem, .9vw, .86rem);
+  font-size: .62rem;
 }
 
 .club-brand-lockup.brand-lockup--display h1 {
   overflow: hidden;
   color: var(--ivory-50);
   font-family: var(--font-heritage);
-  font-size: clamp(1.2rem, 2vw, 1.65rem);
+  font-size: 1.15rem;
   font-weight: 600;
-  letter-spacing: -.015em;
+  letter-spacing: .025em;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

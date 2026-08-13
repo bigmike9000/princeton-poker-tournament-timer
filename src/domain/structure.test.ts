@@ -16,7 +16,7 @@ describe('PPC default structure', () => {
       [10, 20, 20, 'big-blind', 900], [15, 30, 30, 'big-blind', 900],
       [20, 40, 40, 'big-blind', 900], [30, 60, 60, 'big-blind', 900],
       [40, 80, 80, 'big-blind', 900],
-      ['break', 600, 'Count and stack red chips'],
+      ['break', 600, 'Count and stack red chips in stacks of 10'],
       [50, 100, 100, 'big-blind', 900], [75, 150, 150, 'big-blind', 900],
       [100, 200, 200, 'big-blind', 900], [150, 300, 300, 'big-blind', 900],
       [200, 400, 400, 'big-blind', 900],
@@ -60,7 +60,7 @@ describe('PPC default structure', () => {
     expect(levels.every((entry) => entry.note === undefined)).toBe(true)
     expect(sampleStructure.filter((entry) => entry.kind === 'break').map((entry) => entry.label)).toEqual([
       'Count and stack white chips in stacks of 10',
-      'Count and stack red chips',
+      'Count and stack red chips in stacks of 10',
     ])
   })
 
