@@ -35,8 +35,25 @@ function renderHarness({ players, startingPlayers }: { players: number; starting
 }
 
 describe('PlayerCountControl', () => {
-  it('keeps the editable player count target at the full control height', () => {
-    expect(cssRule(displayCss, '.player-stepper input')).toMatch(/min-height:\s*3\.4rem/)
+  it('keeps the player stepper at the shared 3.4rem control height', () => {
+    const stepperRule = cssRule(displayCss, '.player-stepper')
+
+    expect(stepperRule).toMatch(/(?:^|\n)\s*height:\s*3\.4rem/)
+    expect(stepperRule).toMatch(/(?:^|\n)\s*min-height:\s*3\.4rem/)
+  })
+
+  it('positions the player label inside a full-height editable center', () => {
+    const centerRule = cssRule(displayCss, '.player-stepper div')
+    const labelRule = cssRule(displayCss, '.player-stepper span')
+    const inputRule = cssRule(displayCss, '.player-stepper input')
+
+    expect(centerRule).toMatch(/position:\s*relative/)
+    expect(centerRule).toMatch(/padding:\s*0\s+\.65rem/)
+    expect(labelRule).toMatch(/position:\s*absolute/)
+    expect(labelRule).toMatch(/top:\s*\.42rem/)
+    expect(inputRule).toMatch(/height:\s*100%/)
+    expect(inputRule).toMatch(/min-height:\s*2\.75rem/)
+    expect(inputRule).toMatch(/padding:\s*1\.05rem\s+\.35rem\s+0/)
   })
 
   it('commits a typed player count on Enter', async () => {

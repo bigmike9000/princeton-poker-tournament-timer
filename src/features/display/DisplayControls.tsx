@@ -42,7 +42,7 @@ export function DisplayControls({
           {running ? 'Pause' : state.runtime.status === 'paused' ? 'Resume' : 'Start'}
         </button>
         <button
-          className="control-button"
+          className="control-button control-button--nav"
           disabled={state.runtime.currentEntryIndex === 0}
           onClick={() => dispatch({ type: 'GO_TO_ENTRY', index: state.runtime.currentEntryIndex - 1, now: now() })}
           aria-label="Previous level"
@@ -50,7 +50,7 @@ export function DisplayControls({
           <span aria-hidden="true">‹</span> Prev
         </button>
         <button
-          className="control-button"
+          className="control-button control-button--nav"
           disabled={state.runtime.currentEntryIndex === state.structure.length - 1}
           onClick={() => dispatch({ type: 'GO_TO_ENTRY', index: state.runtime.currentEntryIndex + 1, now: now() })}
           aria-label="Next level"

@@ -740,7 +740,7 @@ select:focus-visible {
   border-radius: var(--radius-control);
 }
 
-.control-button:hover,
+.control-button:hover:not(:disabled),
 .icon-button:hover,
 .director-button:hover,
 .player-stepper button:hover:not(:disabled) {
@@ -766,6 +766,36 @@ select:focus-visible {
 
 .icon-button.utility-icon-button {
   min-width: 3.4rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+}
+
+.control-button--nav {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.control-button--nav:hover:not(:disabled),
+.control-button--nav:focus-visible {
+  color: var(--ivory-50);
+  background: rgb(255 249 232 / 7%);
+}
+
+.icon-button.utility-icon-button:hover:not(:disabled) {
+  color: var(--ivory-50);
+  background: rgb(255 249 232 / 7%);
+}
+
+.icon-button.utility-icon-button:focus-visible {
+  color: var(--ivory-50);
+  background: rgb(255 249 232 / 7%);
+}
+
+.icon-button.utility-icon-button:active:not(:disabled) {
+  background: rgb(217 121 43 / 14%);
 }
 
 .control-icon {
@@ -779,8 +809,7 @@ select:focus-visible {
   stroke-width: 1.7;
 }
 
-.utility-icon-button--active {
-  border-color: rgb(217 121 43 / 62%);
+.icon-button.utility-icon-button.utility-icon-button--active {
   color: var(--orange-400);
   background: rgb(217 121 43 / 9%);
 }
@@ -815,6 +844,7 @@ select:focus-visible {
 .player-stepper {
   display: grid;
   grid-template-columns: 3.4rem minmax(5.2rem, auto) 3.4rem;
+  height: 3.4rem;
   min-height: 3.4rem;
   overflow: hidden;
   align-items: stretch;
@@ -839,17 +869,19 @@ select:focus-visible {
 }
 
 .player-stepper div {
-  display: grid;
+  position: relative;
   min-width: 6rem;
-  place-content: center;
-  gap: .08rem;
   border-right: 1px solid var(--line);
   border-left: 1px solid var(--line);
-  padding: .28rem .65rem;
+  padding: 0 .65rem;
   text-align: center;
 }
 
 .player-stepper span {
+  position: absolute;
+  top: .42rem;
+  right: 0;
+  left: 0;
   color: var(--slate-400);
   font-size: .55rem;
   font-weight: 800;
@@ -860,9 +892,10 @@ select:focus-visible {
 
 .player-stepper input {
   width: 100%;
-  min-height: 3.4rem;
+  height: 100%;
+  min-height: 2.75rem;
   border: 0;
-  padding: 0 .35rem;
+  padding: 1.05rem .35rem 0;
   color: var(--ivory-50);
   background: transparent;
   font-family: var(--font-numeric);

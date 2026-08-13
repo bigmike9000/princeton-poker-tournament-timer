@@ -397,6 +397,40 @@ describe('TournamentDisplay', () => {
     expect(iconRule).toMatch(/height:\s*1\.35rem/)
   })
 
+  it('uses ghost navigation and circular utility interaction surfaces', () => {
+    const { container } = renderDisplay()
+    const controls = within(screen.getByRole('navigation', { name: 'Tournament controls' }))
+    const navRule = cssRule(displayCss, '.control-button--nav')
+    const utilitySizeRule = cssRule(displayCss, '.utility-icon-button')
+    const utilityRule = cssRule(displayCss, '.icon-button.utility-icon-button')
+    const hoverRule = cssRule(displayCss, '.icon-button.utility-icon-button:hover:not(:disabled)')
+    const focusRule = cssRule(displayCss, '.icon-button.utility-icon-button:focus-visible')
+    const activeRule = cssRule(displayCss, '.icon-button.utility-icon-button:active:not(:disabled)')
+
+    expect(controls.getByRole('button', { name: 'Previous level' })).toHaveClass('control-button--nav')
+    expect(controls.getByRole('button', { name: 'Next level' })).toHaveClass('control-button--nav')
+    expect(navRule).toMatch(/border:\s*0/)
+    expect(navRule).toMatch(/background:\s*transparent/)
+    expect(navRule).toMatch(/box-shadow:\s*none/)
+    expect(utilityRule).toMatch(/border:\s*0/)
+    expect(utilityRule).toMatch(/background:\s*transparent/)
+    expect(utilityRule).toMatch(/box-shadow:\s*none/)
+    expect(utilitySizeRule).toMatch(/width:\s*3\.4rem/)
+    expect(utilitySizeRule).toMatch(/height:\s*3\.4rem/)
+    expect(utilityRule).toMatch(/border-radius:\s*50%/)
+    expect(hoverRule).toMatch(/background:\s*rgb\(255 249 232 \/ 7%\)/)
+    expect(focusRule).toMatch(/background:\s*rgb\(255 249 232 \/ 7%\)/)
+    expect(activeRule).toMatch(/background:\s*rgb\(217 121 43 \/ 14%\)/)
+    expect(container.querySelector('.control-button--start')).toHaveClass('control-button--start')
+  })
+
+  it('keeps disabled ghost navigation out of the generic hover surface', () => {
+    renderDisplay()
+
+    expect(screen.getByRole('button', { name: 'Previous level' })).toBeDisabled()
+    expect(displayCss).toMatch(/\.control-button:hover:not\(:disabled\)\s*,/)
+  })
+
   it('updates player statistics from the editable player count', async () => {
     const user = userEvent.setup()
     renderDisplay()
